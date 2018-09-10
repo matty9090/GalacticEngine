@@ -67,7 +67,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
-        HWND hwnd = CreateWindowEx(0, L"GalacticEngineWindowClass", L"GalacticEngine", WS_OVERLAPPEDWINDOW,
+        HWND hwnd = CreateWindowEx(0, L"GalacticEngineWindowClass", L"GalacticEngine", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
             CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
             nullptr);
         // TODO: Change to CreateWindowEx(WS_EX_TOPMOST, L"GalacticEngineWindowClass", L"GalacticEngine", WS_POPUP,

@@ -92,6 +92,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalIncludeDirectories>Inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -107,6 +108,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>Inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -125,6 +127,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalIncludeDirectories>Inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,6 +147,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>Inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,11 +161,23 @@
     <Manifest Include="settings.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Inc\Body\IBody.hpp" />
+    <ClInclude Include="Inc\Body\IPlanet.hpp" />
+    <ClInclude Include="Inc\Body\Planet.hpp" />
+    <ClInclude Include="Inc\GalacticEngine.hpp" />
+    <ClInclude Include="Inc\pch.h" />
+    <ClInclude Include="Inc\Render\IRenderable.hpp" />
+    <ClInclude Include="Inc\Render\PlanetRendererFactory.hpp" />
+    <ClInclude Include="Inc\Render\PlanetRendererHigh.hpp" />
+    <ClInclude Include="Inc\Render\PlanetRendererLow.hpp" />
+    <ClInclude Include="Inc\Render\PlanetRendererMed.hpp" />
     <ClInclude Include="Src\Game.h" />
     <ClInclude Include="Src\pch.h" />
     <ClInclude Include="Src\StepTimer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Body\Planet.cpp" />
+    <ClCompile Include="Src\GalacticEngine.cpp" />
     <ClCompile Include="Src\Game.cpp" />
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\pch.cpp">
@@ -174,6 +190,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Src\Render\PlanetRendererHigh.cpp" />
+    <ClCompile Include="Src\Render\PlanetRendererLow.cpp" />
+    <ClCompile Include="Src\Render\PlanetRendererMed.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Src\resource.rc" />

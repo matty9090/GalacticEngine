@@ -14,8 +14,8 @@ using Microsoft::WRL::ComPtr;
 
 Game::Game() noexcept :
     m_window(nullptr),
-    m_outputWidth(800),
-    m_outputHeight(600),
+    m_outputWidth(1280),
+    m_outputHeight(960),
     m_featureLevel(D3D_FEATURE_LEVEL_9_1)
 {
 }
@@ -53,10 +53,11 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {
-    float elapsedTime = float(timer.GetElapsedSeconds());
+    float dt = float(timer.GetElapsedSeconds());
 
     // TODO: Add your game logic here.
-    elapsedTime;
+	for (auto &body : m_bodies)
+		body->Update(dt);
 }
 
 // Draws the scene.
@@ -70,13 +71,10 @@ void Game::Render()
 
     Clear();
 
+
     // TODO: Add your rendering code here.
-	m_spriteBatch->Begin();
-
-	m_spriteBatch->Draw(m_texture.Get(), m_screenPos, nullptr, Colors::White,
-		0.f, m_origin);
-
-	m_spriteBatch->End();
+	for(auto &body : m_bodies)
+		body->Render(m_view, m_proj);
 
     Present();
 }
@@ -85,7 +83,7 @@ void Game::Render()
 void Game::Clear()
 {
     // Clear the views.
-    m_d3dContext->ClearRenderTargetView(m_renderTargetView.Get(), Colors::CornflowerBlue);
+    m_d3dContext->ClearRenderTargetView(m_renderTargetView.Get(), Color(0.012f, 0.012f, 0.012f));
     m_d3dContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     m_d3dContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthStencilView.Get());
@@ -150,9 +148,8 @@ void Game::OnWindowSizeChanged(int width, int height)
 // Properties
 void Game::GetDefaultSize(int& width, int& height) const
 {
-    // TODO: Change to desired default window size (note minimum size is 320x200).
-    width = 800;
-    height = 600;
+    width = 1280;
+    height = 960;
 }
 
 // These are the resources that depend on the device.
@@ -220,22 +217,10 @@ void Game::CreateDevice()
     DX::ThrowIfFailed(context.As(&m_d3dContext));
 
     // TODO: Initialize device dependent objects here (independent of window size).
-	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+	auto planet = Galactic::CreatePlanet(m_d3dContext, "Planet", 5.962e24, 6371.0);
+	planet->SetPosition(Vector3::Zero);
 
-	ComPtr<ID3D11Resource> resource;
-	DX::ThrowIfFailed(
-		CreateWICTextureFromFile(m_d3dDevice.Get(), L"Resources/s1200.png",
-			resource.GetAddressOf(),
-			m_texture.ReleaseAndGetAddressOf()));
-
-	ComPtr<ID3D11Texture2D> cat;
-	DX::ThrowIfFailed(resource.As(&cat));
-
-	CD3D11_TEXTURE2D_DESC catDesc;
-	cat->GetDesc(&catDesc);
-
-	m_origin.x = float(catDesc.Width / 2);
-	m_origin.y = float(catDesc.Height / 2);
+	m_bodies.push_back(planet);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -332,8 +317,8 @@ void Game::CreateResources()
     DX::ThrowIfFailed(m_d3dDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, m_depthStencilView.ReleaseAndGetAddressOf()));
 
     // TODO: Initialize windows-size dependent objects here.
-	m_screenPos.x = backBufferWidth / 2.f;
-	m_screenPos.y = backBufferHeight / 2.f;
+	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f), Vector3::Zero, Vector3::UnitY);
+	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(backBufferWidth) / float(backBufferHeight), 0.1f, 10.f);
 }
 
 void Game::OnDeviceLost()
@@ -346,10 +331,9 @@ void Game::OnDeviceLost()
     m_d3dContext.Reset();
     m_d3dDevice.Reset();
 
-	m_texture.Reset();
-	m_spriteBatch.reset();
+	for (auto &body : m_bodies)
+		body->Reset();
 	
     CreateDevice();
-
     CreateResources();
 }
