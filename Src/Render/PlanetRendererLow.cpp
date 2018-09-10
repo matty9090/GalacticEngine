@@ -10,21 +10,21 @@ using namespace DirectX::SimpleMath;
 
 LowDetailPlanetRenderer::LowDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext) : m_deviceContext(deviceContext)
 {
-	m_geometry = GeometricPrimitive::CreateSphere(deviceContext.Get(), 1.0f, 5U);
-	m_world = Matrix::Identity;
+    m_geometry = GeometricPrimitive::CreateSphere(deviceContext.Get(), 1.0f, 5U);
+    m_world = Matrix::Identity;
 }
 
 void LowDetailPlanetRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
-	m_geometry->Draw(m_world, view, proj);
+    m_geometry->Draw(m_world, view, proj);
 }
 
 void LowDetailPlanetRenderer::Update(float dt)
 {
-	m_world *= Matrix::CreateRotationY(cosf(dt) * 0.012f);
+    m_world *= Matrix::CreateRotationY(cosf(dt) * 0.012f);
 }
 
 void Galactic::LowDetailPlanetRenderer::Reset()
 {
-	m_geometry.reset();
+    m_geometry.reset();
 }

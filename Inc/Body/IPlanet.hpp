@@ -4,9 +4,9 @@
 
 namespace Galactic
 {
-	class IPlanet : public IBody
-	{
-		public:
-			virtual void SetRadius(double r) = 0;
-	};
+    class IPlanet : public IBody
+    {
+        public:
+            virtual void SetRadius(double r) = 0;
+    };
 }

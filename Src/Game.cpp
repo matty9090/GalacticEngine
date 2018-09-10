@@ -56,8 +56,8 @@ void Game::Update(DX::StepTimer const& timer)
     float dt = float(timer.GetElapsedSeconds());
 
     // TODO: Add your game logic here.
-	for (auto &body : m_bodies)
-		body->Update(dt);
+    for (auto &body : m_bodies)
+        body->Update(dt);
 }
 
 // Draws the scene.
@@ -73,8 +73,8 @@ void Game::Render()
 
 
     // TODO: Add your rendering code here.
-	for(auto &body : m_bodies)
-		body->Render(m_view, m_proj);
+    for(auto &body : m_bodies)
+        body->Render(m_view, m_proj);
 
     Present();
 }
@@ -141,7 +141,7 @@ void Game::OnWindowSizeChanged(int width, int height)
     m_outputHeight = std::max(height, 1);
 
     CreateResources();
-
+    
     // TODO: Game window is being resized.
 }
 
@@ -217,10 +217,10 @@ void Game::CreateDevice()
     DX::ThrowIfFailed(context.As(&m_d3dContext));
 
     // TODO: Initialize device dependent objects here (independent of window size).
-	auto planet = Galactic::CreatePlanet(m_d3dContext, "Planet", 5.962e24, 6371.0);
-	planet->SetPosition(Vector3::Zero);
+    auto planet = Galactic::CreatePlanet(m_d3dContext, "Planet", 5.962e24, 6371.0);
+    planet->SetPosition(Vector3::Zero);
 
-	m_bodies.push_back(planet);
+    m_bodies.push_back(planet);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -317,8 +317,8 @@ void Game::CreateResources()
     DX::ThrowIfFailed(m_d3dDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, m_depthStencilView.ReleaseAndGetAddressOf()));
 
     // TODO: Initialize windows-size dependent objects here.
-	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f), Vector3::Zero, Vector3::UnitY);
-	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(backBufferWidth) / float(backBufferHeight), 0.1f, 10.f);
+    m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f), Vector3::Zero, Vector3::UnitY);
+    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(backBufferWidth) / float(backBufferHeight), 0.1f, 10.f);
 }
 
 void Game::OnDeviceLost()
@@ -331,9 +331,9 @@ void Game::OnDeviceLost()
     m_d3dContext.Reset();
     m_d3dDevice.Reset();
 
-	for (auto &body : m_bodies)
-		body->Reset();
-	
+    for (auto &body : m_bodies)
+        body->Reset();
+    
     CreateDevice();
     CreateResources();
 }
