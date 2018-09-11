@@ -21,7 +21,7 @@ void MedDetailPlanetRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX::
 
 void MedDetailPlanetRenderer::Update(float dt)
 {
-    m_world *= Matrix::CreateRotationY(cosf(dt) * 2.0f);
+    dt;
 }
 
 void Galactic::MedDetailPlanetRenderer::Reset()

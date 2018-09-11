@@ -3,29 +3,25 @@
 #include <memory>
 #include <wrl/client.h>
 
-#include "IRenderable.hpp"
-
 #include "PlanetRendererLow.hpp"
 #include "PlanetRendererMed.hpp"
 #include "PlanetRendererHigh.hpp"
 
 namespace Galactic {
-    enum EPlanetDetail { Low, Medium, High };
-
-    std::shared_ptr<Galactic::IRenderable> CreatePlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, EPlanetDetail detail)
+    std::shared_ptr<Galactic::IPlanetRenderer> CreatePlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, EDetail detail)
     {
-        std::shared_ptr<IRenderable> renderer;
+        std::shared_ptr<IPlanetRenderer> renderer;
 
         switch (detail) {
-            case EPlanetDetail::Low:
+            case EDetail::Low:
                 renderer = std::make_shared<LowDetailPlanetRenderer>(deviceContext);
                 break;
 
-            case EPlanetDetail::Medium:
+            case EDetail::Medium:
                 renderer = std::make_shared<MedDetailPlanetRenderer>(deviceContext);
                 break;
 
-            case EPlanetDetail::High:
+            case EDetail::High:
                 renderer = std::make_shared<HighDetailPlanetRenderer>(deviceContext);
                 break;
         }

@@ -62,6 +62,9 @@
 #include <exception>
 #include <memory>
 #include <stdexcept>
+#include <thread>
+#include <atomic>
+#include <sstream>
 
 namespace DX
 {

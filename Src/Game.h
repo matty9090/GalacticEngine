@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <thread>
+
 #include "StepTimer.h"
 #include "GalacticEngine.hpp"
 
@@ -60,8 +62,10 @@ private:
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
 
+    std::unique_ptr<DirectX::Keyboard>              m_keyboard;
+    std::unique_ptr<DirectX::Mouse>                 m_mouse;
+
 	DirectX::SimpleMath::Matrix						m_view;
 	DirectX::SimpleMath::Matrix						m_proj;
 	std::vector<std::shared_ptr<Galactic::IBody>>	m_bodies;
-    std::thread                                     m_worker;
 };

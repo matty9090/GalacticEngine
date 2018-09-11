@@ -21,7 +21,7 @@ void HighDetailPlanetRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX:
 
 void HighDetailPlanetRenderer::Update(float dt)
 {
-    m_world *= Matrix::CreateRotationY(cosf(dt) * 2.0f);
+    dt;
 }
 
 void Galactic::HighDetailPlanetRenderer::Reset()

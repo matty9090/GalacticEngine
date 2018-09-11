@@ -3,10 +3,16 @@
 #include "Render/PlanetRendererFactory.hpp"
 
 using namespace Galactic;
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
-Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name) : m_name(name)
+Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name)
+    : m_name(name),
+      m_deviceContext(deviceContext),
+      m_renderer(nullptr),
+      m_isGenerated(false)
 {
-    m_renderer = CreatePlanetRenderer(deviceContext, EPlanetDetail::Low);
+    
 }
 
 Planet::~Planet()
@@ -14,22 +20,39 @@ Planet::~Planet()
 
 }
 
-void Planet::Generate()
+void Planet::Generate(EDetail detail)
 {
-    
+    Matrix matrix;
+
+    if (m_isGenerated)
+        matrix = m_renderer->GetMatrix();
+
+    m_renderer = CreatePlanetRenderer(m_deviceContext, detail);
+
+    if (m_isGenerated)
+        m_renderer->GetMatrix() = matrix;
+
+    m_isGenerated = true;
 }
 
 void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
-    m_renderer->Render(view, proj);
+    if(m_renderer)
+        m_renderer->Render(view, proj);
 }
 
 void Planet::Update(float dt)
 {
-    m_renderer->Update(dt);
+    if (m_renderer) {
+        m_renderer->Update(dt);
+        
+        Matrix &m = m_renderer->GetMatrix();
+        m *= Matrix::CreateRotationY(cosf(dt) * 0.014f);
+    }
 }
 
 void Galactic::Planet::Reset()
 {
-    m_renderer->Reset();
+    if (m_renderer)
+        m_renderer->Reset();
 }

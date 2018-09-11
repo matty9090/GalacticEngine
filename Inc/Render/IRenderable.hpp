@@ -1,6 +1,7 @@
 #pragma once
 
 #include <D3DX11.h>
+#include <memory>
 #include <wrl/client.h>
 #include <SimpleMath.h>
 

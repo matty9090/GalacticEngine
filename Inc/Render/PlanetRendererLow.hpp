@@ -1,21 +1,23 @@
 #pragma once
 
-#include "Render/IRenderable.hpp"
+#include "Render/IPlanetRenderer.hpp"
 
 namespace Galactic {
-    class LowDetailPlanetRenderer : public IRenderable
+    class LowDetailPlanetRenderer : public IPlanetRenderer
     {
-    public:
-        LowDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> device);
+        public:
+            LowDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> device);
 
-        void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
-        void Update(float dt);
-        void Reset();
+            void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
+            void Update(float dt);
+            void Reset();
 
-    private:
-        DirectX::SimpleMath::Matrix m_world;
+            DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
 
-        Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
-        std::unique_ptr<DirectX::GeometricPrimitive> m_geometry;
+        private:
+            DirectX::SimpleMath::Matrix m_world;
+
+            Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
+            std::unique_ptr<DirectX::GeometricPrimitive> m_geometry;
     };
 }

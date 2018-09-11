@@ -27,9 +27,6 @@
     <ClInclude Include="Src\Game.h">
       <Filter>Client</Filter>
     </ClInclude>
-    <ClInclude Include="Src\pch.h">
-      <Filter>Client</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Body\IBody.hpp">
       <Filter>Body</Filter>
     </ClInclude>
@@ -54,6 +51,9 @@
       <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Render\PlanetRendererFactory.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\IPlanetRenderer.hpp">
       <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>

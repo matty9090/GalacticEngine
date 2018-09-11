@@ -16,7 +16,7 @@ Game::Game() noexcept :
     m_window(nullptr),
     m_outputWidth(1280),
     m_outputHeight(960),
-    m_featureLevel(D3D_FEATURE_LEVEL_9_1)
+    m_featureLevel(D3D_FEATURE_LEVEL_11_1)
 {
 }
 
@@ -28,8 +28,11 @@ void Game::Initialize(HWND window, int width, int height)
     m_outputHeight = std::max(height, 1);
 
     CreateDevice();
-
     CreateResources();
+
+    m_keyboard = std::make_unique<Keyboard>();
+    m_mouse = std::make_unique<Mouse>();
+    m_mouse->SetWindow(window);
 
     // TODO: Change the timer settings if you want something other than the default variable timestep mode.
     // e.g. for 60 FPS fixed timestep update logic, call:
@@ -55,6 +58,23 @@ void Game::Update(DX::StepTimer const& timer)
 {
     float dt = float(timer.GetElapsedSeconds());
 
+    std::ostringstream caption;
+    caption << "Galactic Engine [FPS: ";
+    caption << timer.GetFramesPerSecond();
+    caption << "]";
+
+    SetWindowTextA(m_window, caption.str().c_str());
+
+    auto kb = m_keyboard->GetState();
+    auto mouse = m_mouse->GetState();
+
+    if (kb.Escape)
+        PostQuitMessage(0);
+
+    if (kb.F1) m_bodies[0]->Generate(Galactic::EDetail::Low);
+    if (kb.F2) m_bodies[0]->Generate(Galactic::EDetail::Medium);
+    if (kb.F3) m_bodies[0]->Generate(Galactic::EDetail::High);
+
     // TODO: Add your game logic here.
     for (auto &body : m_bodies)
         body->Update(dt);
@@ -70,7 +90,6 @@ void Game::Render()
     }
 
     Clear();
-
 
     // TODO: Add your rendering code here.
     for(auto &body : m_bodies)
@@ -219,7 +238,7 @@ void Game::CreateDevice()
     // TODO: Initialize device dependent objects here (independent of window size).
     auto planet = Galactic::CreatePlanet(m_d3dContext, "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
-    planet->Generate();
+    planet->Generate(Galactic::EDetail::Low);
 
     m_bodies.push_back(planet);
 }
