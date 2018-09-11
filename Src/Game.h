@@ -63,4 +63,5 @@ private:
 	DirectX::SimpleMath::Matrix						m_view;
 	DirectX::SimpleMath::Matrix						m_proj;
 	std::vector<std::shared_ptr<Galactic::IBody>>	m_bodies;
+    std::thread                                     m_worker;
 };
