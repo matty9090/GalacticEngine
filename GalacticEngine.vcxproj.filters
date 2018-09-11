@@ -68,6 +68,12 @@
     <ClInclude Include="Inc\Physics\Constants.hpp">
       <Filter>Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\TerrainNode.hpp">
+      <Filter>Render\SphericalQuadTreeTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\ISphericalTerrain.hpp">
+      <Filter>Render\SphericalQuadTreeTerrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -91,6 +97,9 @@
       <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeTerrain.cpp">
+      <Filter>Render\SphericalQuadTreeTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\TerrainNode.cpp">
       <Filter>Render\SphericalQuadTreeTerrain</Filter>
     </ClCompile>
   </ItemGroup>

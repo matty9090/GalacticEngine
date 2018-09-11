@@ -21,7 +21,7 @@ namespace Galactic {
 
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
             
-            std::unique_ptr<SphericalQuadTreeTerrain> m_terrain;
+            std::shared_ptr<SphericalQuadTreeTerrain> m_terrain;
             std::shared_ptr<IPlanet> m_planet;
     };
 }

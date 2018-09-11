@@ -14,7 +14,8 @@ HighDetailPlanetRenderer::HighDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11
       m_world(planet->GetMatrix())
 {
     m_world = Matrix::Identity;
-    m_terrain = std::make_unique<SphericalQuadTreeTerrain>(planet);
+    m_terrain = std::make_shared<SphericalQuadTreeTerrain>(deviceContext, planet);
+    m_terrain->Generate();
 }
 
 void HighDetailPlanetRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
