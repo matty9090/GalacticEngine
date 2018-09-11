@@ -51,8 +51,7 @@ void Planet::Update(float dt)
 
     Matrix translation = Matrix::CreateTranslation(m_position);
 
-    Matrix &m = m_renderer->GetMatrix();
-    m = rotX * rotY * rotZ * translation;
+    m_world = rotX * rotY * rotZ * translation;
 
     if (m_renderer)
         m_renderer->Update(dt);

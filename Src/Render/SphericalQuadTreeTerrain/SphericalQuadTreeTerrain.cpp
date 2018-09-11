@@ -2,6 +2,8 @@
 #include "Render/SphericalQuadTreeTerrain/SphericalQuadTreeTerrain.hpp"
 
 using namespace Galactic;
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(std::weak_ptr<IPlanet> planet)
     : m_planet(planet),

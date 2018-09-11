@@ -7,7 +7,7 @@ namespace Galactic {
     class MedDetailPlanetRenderer : public IPlanetRenderer
     {
         public:
-            MedDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> device, std::shared_ptr<IPlanet> planet);
+            MedDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> device, std::weak_ptr<IPlanet> planet);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -16,7 +16,7 @@ namespace Galactic {
             DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
 
         private:
-            DirectX::SimpleMath::Matrix m_world;
+            DirectX::SimpleMath::Matrix &m_world;
 
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
             std::unique_ptr<DirectX::GeometricPrimitive> m_geometry;

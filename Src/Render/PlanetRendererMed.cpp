@@ -8,7 +8,10 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-MedDetailPlanetRenderer::MedDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::shared_ptr<IPlanet> planet) : m_deviceContext(deviceContext), m_planet(planet)
+MedDetailPlanetRenderer::MedDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::weak_ptr<IPlanet> planet)
+    : m_deviceContext(deviceContext),
+      m_planet(planet),
+      m_world(planet.lock()->GetMatrix())
 {
     m_geometry = GeometricPrimitive::CreateSphere(deviceContext.Get(), 1.0f, 16U);
     m_world = Matrix::Identity;
