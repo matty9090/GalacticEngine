@@ -65,6 +65,7 @@
 #include <thread>
 #include <atomic>
 #include <sstream>
+#include <iostream>
 
 namespace DX
 {

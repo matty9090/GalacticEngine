@@ -1,12 +1,14 @@
 #pragma once
 
+#include "Body/IPlanet.hpp"
 #include "Render/IPlanetRenderer.hpp"
+#include "Render/SphericalQuadTreeTerrain/SphericalQuadTreeTerrain.hpp"
 
 namespace Galactic {
     class HighDetailPlanetRenderer : public IPlanetRenderer
     {
         public:
-            HighDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> device);
+            HighDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> device, std::shared_ptr<IPlanet> planet);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -18,6 +20,9 @@ namespace Galactic {
             DirectX::SimpleMath::Matrix m_world;
 
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
+            
             std::unique_ptr<DirectX::GeometricPrimitive> m_geometry;
+            std::unique_ptr<SphericalQuadTreeTerrain> m_terrain;
+			std::shared_ptr<IPlanet> m_planet;
     };
 }

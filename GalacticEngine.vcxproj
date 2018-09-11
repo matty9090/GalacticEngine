@@ -166,12 +166,14 @@
     <ClInclude Include="Inc\Body\Planet.hpp" />
     <ClInclude Include="Inc\GalacticEngine.hpp" />
     <ClInclude Include="Inc\pch.h" />
+    <ClInclude Include="Inc\Physics\Constants.hpp" />
     <ClInclude Include="Inc\Render\IPlanetRenderer.hpp" />
     <ClInclude Include="Inc\Render\IRenderable.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererFactory.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererHigh.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererLow.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererMed.hpp" />
+    <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\SphericalQuadTreeTerrain.hpp" />
     <ClInclude Include="Src\Game.h" />
     <ClInclude Include="Src\StepTimer.h" />
   </ItemGroup>
@@ -193,6 +195,7 @@
     <ClCompile Include="Src\Render\PlanetRendererHigh.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererLow.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererMed.cpp" />
+    <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeTerrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Src\resource.rc" />

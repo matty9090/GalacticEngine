@@ -5,7 +5,7 @@
 
 namespace Galactic
 {
-    class Planet : public IPlanet
+    class Planet : public IPlanet, public std::enable_shared_from_this<Planet>
     {
         public:
             Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name);
@@ -22,6 +22,12 @@ namespace Galactic
             void SetPosition(DirectX::SimpleMath::Vector3 pos) { m_position = pos; }
             void SetVelocity(DirectX::SimpleMath::Vector3 vel) { m_velocity = vel; }
             void SetInfluence(std::shared_ptr<IBody> body) { m_influence = body; }
+
+            double GetRadius() const { return m_radius; }
+            long double GetMass() const { return m_mass; }
+            DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
+            DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }
+
             bool IsGenerated() const { return m_isGenerated; }
 
         private:

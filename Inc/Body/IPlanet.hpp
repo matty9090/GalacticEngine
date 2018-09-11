@@ -8,5 +8,6 @@ namespace Galactic
     {
         public:
             virtual void SetRadius(double r) = 0;
+            virtual double GetRadius() const = 0;
     };
 }

@@ -27,7 +27,7 @@ void Planet::Generate(EDetail detail)
     if (m_isGenerated)
         matrix = m_renderer->GetMatrix();
 
-    m_renderer = CreatePlanetRenderer(m_deviceContext, detail);
+    m_renderer = CreatePlanetRenderer(m_deviceContext, shared_from_this(), detail);
 
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
@@ -47,7 +47,7 @@ void Planet::Update(float dt)
         m_renderer->Update(dt);
         
         Matrix &m = m_renderer->GetMatrix();
-        m *= Matrix::CreateRotationY(cosf(dt) * 0.014f);
+        m *= Matrix::CreateRotationY(cosf(dt) * 0.006f);
     }
 }
 
