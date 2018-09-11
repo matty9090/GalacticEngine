@@ -12,5 +12,7 @@ namespace Galactic
             virtual void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj) = 0;
             virtual void Update(float dt) = 0;
             virtual void Reset() = 0;
+
+            virtual DirectX::SimpleMath::Matrix &GetMatrix() = 0;
     };
 }

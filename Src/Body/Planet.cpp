@@ -43,12 +43,19 @@ void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matri
 
 void Planet::Update(float dt)
 {
-    if (m_renderer) {
+    m_rotation.y += dt * 0.4f;
+
+    Matrix rotX = Matrix::CreateRotationX(m_rotation.x);
+    Matrix rotY = Matrix::CreateRotationY(m_rotation.y);
+    Matrix rotZ = Matrix::CreateRotationZ(m_rotation.z);
+
+    Matrix translation = Matrix::CreateTranslation(m_position);
+
+    Matrix &m = m_renderer->GetMatrix();
+    m = rotX * rotY * rotZ * translation;
+
+    if (m_renderer)
         m_renderer->Update(dt);
-        
-        Matrix &m = m_renderer->GetMatrix();
-        m *= Matrix::CreateRotationY(cosf(dt) * 0.006f);
-    }
 }
 
 void Galactic::Planet::Reset()

@@ -21,11 +21,13 @@ namespace Galactic
             virtual void SetMass(long double mass) = 0;
             virtual void SetPosition(DirectX::SimpleMath::Vector3 pos) = 0;
             virtual void SetVelocity(DirectX::SimpleMath::Vector3 vel) = 0;
+            virtual void SetRotation(DirectX::SimpleMath::Vector3 rot) = 0;
             virtual void SetInfluence(std::shared_ptr<IBody> body) = 0;
 
-            virtual long double GetMass() const = 0;
+            virtual long double                  GetMass()     const = 0;
             virtual DirectX::SimpleMath::Vector3 GetPosition() const = 0;
             virtual DirectX::SimpleMath::Vector3 GetVelocity() const = 0;
+            virtual DirectX::SimpleMath::Vector3 GetRotation() const = 0;
             
             virtual bool IsGenerated() const = 0;
     };

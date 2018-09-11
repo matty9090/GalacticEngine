@@ -21,12 +21,16 @@ namespace Galactic
             void SetMass(long double mass) { m_mass = mass; }
             void SetPosition(DirectX::SimpleMath::Vector3 pos) { m_position = pos; }
             void SetVelocity(DirectX::SimpleMath::Vector3 vel) { m_velocity = vel; }
+            void SetRotation(DirectX::SimpleMath::Vector3 vel) { m_rotation = vel; }
             void SetInfluence(std::shared_ptr<IBody> body) { m_influence = body; }
 
             double GetRadius() const { return m_radius; }
             long double GetMass() const { return m_mass; }
+
+            DirectX::SimpleMath::Matrix &GetMatrix()         { return m_world; };
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
             DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }
+            DirectX::SimpleMath::Vector3 GetRotation() const { return m_rotation; }
 
             bool IsGenerated() const { return m_isGenerated; }
 
@@ -37,8 +41,8 @@ namespace Galactic
             double m_radius;
             long double m_mass;
 
-            DirectX::SimpleMath::Vector3 m_position;
-            DirectX::SimpleMath::Vector3 m_velocity;
+            DirectX::SimpleMath::Matrix  m_world;
+            DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation;
 
             std::shared_ptr<IBody> m_influence;
             std::shared_ptr<IPlanetRenderer> m_renderer;

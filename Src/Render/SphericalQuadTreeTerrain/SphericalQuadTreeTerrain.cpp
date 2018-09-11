@@ -3,7 +3,14 @@
 
 using namespace Galactic;
 
-SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(std::weak_ptr<IPlanet> planet) : m_planet(planet)
+SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(std::weak_ptr<IPlanet> planet)
+    : m_planet(planet),
+      m_world(planet.lock()->GetMatrix())
+{
+    
+}
+
+SphericalQuadTreeTerrain::~SphericalQuadTreeTerrain()
 {
     
 }
