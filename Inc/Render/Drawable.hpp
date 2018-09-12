@@ -90,9 +90,6 @@ namespace Galactic
     template<class VertexType>
     inline void Drawable<VertexType>::Cleanup()
     {
-        m_indices.clear();
-        m_vertices.clear();
-
         if (m_vertexBuffer.Get() && m_indexBuffer.Get())
         {
             m_vertexBuffer->Release();

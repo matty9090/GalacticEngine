@@ -53,6 +53,7 @@ void Planet::Update(float dt)
     Matrix rotZ = Matrix::CreateRotationZ(m_rotation.z);
 
     Matrix translation = Matrix::CreateTranslation(m_position);
+    Matrix scale = Matrix::CreateScale(m_radius);
 
     m_world = rotX * rotY * rotZ * translation;
 

@@ -24,7 +24,8 @@ void SphericalQuadTreeTerrain::CreateEffect()
     D3D11_INPUT_ELEMENT_DESC els[] = {
         // Semantic   Index  Format							 Slot   Offset	Slot Class					 Instance Step
         { "POSITION", 0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		0,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",	  0,	 DXGI_FORMAT_R32G32B32A32_FLOAT, 0,		12,		D3D11_INPUT_PER_VERTEX_DATA, 0 }
+        { "NORMAL",   0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		12,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",	  0,	 DXGI_FORMAT_R32G32B32A32_FLOAT, 0,		24,		D3D11_INPUT_PER_VERTEX_DATA, 0 }
         //{ "TANGENT",  0,	 DXGI_FORMAT_R32G32B32_FLOAT,    0,		24,		D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
@@ -41,12 +42,30 @@ void SphericalQuadTreeTerrain::CreateEffect()
 
 void SphericalQuadTreeTerrain::Generate()
 {
-    m_root = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet);
-    m_root->Generate();
+    std::array<Matrix, 6> orientations = 
+    {
+        Matrix::Identity,
+        Matrix::CreateRotationX(XM_PI),
+        Matrix::CreateRotationX(XM_PI / 2),
+        Matrix::CreateRotationX(-XM_PI / 2),
+        Matrix::CreateRotationZ(XM_PI / 2),
+        Matrix::CreateRotationZ(-XM_PI / 2)
+    };
+
+    for (int i = 0; i < 6; ++i)
+    {
+        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, 1.0f });
+        m_faces[i]->GetMatrix() = orientations[i];
+    }
+    
+    for (int i = 0; i < 6; ++i)
+        m_faces[i]->Generate();
 }
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
+    m_world *= Matrix::CreateScale(m_radius);
+
     auto sampler = m_states->LinearWrap();
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
@@ -59,17 +78,21 @@ void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX:
     m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-    m_root->Render(view, proj);
+    for(auto &face : m_faces)
+        face->Render(view, proj);
 }
 
 void SphericalQuadTreeTerrain::Update(float dt)
 {
-    m_root->Update(dt);
+    for (auto &face : m_faces)
+        face->Update(dt);
 }
 
 void SphericalQuadTreeTerrain::Reset()
 {
     m_states.reset();
     m_effect->Reset();
-    m_root->Release();
+
+    for (auto &face : m_faces)
+        face->Release();
 }

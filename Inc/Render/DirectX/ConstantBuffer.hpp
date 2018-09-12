@@ -13,7 +13,7 @@ namespace Galactic
             ConstantBuffer(ID3D11Device *device);
 
             void SetData(ID3D11DeviceContext *deviceContext, const T &data);
-            ID3D11Buffer *GetBuffer() { return m_buffer.Get(); }
+            ID3D11Buffer **GetBuffer() { return m_buffer.GetAddressOf(); }
 
         private:
             Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;

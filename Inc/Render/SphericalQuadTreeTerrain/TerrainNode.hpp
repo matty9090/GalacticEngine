@@ -12,6 +12,7 @@ namespace Galactic
     struct PlanetVertex
     {
         DirectX::SimpleMath::Vector3 position;
+        DirectX::SimpleMath::Vector3 normal;
         DirectX::SimpleMath::Vector4 color;
     };
 
@@ -20,10 +21,15 @@ namespace Galactic
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
     };
 
+    struct Square
+    {
+        float start, size;
+    };
+    
     class TerrainNode : public IRenderable, public Drawable<PlanetVertex>
     {
         public:
-            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, std::weak_ptr<IPlanet> planet);
+            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, std::weak_ptr<IPlanet> planet, Square bounds);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -38,6 +44,8 @@ namespace Galactic
             void Release();
 
         private:
+            Square m_bounds;
+
             std::weak_ptr<TerrainNode> m_parent;
             std::weak_ptr<IPlanet> m_planet;
             std::shared_ptr<ISphericalTerrain> m_terrain;
@@ -48,5 +56,7 @@ namespace Galactic
             DirectX::SimpleMath::Matrix m_world;
 
             Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
+
+            DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
     };
 }

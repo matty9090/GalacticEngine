@@ -9,6 +9,7 @@ struct VS_OUTPUT {
 
 struct VS_INPUT {
 	float4 vPosition : POSITION;
+	float3 vNormal : NORMAL;
 	float4 vColor : COLOR;
 };
 

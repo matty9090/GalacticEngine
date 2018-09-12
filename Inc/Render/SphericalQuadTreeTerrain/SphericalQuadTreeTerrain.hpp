@@ -20,7 +20,7 @@ namespace Galactic
             void Update(float dt);
             void Reset();
 
-            int GetGridSize() const { return 16; }
+            int GetGridSize() const { return 17; }
             float GetRadius() const { return m_radius; }
 
             DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
@@ -31,9 +31,9 @@ namespace Galactic
             DirectX::SimpleMath::Matrix &m_world;
 
             std::weak_ptr<IPlanet> m_planet;
-            std::shared_ptr<TerrainNode> m_root;
             std::shared_ptr<Effect> m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
+            std::array<std::shared_ptr<TerrainNode>, 6> m_faces;
 
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;

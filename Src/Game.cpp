@@ -238,7 +238,7 @@ void Game::CreateDevice()
     // TODO: Initialize device dependent objects here (independent of window size).
     auto planet = Galactic::CreatePlanet(m_d3dContext, "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
-    planet->Generate(Galactic::EDetail::Low);
+    planet->Generate(Galactic::EDetail::High);
 
     m_bodies.push_back(planet);
 }
