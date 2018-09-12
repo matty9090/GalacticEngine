@@ -59,7 +59,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
         PreDraw();
 
         Matrix worldViewProj = m_world * view * proj;
-        MatrixBuffer buffer = { worldViewProj };
+        MatrixBuffer buffer = { worldViewProj.Transpose() };
         
         m_buffer->SetData(m_terrain->GetContext().Get(), buffer);
         auto c_buffer = m_buffer->GetBuffer();
