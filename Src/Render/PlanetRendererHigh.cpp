@@ -30,5 +30,6 @@ void HighDetailPlanetRenderer::Update(float dt)
 
 void Galactic::HighDetailPlanetRenderer::Reset()
 {
+    m_terrain->Reset();
     m_terrain.reset();
 }

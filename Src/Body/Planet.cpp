@@ -25,7 +25,10 @@ void Planet::Generate(EDetail detail)
     Matrix matrix;
 
     if (m_isGenerated)
+    {
         matrix = m_renderer->GetMatrix();
+        m_renderer->Reset();
+    }
 
     m_renderer = CreatePlanetRenderer(m_deviceContext, shared_from_this(), detail);
 

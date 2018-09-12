@@ -20,6 +20,12 @@
     <Filter Include="Physics">
       <UniqueIdentifier>{51afea56-f7cb-46ec-a8d1-30ebc7eb9a77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Render\DirectX">
+      <UniqueIdentifier>{df2a4e47-6406-4632-ba0d-b46e900bae62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{f2c13dd2-f616-4675-adc2-d472667b665a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="settings.manifest">
@@ -74,6 +80,15 @@
     <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\ISphericalTerrain.hpp">
       <Filter>Render\SphericalQuadTreeTerrain</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\DirectX\Effect.hpp">
+      <Filter>Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\DirectX\ConstantBuffer.hpp">
+      <Filter>Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\Drawable.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -102,6 +117,9 @@
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\TerrainNode.cpp">
       <Filter>Render\SphericalQuadTreeTerrain</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Render\DirectX\Effect.cpp">
+      <Filter>Render\DirectX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\planet.ico">
@@ -117,5 +135,13 @@
     <ResourceCompile Include="Src\resource.rc">
       <Filter>Client</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\AtmosphereVS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\AtmospherePS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

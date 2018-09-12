@@ -73,7 +73,6 @@ namespace DX
     {
         if (FAILED(hr))
         {
-            // Set a breakpoint on this line to catch DirectX API errors
             throw std::exception();
         }
     }
