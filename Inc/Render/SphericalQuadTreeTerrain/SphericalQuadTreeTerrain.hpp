@@ -35,6 +35,7 @@ namespace Galactic
             std::shared_ptr<Effect> m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
 
+            Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
 

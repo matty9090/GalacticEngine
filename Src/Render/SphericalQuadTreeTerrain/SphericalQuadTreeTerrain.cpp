@@ -31,6 +31,12 @@ void SphericalQuadTreeTerrain::CreateEffect()
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
     m_effect = std::make_shared<Effect>(m_device.Get(), L"Shaders/BasicVS.fx", L"Shaders/BasicPS.fx", els, num, false);
+
+    CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_WIREFRAME, D3D11_CULL_NONE, FALSE,
+        D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
+        D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
+
+    DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
 }
 
 void SphericalQuadTreeTerrain::Generate()
@@ -45,7 +51,7 @@ void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX:
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
     m_deviceContext->PSSetSamplers(0, 1, &sampler);
-    m_deviceContext->RSSetState(m_states->Wireframe());
+    m_deviceContext->RSSetState(m_raster.Get());
     m_deviceContext->OMSetBlendState(m_states->AlphaBlend(), factor, 0xFFFFFFFF);
     m_deviceContext->OMSetDepthStencilState(m_states->DepthDefault(), 1);
 
