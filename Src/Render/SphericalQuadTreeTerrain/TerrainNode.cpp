@@ -12,14 +12,14 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
       m_planet(planet),
       m_bounds(bounds),
       m_scale(bounds.size),
-      m_transformed(Matrix::Identity),
-      m_depth(-(int)log2f(m_scale))
+      m_transformed(Matrix::Identity)
 {
     ID3D11Device *device;
     terrain->GetContext()->GetDevice(&device);
 
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
     m_world = Matrix::Identity * (IsRoot() ? Matrix::Identity : m_parent.lock()->GetMatrix());
+    m_depth = -(int)log2f(m_scale);
 }
 
 void TerrainNode::Generate()
@@ -115,7 +115,10 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (IsLeaf() && m_depth < 8)
+    if (m_depth >= 8)
+        return;
+
+    if (IsLeaf())
     {
         float x = m_bounds.x, y = m_bounds.y;
         float d = m_bounds.size / 2;

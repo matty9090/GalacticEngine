@@ -15,6 +15,8 @@
 #include "Render/PlanetRendererMed.hpp"
 #include "Render/PlanetRendererHigh.hpp"
 
+#include "Physics/Constants.hpp"
+
 namespace Galactic {
     std::shared_ptr<Galactic::IBody> CreatePlanet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name, long double mass, double radius);
 }

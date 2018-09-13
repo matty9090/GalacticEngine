@@ -120,7 +120,16 @@ void Game::Update(DX::StepTimer const& timer)
 
     move = Vector3::Transform(move, q);
     move *= 0.05f;
-    m_cameraPos += move;
+
+    // TODO: Find actual closest body
+    std::shared_ptr<Galactic::IPlanet> closestBody = std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0]);
+    
+    float radius = (closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
+    float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
+
+    std::cout << factor << "\n";
+
+    m_cameraPos += move * factor * dt;
 
     // TODO: Add your game logic here.
     for (auto &body : m_bodies)
@@ -396,7 +405,7 @@ void Game::CreateResources()
 
     // TODO: Initialize windows-size dependent objects here.
     m_view = Matrix::CreateLookAt(Vector3(0.0f, 5.0f, -10.f), Vector3::Zero, Vector3::UnitY);
-    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(backBufferWidth) / float(backBufferHeight), 0.01f, 1000.f);
+    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(backBufferWidth) / float(backBufferHeight), 0.0001f, 1000.f);
 }
 
 void Game::OnDeviceLost()
