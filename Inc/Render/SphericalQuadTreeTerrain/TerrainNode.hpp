@@ -23,10 +23,11 @@ namespace Galactic
 
     struct Square
     {
-        float start, size;
+        float x, y;
+        float size;
     };
     
-    class TerrainNode : public IRenderable, public Drawable<PlanetVertex>
+    class TerrainNode : public IRenderable, public Drawable<PlanetVertex>, public std::enable_shared_from_this<TerrainNode>
     {
         public:
             TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, std::weak_ptr<IPlanet> planet, Square bounds);
@@ -42,6 +43,8 @@ namespace Galactic
             void Split();
             void Merge();
             void Release();
+
+            bool IsRoot() const { return !m_parent.lock(); }
 
         private:
             Square m_bounds;

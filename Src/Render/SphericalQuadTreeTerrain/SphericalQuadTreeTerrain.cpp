@@ -54,12 +54,13 @@ void SphericalQuadTreeTerrain::Generate()
 
     for (int i = 0; i < 6; ++i)
     {
-        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, 1.0f });
+        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, -0.5f, 1.0f });
         m_faces[i]->GetMatrix() = orientations[i];
     }
     
-    for (int i = 0; i < 6; ++i)
+    for (int i = 0; i < 6; ++i) {
         m_faces[i]->Generate();
+    }
 }
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)

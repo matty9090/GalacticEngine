@@ -16,7 +16,7 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
     terrain->GetContext()->GetDevice(&device);
 
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
-    m_world = Matrix::Identity;
+    m_world = Matrix::Identity * (IsRoot() ? Matrix::Identity : m_parent.lock()->GetMatrix());
 }
 
 void TerrainNode::Generate()
@@ -27,8 +27,8 @@ void TerrainNode::Generate()
 
     for (int y = 0; y < gridsize; ++y) {
         for (int x = 0; x < gridsize; ++x) {
-            float xx = m_bounds.start + x * step;
-            float yy = m_bounds.start + y * step;
+            float xx = m_bounds.x + x * step;
+            float yy = m_bounds.y + y * step;
 
             Vector3 pos = PointToSphere(Vector3(xx, 0.5f, yy));
             pos.Normalize();
@@ -100,7 +100,24 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
+    if (IsLeaf())
+    {
+        float x = m_bounds.x, y = m_bounds.y;
+        float d = m_bounds.size / 2;
 
+        m_children[0] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x    , y    , d });
+        m_children[1] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x + d, y    , d });
+        m_children[2] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x + d, y + d, d });
+        m_children[3] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x    , y + d, d });
+
+        for (auto &child : m_children)
+            child->Generate();
+    }
+    else
+    {
+        for (auto &child : m_children)
+            child->Split();
+    }
 }
 
 void TerrainNode::Merge()
