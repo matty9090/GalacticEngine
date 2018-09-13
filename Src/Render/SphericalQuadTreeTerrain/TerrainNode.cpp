@@ -27,20 +27,32 @@ void TerrainNode::Generate()
     uint16_t gridsize = (uint16_t)m_terrain->GetGridSize();
 
     float step = m_bounds.size / (gridsize - 1);
+    int i = 0;
+    bool hasParent = !IsRoot();
 
     for (int y = 0; y < gridsize; ++y) {
-        for (int x = 0; x < gridsize; ++x) {
-            float xx = m_bounds.x + x * step;
-            float yy = m_bounds.y + y * step;
+        float yy = m_bounds.y + y * step;
 
-            Vector3 pos = PointToSphere(Vector3(xx, 0.5f, yy));
-            pos.Normalize();
-
+        for (int x = 0; x < gridsize; ++x, ++i) {
             PlanetVertex v;
-            v.position = pos;
-            v.color = Vector4(0.0f, 0.2f, 1.0f, 1.0f);
-            v.normal = pos;
-            //v.tangent = v.normal;
+
+            if (x % 2 == 0 && y & 2 == 0 && hasParent)
+            {
+                v = m_parent.lock()->GetVertex(i);
+            } 
+            else
+            {
+                float xx = m_bounds.x + x * step;
+
+                Vector3 pos = PointToSphere(Vector3(xx, 0.5f, yy));
+                pos.Normalize();
+
+
+                v.position = pos;
+                v.color = Vector4(0.0f, 0.2f, 1.0f, 1.0f);
+                v.normal = pos;
+                //v.tangent = v.normal;
+            }
 
             m_vertices.push_back(v);
         }

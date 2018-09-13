@@ -37,6 +37,7 @@ namespace Galactic
             void Update(float dt);
             void Reset();
 
+            PlanetVertex &GetVertex(int i) { return m_vertices[i]; }
             DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
 
             void Generate();
