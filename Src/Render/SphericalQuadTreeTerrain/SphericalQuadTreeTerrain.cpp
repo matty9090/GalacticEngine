@@ -99,6 +99,6 @@ void SphericalQuadTreeTerrain::Reset()
     m_states.reset();
     m_effect->Reset();
 
-    for (auto &face : m_faces)
-        face->Release();
+    //for (auto &face : m_faces)
+     //   face->Release();
 }

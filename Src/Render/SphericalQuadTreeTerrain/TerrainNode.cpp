@@ -86,30 +86,38 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 
 void TerrainNode::Update(float dt)
 {
-    if (IsLeaf())
+    int gridsize = m_terrain->GetGridSize();
+
+    Vector3 cam = m_planet.lock()->GetCameraPos();
+    Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
+
+    Vector3 mid = Vector3::Transform(midpoint, m_transformed);
+
+    float distance = Vector3::Distance(cam, mid);
+    bool divide = distance < m_scale * 5.0f;
+
+    if (true)
     {
-        int gridsize = m_terrain->GetGridSize();
+        if (!divide)
+            Merge();
 
-        Vector3 cam = m_planet.lock()->GetCameraPos();
-        Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
-
-        Vector3 mid = Vector3::Transform(midpoint, m_transformed);
-        
-        float distance = Vector3::Distance(cam, mid);
-
-        if (distance < m_scale * 5.0f)
+        if (IsLeaf() && divide)
+        {
             Split();
-    }
-    else
-    {
-        for (auto &child : m_children)
-            child->Update(dt);
+        }
+        else if(!IsLeaf())
+        {
+            for (auto &child : m_children)
+                child->Update(dt);
+        }
     }
 }
 
 void TerrainNode::Reset()
 {
-    m_inputLayout.Reset();
+    m_terrain.reset();
+    m_buffer.reset();
+
     Cleanup();
 }
 
@@ -140,7 +148,25 @@ void TerrainNode::Split()
 
 void TerrainNode::Merge()
 {
+    if (IsLeaf())
+        return;
 
+    if (m_children[0]->IsLeaf())
+    {
+        for (auto &child : m_children) {
+            child->Reset();
+        }
+
+        m_children[0].reset();
+        m_children[1].reset();
+        m_children[2].reset();
+        m_children[3].reset();
+    }
+    else
+    {
+        for (auto &child : m_children)
+            child->Merge();
+    }
 }
 
 void Galactic::TerrainNode::Release()

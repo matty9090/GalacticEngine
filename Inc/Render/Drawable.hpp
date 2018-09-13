@@ -21,7 +21,7 @@ namespace Galactic
             D3D11_BUFFER_DESC m_vertexBufferDesc, m_indexBufferDesc;
             D3D11_SUBRESOURCE_DATA m_vertexData, m_indexData;
 
-            Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer, m_indexBuffer;
+            ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
             
             ID3D11Device *m_device;
             ID3D11DeviceContext *m_context;
@@ -66,8 +66,8 @@ namespace Galactic
         m_vertexData.pSysMem = &m_vertices[0];
         m_indexData.pSysMem = &m_indices[0];
 
-        DX::ThrowIfFailed(m_device->CreateBuffer(&m_vertexBufferDesc, &m_vertexData, m_vertexBuffer.GetAddressOf()));
-        DX::ThrowIfFailed(m_device->CreateBuffer(&m_indexBufferDesc, &m_indexData, m_indexBuffer.GetAddressOf()));
+        DX::ThrowIfFailed(m_device->CreateBuffer(&m_vertexBufferDesc, &m_vertexData, &m_vertexBuffer));
+        DX::ThrowIfFailed(m_device->CreateBuffer(&m_indexBufferDesc, &m_indexData, &m_indexBuffer));
     }
 
     template<class VertexType>
@@ -76,8 +76,8 @@ namespace Galactic
         unsigned int stride = sizeof(VertexType);
         unsigned int offset = 0;
 
-        m_context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
-        m_context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+        m_context->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+        m_context->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
         m_context->IASetPrimitiveTopology(m_topology);
     }
 
@@ -90,10 +90,7 @@ namespace Galactic
     template<class VertexType>
     inline void Drawable<VertexType>::Cleanup()
     {
-        if (m_vertexBuffer.Get() && m_indexBuffer.Get())
-        {
-            m_vertexBuffer->Release();
-            m_indexBuffer->Release();
-        }
+        m_vertexBuffer->Release();
+        m_indexBuffer->Release();
     }
 }

@@ -62,8 +62,6 @@ namespace Galactic
             DirectX::SimpleMath::Matrix m_world;
             DirectX::SimpleMath::Matrix m_transformed;
 
-            Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
     };
 }
