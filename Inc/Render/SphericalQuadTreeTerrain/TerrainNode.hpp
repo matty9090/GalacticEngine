@@ -19,6 +19,7 @@ namespace Galactic
     struct MatrixBuffer
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
+        DirectX::SimpleMath::Matrix world; // 64 bytes
     };
 
     struct Square

@@ -35,8 +35,8 @@ void TerrainNode::Generate()
 
             PlanetVertex v;
             v.position = pos;
-            v.color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-            v.normal = Vector3::Up;
+            v.color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+            v.normal = pos;
             //v.tangent = v.normal;
 
             m_vertices.push_back(v);
@@ -63,8 +63,10 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         PreDraw();
 
-        Matrix worldViewProj = m_world * m_terrain->GetMatrix() * view * proj;
-        MatrixBuffer buffer = { worldViewProj.Transpose() };
+        Matrix m_final = m_world * m_terrain->GetMatrix();
+
+        Matrix worldViewProj = m_final * view * proj;
+        MatrixBuffer buffer = { worldViewProj.Transpose(), m_final.Transpose() };
         
         m_buffer->SetData(m_terrain->GetContext().Get(), buffer);
 

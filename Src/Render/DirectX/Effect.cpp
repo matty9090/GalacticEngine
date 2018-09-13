@@ -26,8 +26,15 @@ Effect::Effect(ID3D11Device *device, std::wstring vs, std::wstring ps, D3D11_INP
         flags |= D3DCOMPILE_DEBUG;
 #endif
         
-        DX::ThrowIfFailed(D3DCompileFromFile(vs.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_5_0", flags, 0, &v_buffer, &v_error));
-        DX::ThrowIfFailed(D3DCompileFromFile(ps.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_5_0", flags, 0, &p_buffer, &p_error));
+        HRESULT res;
+
+        res = D3DCompileFromFile(vs.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_5_0", flags, 0, &v_buffer, &v_error);
+        LogErrors(v_error);
+        DX::ThrowIfFailed(res);
+        
+        res = D3DCompileFromFile(ps.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_5_0", flags, 0, &p_buffer, &p_error);
+        LogErrors(p_error);
+        DX::ThrowIfFailed(res);
     }
 
     DX::ThrowIfFailed(device->CreateVertexShader(v_buffer->GetBufferPointer(), v_buffer->GetBufferSize(), nullptr, m_vertexShader.ReleaseAndGetAddressOf()));
@@ -36,9 +43,6 @@ Effect::Effect(ID3D11Device *device, std::wstring vs, std::wstring ps, D3D11_INP
 
     v_buffer->Release();
     p_buffer->Release();
-
-    LogErrors(v_error);
-    LogErrors(p_error);
 }
 
 void Galactic::Effect::Reset()
