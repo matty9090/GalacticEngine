@@ -88,7 +88,7 @@ void Game::Update(DX::StepTimer const& timer)
 
     if (mouse.positionMode == Mouse::MODE_RELATIVE)
     {
-        Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f) * 0.008f;
+        Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f) * 0.004f;
 
         m_pitch -= delta.y;
         m_yaw -= delta.x;
@@ -124,7 +124,10 @@ void Game::Update(DX::StepTimer const& timer)
 
     // TODO: Add your game logic here.
     for (auto &body : m_bodies)
+    {
+        body->SetCameraPos(m_cameraPos);
         body->Update(dt);
+    }
 }
 
 // Draws the scene.

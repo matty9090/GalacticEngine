@@ -10,7 +10,10 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
       m_terrain(terrain),
       m_parent(parent),
       m_planet(planet),
-      m_bounds(bounds)
+      m_bounds(bounds),
+      m_scale(bounds.size),
+      m_transformed(Matrix::Identity),
+      m_depth(-(int)log2f(m_scale))
 {
     ID3D11Device *device;
     terrain->GetContext()->GetDevice(&device);
@@ -63,10 +66,10 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         PreDraw();
 
-        Matrix m_final = m_world * m_terrain->GetMatrix();
+        m_transformed = m_world * m_terrain->GetMatrix();
 
-        Matrix worldViewProj = m_final * view * proj;
-        MatrixBuffer buffer = { worldViewProj.Transpose(), m_final.Transpose() };
+        Matrix worldViewProj = m_transformed * view * proj;
+        MatrixBuffer buffer = { worldViewProj.Transpose(), m_transformed.Transpose() };
         
         m_buffer->SetData(m_terrain->GetContext().Get(), buffer);
 
@@ -85,7 +88,17 @@ void TerrainNode::Update(float dt)
 {
     if (IsLeaf())
     {
+        int gridsize = m_terrain->GetGridSize();
 
+        Vector3 cam = m_planet.lock()->GetCameraPos();
+        Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
+
+        Vector3 mid = Vector3::Transform(midpoint, m_transformed);
+        
+        float distance = Vector3::Distance(cam, mid);
+
+        if (distance < m_scale * 5.0f)
+            Split();
     }
     else
     {
@@ -102,7 +115,7 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (IsLeaf())
+    if (IsLeaf() && m_depth < 8)
     {
         float x = m_bounds.x, y = m_bounds.y;
         float d = m_bounds.size / 2;

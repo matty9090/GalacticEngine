@@ -48,6 +48,8 @@ namespace Galactic
             bool IsRoot() const { return !m_parent.lock(); }
 
         private:
+            int m_depth;
+            float m_scale;
             Square m_bounds;
 
             std::weak_ptr<TerrainNode> m_parent;
@@ -58,6 +60,7 @@ namespace Galactic
             std::array<std::shared_ptr<TerrainNode>, 4> m_children;
 
             DirectX::SimpleMath::Matrix m_world;
+            DirectX::SimpleMath::Matrix m_transformed;
 
             Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 
