@@ -46,14 +46,13 @@ void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matri
 
 void Planet::Update(float dt)
 {
-    m_rotation.y += dt * 0.4f;
+    m_rotation.y += dt * 0.2f;
 
     Matrix rotX = Matrix::CreateRotationX(m_rotation.x);
     Matrix rotY = Matrix::CreateRotationY(m_rotation.y);
     Matrix rotZ = Matrix::CreateRotationZ(m_rotation.z);
 
     Matrix translation = Matrix::CreateTranslation(m_position);
-    Matrix scale = Matrix::CreateScale(m_radius);
 
     m_world = rotX * rotY * rotZ * translation;
 

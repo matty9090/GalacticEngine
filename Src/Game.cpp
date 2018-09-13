@@ -12,6 +12,8 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
+bool Galactic::IBody::Wireframe = false;
+
 Game::Game() noexcept :
     m_window(nullptr),
     m_outputWidth(1280),
@@ -68,12 +70,16 @@ void Game::Update(DX::StepTimer const& timer)
     auto kb = m_keyboard->GetState();
     auto mouse = m_mouse->GetState();
 
+    m_tracker.Update(kb);
+
     if (kb.Escape)
         PostQuitMessage(0);
 
-    if (kb.F1) m_bodies[0]->Generate(Galactic::EDetail::Low);
-    if (kb.F2) m_bodies[0]->Generate(Galactic::EDetail::Medium);
-    if (kb.F3) m_bodies[0]->Generate(Galactic::EDetail::High);
+    if (m_tracker.IsKeyReleased(Keyboard::F1)) m_bodies[0]->Generate(Galactic::EDetail::Low);
+    if (m_tracker.IsKeyReleased(Keyboard::F2)) m_bodies[0]->Generate(Galactic::EDetail::Medium);
+    if (m_tracker.IsKeyReleased(Keyboard::F3)) m_bodies[0]->Generate(Galactic::EDetail::High);
+
+    if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
 
     // TODO: Add your game logic here.
     for (auto &body : m_bodies)

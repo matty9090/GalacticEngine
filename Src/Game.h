@@ -62,6 +62,7 @@ private:
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
 
+    DirectX::Keyboard::KeyboardStateTracker         m_tracker;
     std::unique_ptr<DirectX::Keyboard>              m_keyboard;
     std::unique_ptr<DirectX::Mouse>                 m_mouse;
 

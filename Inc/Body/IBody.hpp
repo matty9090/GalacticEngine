@@ -30,5 +30,7 @@ namespace Galactic
             virtual DirectX::SimpleMath::Vector3 GetRotation() const = 0;
             
             virtual bool IsGenerated() const = 0;
+            
+            static bool Wireframe;
     };
 }

@@ -35,7 +35,7 @@ namespace Galactic
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::array<std::shared_ptr<TerrainNode>, 6> m_faces;
 
-            Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
+            Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
 
