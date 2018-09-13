@@ -66,7 +66,12 @@ private:
     std::unique_ptr<DirectX::Keyboard>              m_keyboard;
     std::unique_ptr<DirectX::Mouse>                 m_mouse;
 
-	DirectX::SimpleMath::Matrix						m_view;
-	DirectX::SimpleMath::Matrix						m_proj;
+    DirectX::SimpleMath::Matrix                     m_view;
+    DirectX::SimpleMath::Matrix                     m_proj;
+    DirectX::SimpleMath::Vector3                    m_cameraPos;
+    
+    float                                           m_pitch;
+    float                                           m_yaw;
+    
 	std::vector<std::shared_ptr<Galactic::IBody>>	m_bodies;
 };

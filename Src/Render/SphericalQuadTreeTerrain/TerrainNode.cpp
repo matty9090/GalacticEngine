@@ -35,7 +35,7 @@ void TerrainNode::Generate()
 
             PlanetVertex v;
             v.position = pos;
-            v.color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+            v.color = Vector4(0.0f, 0.2f, 1.0f, 1.0f);
             v.normal = pos;
             //v.tangent = v.normal;
 

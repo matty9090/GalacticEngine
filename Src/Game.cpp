@@ -18,7 +18,10 @@ Game::Game() noexcept :
     m_window(nullptr),
     m_outputWidth(1280),
     m_outputHeight(960),
-    m_featureLevel(D3D_FEATURE_LEVEL_11_1)
+    m_featureLevel(D3D_FEATURE_LEVEL_11_1),
+    m_yaw(0),
+    m_pitch(0),
+    m_cameraPos(0.0f, 0.0f, -10.0f)
 {
 }
 
@@ -75,11 +78,49 @@ void Game::Update(DX::StepTimer const& timer)
     if (kb.Escape)
         PostQuitMessage(0);
 
+    if (kb.Home) m_cameraPos = Vector3(0.0f, 5.0f, -10.0f);
+
     if (m_tracker.IsKeyReleased(Keyboard::F1)) m_bodies[0]->Generate(Galactic::EDetail::Low);
     if (m_tracker.IsKeyReleased(Keyboard::F2)) m_bodies[0]->Generate(Galactic::EDetail::Medium);
     if (m_tracker.IsKeyReleased(Keyboard::F3)) m_bodies[0]->Generate(Galactic::EDetail::High);
 
     if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
+
+    if (mouse.positionMode == Mouse::MODE_RELATIVE)
+    {
+        Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f) * 0.008f;
+
+        m_pitch -= delta.y;
+        m_yaw -= delta.x;
+
+        float limit = XM_PI / 2.0f - 0.01f;
+        m_pitch = std::max(-limit, m_pitch);
+        m_pitch = std::min(+limit, m_pitch);
+
+        if (m_yaw > XM_PI)
+        {
+            m_yaw -= XM_PI * 2.0f;
+        }
+        else if (m_yaw < -XM_PI)
+        {
+            m_yaw += XM_PI * 2.0f;
+        }
+    }
+
+    m_mouse->SetMode(mouse.leftButton ? Mouse::MODE_RELATIVE : Mouse::MODE_ABSOLUTE);
+
+    Vector3 move = Vector3::Zero;
+
+    if (kb.W) move.z += 1.f;
+    if (kb.S) move.z -= 1.f;
+    if (kb.A) move.x += 1.f;
+    if (kb.D) move.x -= 1.f;
+
+    Quaternion q = Quaternion::CreateFromYawPitchRoll(m_yaw, -m_pitch, 0.f);
+
+    move = Vector3::Transform(move, q);
+    move *= 0.05f;
+    m_cameraPos += move;
 
     // TODO: Add your game logic here.
     for (auto &body : m_bodies)
@@ -97,9 +138,17 @@ void Game::Render()
 
     Clear();
 
+    float y = sinf(m_pitch);
+    float r = cosf(m_pitch);
+    float z = r * cosf(m_yaw);
+    float x = r * sinf(m_yaw);
+
+    XMVECTOR lookAt = m_cameraPos + Vector3(x, y, z);
+    XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
+
     // TODO: Add your rendering code here.
     for(auto &body : m_bodies)
-        body->Render(m_view, m_proj);
+        body->Render(view, m_proj);
 
     Present();
 }
