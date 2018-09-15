@@ -4,6 +4,7 @@
 #include "TerrainNode.hpp"
 #include "ISphericalTerrain.hpp"
 
+#include "FastNoise/FastNoise.h"
 #include "Render/DirectX/Effect.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
@@ -20,14 +21,16 @@ namespace Galactic
             void Update(float dt);
             void Reset();
 
-            int GetGridSize() const { return 17; }
+            int GetGridSize() const { return 33; }
             float GetRadius() const { return m_radius; }
-
+            float GetHeight(DirectX::SimpleMath::Vector3 p);
+            
             DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
             std::shared_ptr<Effect> GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
 
         private:
+            FastNoise m_noise;
             DirectX::SimpleMath::Matrix &m_world;
 
             std::weak_ptr<IPlanet> m_planet;

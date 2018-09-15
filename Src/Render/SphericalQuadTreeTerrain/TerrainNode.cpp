@@ -11,14 +11,13 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
       m_parent(parent),
       m_planet(planet),
       m_bounds(bounds),
-      m_scale(bounds.size),
-      m_transformed(Matrix::Identity)
+      m_scale(bounds.size)
 {
     ID3D11Device *device;
     terrain->GetContext()->GetDevice(&device);
 
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
-    m_world = Matrix::Identity * (IsRoot() ? Matrix::Identity : m_parent.lock()->GetMatrix());
+    m_world = IsRoot() ? Matrix::Identity : m_parent.lock()->GetMatrix();
     m_depth = -(int)log2f(m_scale);
 }
 
@@ -27,46 +26,61 @@ void TerrainNode::Generate()
     uint16_t gridsize = (uint16_t)m_terrain->GetGridSize();
 
     float step = m_bounds.size / (gridsize - 1);
-    int i = 0;
-    bool hasParent = !IsRoot();
+    //int i = 0;
+    //bool hasParent = !IsRoot();
 
-    for (int y = 0; y < gridsize; ++y) {
+    for (int y = 0; y < gridsize; ++y)
+    {
         float yy = m_bounds.y + y * step;
 
-        for (int x = 0; x < gridsize; ++x, ++i) {
+        for (int x = 0; x < gridsize; ++x)
+        {
             PlanetVertex v;
 
-            if (x % 2 == 0 && y & 2 == 0 && hasParent)
-            {
-                v = m_parent.lock()->GetVertex(i);
-            } 
-            else
-            {
-                float xx = m_bounds.x + x * step;
+            float xx = m_bounds.x + x * step;
 
-                Vector3 pos = PointToSphere(Vector3(xx, 0.5f, yy));
-                pos.Normalize();
+            Vector3 pos = Vector3(xx, 0.5f, yy);
+            
+            pos.Normalize();
+            pos = Vector3::Transform(pos, m_world);
 
-
-                v.position = pos;
-                v.color = Vector4(0.0f, 0.2f, 1.0f, 1.0f);
-                v.normal = pos;
-                //v.tangent = v.normal;
-            }
+            v.color = Vector4(0.0f, 1.0f, 0.2f, 1.0f);
+            v.position = pos + Vector3(0.0f, m_terrain->GetHeight(pos), 0.0f);
 
             m_vertices.push_back(v);
         }
     }
 
-    for (uint16_t y = 0; y < gridsize - 1; ++y) {
-        for (uint16_t x = 0; x < gridsize - 1; ++x) {
+    for (uint16_t y = 0; y < gridsize - 1; ++y)
+    {
+        for (uint16_t x = 0; x < gridsize - 1; ++x)
+        {
             m_indices.push_back(y * gridsize + x);
             m_indices.push_back(y * gridsize + x + 1);
             m_indices.push_back((y + 1) * gridsize + x);
-            m_indices.push_back((y + 1) * gridsize + x);
-            m_indices.push_back((y + 1) * gridsize + x + 1);
             m_indices.push_back(y * gridsize + x + 1);
+            m_indices.push_back((y + 1) * gridsize + x + 1);
+            m_indices.push_back((y + 1) * gridsize + x);
         }
+    }
+
+    for (size_t i = 0; i < m_indices.size() - 3; i += 3)
+    {
+        Vector3 p1 = m_vertices[m_indices[i + 0]].position;
+        Vector3 p2 = m_vertices[m_indices[i + 1]].position;
+        Vector3 p3 = m_vertices[m_indices[i + 2]].position;
+
+        Vector3 n = (p3 - p1).Cross(p2 - p1);
+
+        m_vertices[m_indices[i + 0]].normal += n;
+        m_vertices[m_indices[i + 1]].normal += n;
+        m_vertices[m_indices[i + 2]].normal += n;
+    }
+
+    for (size_t i = 0; i < m_vertices.size(); ++i)
+    {
+        m_vertices[i].normal.Normalize();
+        //m_vertices[i].normal = Vector3::TransformNormal(m_vertices[i].normal, m_world);
     }
 
     Init();
@@ -78,10 +92,8 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         PreDraw();
 
-        m_transformed = m_world * m_terrain->GetMatrix();
-
-        Matrix worldViewProj = m_transformed * view * proj;
-        MatrixBuffer buffer = { worldViewProj.Transpose(), m_transformed.Transpose() };
+        Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
+        MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
         
         m_buffer->SetData(m_terrain->GetContext().Get(), buffer);
 
@@ -101,9 +113,9 @@ void TerrainNode::Update(float dt)
     int gridsize = m_terrain->GetGridSize();
 
     Vector3 cam = m_planet.lock()->GetCameraPos();
-    Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
+    Vector3 midpoint = m_vertices[(int)ceil((gridsize * gridsize) / 2)].position;
 
-    Vector3 mid = Vector3::Transform(midpoint, m_transformed);
+    Vector3 mid = Vector3::Transform(midpoint, m_terrain->GetMatrix());
 
     float distance = Vector3::Distance(cam, mid);
     bool divide = distance < m_scale * 5.0f;
@@ -181,7 +193,7 @@ void TerrainNode::Merge()
     }
 }
 
-void Galactic::TerrainNode::Release()
+void TerrainNode::Release()
 {
     if (!IsLeaf())
     {
@@ -192,7 +204,32 @@ void Galactic::TerrainNode::Release()
     Reset();
 }
 
-DirectX::SimpleMath::Vector3 TerrainNode::PointToSphere(DirectX::SimpleMath::Vector3 p)
+Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
+{
+    std::array<float, 9> s;
+    Vector3 n;
+    uint32_t i = 0;
+
+    for (int yy = -1; yy <= 1; yy++) {
+        for (int xx = -1; xx <= 1; xx++) {
+            Vector3 v = Vector3(x + (float)xx * step, 0.5f, y + (float)yy * step);
+            v.Normalize();
+            s[i++] = m_terrain->GetHeight(Vector3::Transform(v, m_world));
+        }
+    }
+
+    float scale = 1.0f;
+
+    n.x = scale * -(s[2] - s[0] + 2 * (s[5] - s[3]) + s[8] - s[6]);
+    n.z = scale * -(s[6] - s[0] + 2 * (s[7] - s[1]) + s[8] - s[2]);
+    n.y = 1.0;
+
+    n.Normalize();
+
+    return n;
+}
+
+Vector3 TerrainNode::PointToSphere(DirectX::SimpleMath::Vector3 p)
 {
     float x2 = p.x * p.x, y2 = p.y * p.y, z2 = p.z * p.z;
 

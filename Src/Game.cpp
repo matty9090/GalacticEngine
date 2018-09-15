@@ -88,7 +88,7 @@ void Game::Update(DX::StepTimer const& timer)
 
     if (mouse.positionMode == Mouse::MODE_RELATIVE)
     {
-        Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f) * 0.004f;
+        Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f) * 0.002f;
 
         m_pitch -= delta.y;
         m_yaw -= delta.x;
@@ -124,7 +124,7 @@ void Game::Update(DX::StepTimer const& timer)
     // TODO: Find actual closest body
     std::shared_ptr<Galactic::IPlanet> closestBody = std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0]);
     
-    float radius = (closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
+    float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
 
     std::cout << factor << "\n";

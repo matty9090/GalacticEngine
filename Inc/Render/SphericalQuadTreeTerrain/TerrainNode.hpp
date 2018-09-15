@@ -61,8 +61,8 @@ namespace Galactic
             std::array<std::shared_ptr<TerrainNode>, 4> m_children;
 
             DirectX::SimpleMath::Matrix m_world;
-            DirectX::SimpleMath::Matrix m_transformed;
 
+            DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
     };
 }
