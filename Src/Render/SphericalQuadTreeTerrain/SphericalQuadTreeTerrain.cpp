@@ -66,7 +66,7 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
 
     for (int i = 0; i < 6; ++i)
     {
-        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, -0.5f, 1.0f });
+        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
         m_faces[i]->GetMatrix() = orientations[i];
     }
     

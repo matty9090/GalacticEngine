@@ -31,7 +31,10 @@ namespace Galactic
     class TerrainNode : public IRenderable, public Drawable<PlanetVertex>, public std::enable_shared_from_this<TerrainNode>
     {
         public:
-            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, std::weak_ptr<IPlanet> planet, Square bounds);
+            enum EDir { North, East, South, West };
+            enum EQuad { NE, NW, SE, SW };
+
+            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, std::weak_ptr<IPlanet> planet, Square bounds, int quad);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -52,6 +55,8 @@ namespace Galactic
             int m_depth;
             bool m_visible;
             float m_scale, m_diameter;
+
+            int m_quad;
             Square m_bounds;
 
             std::weak_ptr<TerrainNode> m_parent;

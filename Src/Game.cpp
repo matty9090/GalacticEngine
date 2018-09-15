@@ -195,7 +195,7 @@ void Game::Render()
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Gain", planet->GetGain()).c_str(), Vector2(10, 120), Colors::White, 0.f, Vector2(0, 0));
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Frequency", planet->GetFrequency()).c_str(), Vector2(10, 150), Colors::White, 0.f, Vector2(0, 0));
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Lacunarity", planet->GetLacunarity()).c_str(), Vector2(10, 180), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Octaves", planet->GetOctaves()).c_str(), Vector2(10, 210), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Octaves", (float)planet->GetOctaves()).c_str(), Vector2(10, 210), Colors::White, 0.f, Vector2(0, 0));
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", planet->GetHeight()).c_str(), Vector2(10, 240), Colors::White, 0.f, Vector2(0, 0));
 
     m_spriteBatch->End();
