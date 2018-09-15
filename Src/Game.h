@@ -46,6 +46,9 @@ private:
 
     void OnDeviceLost();
 
+    std::wstring ValueToString(std::wstring name, DirectX::SimpleMath::Vector3 v);
+    std::wstring ValueToString(std::wstring name, float v);
+
     // Device resources.
     HWND                                            m_window;
     int                                             m_outputWidth;
@@ -65,6 +68,8 @@ private:
     DirectX::Keyboard::KeyboardStateTracker         m_tracker;
     std::unique_ptr<DirectX::Keyboard>              m_keyboard;
     std::unique_ptr<DirectX::Mouse>                 m_mouse;
+    std::unique_ptr<DirectX::SpriteFont>            m_font;
+    std::unique_ptr<DirectX::SpriteBatch>           m_spriteBatch;
 
     DirectX::SimpleMath::Matrix                     m_view;
     DirectX::SimpleMath::Matrix                     m_proj;
@@ -72,6 +77,7 @@ private:
     
     float                                           m_pitch;
     float                                           m_yaw;
+    float                                           m_speed;
     
 	std::vector<std::shared_ptr<Galactic::IBody>>	m_bodies;
 };

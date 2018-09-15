@@ -21,7 +21,7 @@ Game::Game() noexcept :
     m_featureLevel(D3D_FEATURE_LEVEL_11_1),
     m_yaw(0),
     m_pitch(0),
-    m_cameraPos(0.0f, 0.0f, -10.0f)
+    m_cameraPos(0.0f, 0.0f, -50.0f)
 {
 }
 
@@ -127,9 +127,11 @@ void Game::Update(DX::StepTimer const& timer)
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
 
-    std::cout << factor << "\n";
+    factor = std::fmaxf(factor, 1.0f);
 
-    m_cameraPos += move * factor * dt;
+    move = move * factor * dt;
+    m_speed = factor;
+    m_cameraPos += move;
 
     // TODO: Add your game logic here.
     for (auto &body : m_bodies)
@@ -158,9 +160,19 @@ void Game::Render()
     XMVECTOR lookAt = m_cameraPos + Vector3(x, y, z);
     XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
 
+    float height = (m_cameraPos - m_bodies[0]->GetPosition()).Length() - std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0])->GetRadius() / Galactic::Constants::Scale;
+
     // TODO: Add your rendering code here.
     for(auto &body : m_bodies)
         body->Render(view, m_proj);
+
+    m_spriteBatch->Begin();
+
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Camera", m_cameraPos).c_str(), Vector2(10, 10), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", height).c_str(), Vector2(10, 40), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Speed", m_speed).c_str(), Vector2(10, 70), Colors::White, 0.f, Vector2(0, 0));
+
+    m_spriteBatch->End();
 
     Present();
 }
@@ -303,6 +315,9 @@ void Game::CreateDevice()
     DX::ThrowIfFailed(context.As(&m_d3dContext));
 
     // TODO: Initialize device dependent objects here (independent of window size).
+    m_font = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"Resources/Fonts/Courier.font");
+    m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+    
     auto planet = Galactic::CreatePlanet(m_d3dContext, "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
     planet->Generate(Galactic::EDetail::High);
@@ -417,10 +432,31 @@ void Game::OnDeviceLost()
     m_swapChain.Reset();
     m_d3dContext.Reset();
     m_d3dDevice.Reset();
+    m_font.reset();
+    m_spriteBatch.reset();
 
     for (auto &body : m_bodies)
         body->Reset();
     
     CreateDevice();
     CreateResources();
+}
+
+std::wstring Game::ValueToString(std::wstring name, DirectX::SimpleMath::Vector3 v)
+{
+    std::wstringstream ss;
+    ss.precision(3);
+    ss << name << ": ";
+    ss << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+
+    return ss.str();
+}
+
+std::wstring Game::ValueToString(std::wstring name, float v)
+{
+    std::wstringstream ss;
+    ss.precision(3);
+    ss << name << ": " << v;
+
+    return ss.str();
 }
