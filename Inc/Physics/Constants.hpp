@@ -3,6 +3,6 @@
 namespace Galactic
 {
     namespace Constants {
-        const double Scale = 2000.0;
+        const double Scale = 800.0;
     }
 }

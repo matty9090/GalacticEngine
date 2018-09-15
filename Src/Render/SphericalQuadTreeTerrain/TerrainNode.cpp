@@ -11,7 +11,8 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
       m_parent(parent),
       m_planet(planet),
       m_bounds(bounds),
-      m_scale(bounds.size)
+      m_scale(bounds.size),
+      m_visible(true)
 {
     ID3D11Device *device;
     terrain->GetContext()->GetDevice(&device);
@@ -19,6 +20,7 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
     m_world = IsRoot() ? Matrix::Identity : m_parent.lock()->GetMatrix();
     m_depth = -(int)log2f(m_scale);
+    m_diameter = m_scale * m_terrain->GetRadius() * 2;
 }
 
 void TerrainNode::Generate()
@@ -44,8 +46,8 @@ void TerrainNode::Generate()
             pos.Normalize();
             pos = Vector3::Transform(pos, m_world);
 
-            v.color = Vector4(0.0f, 1.0f, 0.2f, 1.0f);
-            v.position = pos + Vector3(0.0f, m_terrain->GetHeight(pos), 0.0f);
+            v.color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+            v.position = pos + pos * m_terrain->GetHeight(pos);
 
             m_vertices.push_back(v);
         }
@@ -77,34 +79,31 @@ void TerrainNode::Generate()
         m_vertices[m_indices[i + 2]].normal += n;
     }
 
-    for (size_t i = 0; i < m_vertices.size(); ++i)
-    {
-        m_vertices[i].normal.Normalize();
-        //m_vertices[i].normal = Vector3::TransformNormal(m_vertices[i].normal, m_world);
-    }
-
     Init();
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
-    if (IsLeaf())
+    if (m_visible)
     {
-        PreDraw();
+        if (IsLeaf())
+        {
+            PreDraw();
 
-        Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
-        MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
-        
-        m_buffer->SetData(m_terrain->GetContext().Get(), buffer);
+            Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
+            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
 
-        m_terrain->GetContext()->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+            m_buffer->SetData(m_terrain->GetContext().Get(), buffer);
 
-        Draw();
-    }
-    else
-    {
-        for (auto &child : m_children)
-            child->Render(view, proj);
+            m_terrain->GetContext()->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+
+            Draw();
+        }
+        else
+        {
+            for (auto &child : m_children)
+                child->Render(view, proj);
+        }
     }
 }
 
@@ -114,14 +113,18 @@ void TerrainNode::Update(float dt)
 
     Vector3 cam = m_planet.lock()->GetCameraPos();
     Vector3 midpoint = m_vertices[(int)ceil((gridsize * gridsize) / 2)].position;
-
     Vector3 mid = Vector3::Transform(midpoint, m_terrain->GetMatrix());
 
     float distance = Vector3::Distance(cam, mid);
-    bool divide = distance < m_scale * 5.0f;
+    float height = (cam - m_planet.lock()->GetPosition()).Length() - m_terrain->GetRadius() * 0.96f;
 
-    if (true)
+    float horizon = sqrtf(height * (2 * m_terrain->GetRadius() + height));
+    m_visible = distance - m_diameter < horizon;
+
+    if (m_visible)
     {
+        bool divide = distance < m_scale * 50.0f;
+
         if (!divide)
             Merge();
 
@@ -129,7 +132,7 @@ void TerrainNode::Update(float dt)
         {
             Split();
         }
-        else if(!IsLeaf())
+        else if (!IsLeaf())
         {
             for (auto &child : m_children)
                 child->Update(dt);
@@ -147,7 +150,7 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (m_depth >= 8)
+    if (m_depth >= 9)
         return;
 
     if (IsLeaf())

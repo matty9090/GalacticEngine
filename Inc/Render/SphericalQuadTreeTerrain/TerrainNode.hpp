@@ -50,7 +50,8 @@ namespace Galactic
 
         private:
             int m_depth;
-            float m_scale;
+            bool m_visible;
+            float m_scale, m_diameter;
             Square m_bounds;
 
             std::weak_ptr<TerrainNode> m_parent;

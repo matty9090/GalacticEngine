@@ -74,8 +74,6 @@ void SphericalQuadTreeTerrain::Generate()
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
-    m_world *= Matrix::CreateScale(m_radius);
-
     auto sampler = m_states->LinearWrap();
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
@@ -94,6 +92,8 @@ void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX:
 
 void SphericalQuadTreeTerrain::Update(float dt)
 {
+    m_world *= Matrix::CreateScale(m_radius);
+
     for (auto &face : m_faces)
         face->Update(dt);
 }
@@ -109,6 +109,6 @@ void SphericalQuadTreeTerrain::Reset()
 
 float Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p)
 {
-    float v = m_noise.GetNoise(p.x * 500.0f, p.y * 500.0f, p.z * 500.0f) / 20.0f;
+    float v = m_noise.GetNoise(p.x * 500.0f, p.y * 500.0f, p.z * 500.0f) / 200.0f;
     return v;
 }
