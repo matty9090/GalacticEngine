@@ -26,6 +26,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{f2c13dd2-f616-4675-adc2-d472667b665a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FastNoise">
+      <UniqueIdentifier>{d62e84ce-a073-4e4b-9ba9-1962e6d2a730}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="settings.manifest">
@@ -89,6 +92,9 @@
     <ClInclude Include="Inc\Render\Drawable.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\FastNoise\FastNoise.h">
+      <Filter>FastNoise</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -119,6 +125,9 @@
     </ClCompile>
     <ClCompile Include="Src\Render\DirectX\Effect.cpp">
       <Filter>Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FastNoise\FastNoise.cpp">
+      <Filter>FastNoise</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

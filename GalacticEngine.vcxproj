@@ -164,6 +164,7 @@
     <ClInclude Include="Inc\Body\IBody.hpp" />
     <ClInclude Include="Inc\Body\IPlanet.hpp" />
     <ClInclude Include="Inc\Body\Planet.hpp" />
+    <ClInclude Include="Inc\FastNoise\FastNoise.h" />
     <ClInclude Include="Inc\GalacticEngine.hpp" />
     <ClInclude Include="Inc\pch.h" />
     <ClInclude Include="Inc\Physics\Constants.hpp" />
@@ -184,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Body\Planet.cpp" />
+    <ClCompile Include="Src\FastNoise\FastNoise.cpp" />
     <ClCompile Include="Src\GalacticEngine.cpp" />
     <ClCompile Include="Src\Game.cpp" />
     <ClCompile Include="Src\Main.cpp" />
