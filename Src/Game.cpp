@@ -116,6 +116,25 @@ void Game::Update(DX::StepTimer const& timer)
     if (kb.A) move.x += 1.f;
     if (kb.D) move.x -= 1.f;
 
+    auto planet = std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0]);
+
+    int octaves = planet->GetOctaves();
+    float gain = planet->GetGain();
+    float height = planet->GetHeight();
+    float lacunarity = planet->GetLacunarity();
+    float frequency = planet->GetFrequency();
+
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad7)) { planet->SetParameters(frequency, lacunarity, gain - 0.1f, height, octaves); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad8)) { planet->SetParameters(frequency, lacunarity, gain + 0.1f, height, octaves); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad4)) { planet->SetParameters(frequency - 0.01f, lacunarity, gain, height, octaves); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad5)) { planet->SetParameters(frequency + 0.01f, lacunarity, gain, height, octaves); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad1)) { planet->SetParameters(frequency, lacunarity - 0.1f, gain, height, octaves); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad2)) { planet->SetParameters(frequency, lacunarity + 0.1f, gain, height, octaves); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad9)) { planet->SetParameters(frequency, lacunarity, gain, height, octaves + 1); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad6)) { planet->SetParameters(frequency, lacunarity, gain, height, octaves - 1); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D1)) { planet->SetParameters(frequency, lacunarity, gain, height - 0.25f, octaves); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D2)) { planet->SetParameters(frequency, lacunarity, gain, height + 0.25f, octaves); planet->Generate(Galactic::High); }
+
     Quaternion q = Quaternion::CreateFromYawPitchRoll(m_yaw, -m_pitch, 0.f);
 
     move = Vector3::Transform(move, q);
@@ -127,7 +146,7 @@ void Game::Update(DX::StepTimer const& timer)
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
 
-    factor = std::fmaxf(factor, 1.0f);
+    factor = std::fmaxf(factor, 5.0f);
 
     move = move * factor * dt;
     m_speed = factor;
@@ -160,7 +179,9 @@ void Game::Render()
     XMVECTOR lookAt = m_cameraPos + Vector3(x, y, z);
     XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
 
-    float height = (m_cameraPos - m_bodies[0]->GetPosition()).Length() - std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0])->GetRadius() / Galactic::Constants::Scale;
+    auto planet = std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0]);
+
+    float height = (m_cameraPos - m_bodies[0]->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
 
     // TODO: Add your rendering code here.
     for(auto &body : m_bodies)
@@ -171,6 +192,11 @@ void Game::Render()
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Camera", m_cameraPos).c_str(), Vector2(10, 10), Colors::White, 0.f, Vector2(0, 0));
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", height).c_str(), Vector2(10, 40), Colors::White, 0.f, Vector2(0, 0));
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Speed", m_speed).c_str(), Vector2(10, 70), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Gain", planet->GetGain()).c_str(), Vector2(10, 120), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Frequency", planet->GetFrequency()).c_str(), Vector2(10, 150), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Lacunarity", planet->GetLacunarity()).c_str(), Vector2(10, 180), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Octaves", planet->GetOctaves()).c_str(), Vector2(10, 210), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", planet->GetHeight()).c_str(), Vector2(10, 240), Colors::White, 0.f, Vector2(0, 0));
 
     m_spriteBatch->End();
 

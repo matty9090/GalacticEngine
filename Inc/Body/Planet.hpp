@@ -12,6 +12,7 @@ namespace Galactic
             ~Planet();
 
             void Generate(EDetail detail = EDetail::Medium);
+            void SetParameters(float freq = 0.1f, float lacunarity = 2.0f, float gain = 0.5f, float height = 1.0f, int octaves = 6);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -28,6 +29,12 @@ namespace Galactic
             double GetRadius() const { return m_radius; }
             long double GetMass() const { return m_mass; }
 
+            int GetOctaves() const { return m_octaves; }
+            float GetGain() const { return m_gain; }
+            float GetHeight() const { return m_height; }
+            float GetFrequency() const { return m_freq; }
+            float GetLacunarity() const { return m_lacunarity; }
+
             DirectX::SimpleMath::Matrix &GetMatrix()         { return m_world; };
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
             DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }
@@ -42,6 +49,9 @@ namespace Galactic
             bool m_isGenerated;
             double m_radius;
             long double m_mass;
+
+            int m_octaves;
+            float m_gain, m_lacunarity, m_freq, m_height;
 
             DirectX::SimpleMath::Matrix  m_world;
             DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation, m_camPos;

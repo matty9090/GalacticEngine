@@ -15,7 +15,7 @@ namespace Galactic
         public:
             SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::weak_ptr<IPlanet> planet);
             
-            void Generate();
+            void Generate(float freq, float lacunarity, float gain, int octaves);
             void CreateEffect();
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);

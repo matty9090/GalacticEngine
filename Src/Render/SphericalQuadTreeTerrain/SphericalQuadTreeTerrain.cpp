@@ -15,10 +15,6 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     m_deviceContext->GetDevice(&m_device);
 
     m_states = std::make_unique<DirectX::CommonStates>(m_device.Get());
-    
-    m_noise.SetInterp(FastNoise::Quintic);
-    m_noise.SetNoiseType(FastNoise::SimplexFractal);
-    m_noise.SetFractalOctaves(8);
 
     CreateEffect();
 }
@@ -49,8 +45,15 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
 }
 
-void SphericalQuadTreeTerrain::Generate()
+void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain, int octaves)
 {
+    m_noise.SetInterp(FastNoise::Quintic);
+    m_noise.SetNoiseType(FastNoise::SimplexFractal);
+    m_noise.SetFractalOctaves(octaves);
+    m_noise.SetFractalGain(gain);
+    m_noise.SetFractalLacunarity(lacunarity);
+    m_noise.SetFrequency(freq);
+
     std::array<Matrix, 6> orientations = 
     {
         Matrix::Identity,
@@ -103,12 +106,12 @@ void SphericalQuadTreeTerrain::Reset()
     m_states.reset();
     m_effect->Reset();
 
-    //for (auto &face : m_faces)
-     //   face->Release();
+    for (auto &face : m_faces)
+        face->Release();
 }
 
 float Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p)
 {
-    float v = m_noise.GetNoise(p.x * 500.0f, p.y * 500.0f, p.z * 500.0f) / 200.0f;
+    float v = m_planet.lock()->GetHeight() * m_noise.GetNoise(p.x * 400.0f, p.y * 400.0f, p.z * 400.0f) / 200.0f;
     return v;
 }

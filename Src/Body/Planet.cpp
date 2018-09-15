@@ -10,14 +10,19 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
     : m_name(name),
       m_deviceContext(deviceContext),
       m_renderer(nullptr),
-      m_isGenerated(false)
+      m_isGenerated(false),
+      m_freq(0.03f),
+      m_gain(0.5f),
+      m_octaves(13),
+      m_lacunarity(1.8f),
+      m_height(1.0f)
 {
     
 }
 
 Planet::~Planet()
 {
-
+    
 }
 
 void Planet::Generate(EDetail detail)
@@ -36,6 +41,15 @@ void Planet::Generate(EDetail detail)
         m_renderer->GetMatrix() = matrix;
 
     m_isGenerated = true;
+}
+
+void Galactic::Planet::SetParameters(float freq, float lacunarity, float gain, float height, int octaves)
+{
+    m_freq = freq;
+    m_gain = gain;
+    m_height = height;
+    m_octaves = octaves;
+    m_lacunarity = lacunarity;
 }
 
 void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
