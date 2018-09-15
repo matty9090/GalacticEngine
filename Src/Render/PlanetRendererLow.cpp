@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "Render/IRenderable.hpp"
 #include "Render/PlanetRendererLow.hpp"
+#include "Physics/Constants.hpp"
 
 using namespace Galactic;
 using namespace DirectX;
@@ -13,8 +14,7 @@ LowDetailPlanetRenderer::LowDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11De
       m_planet(planet),
       m_world(planet.lock()->GetMatrix())
 {
-    m_geometry = GeometricPrimitive::CreateSphere(deviceContext.Get(), 1.0f, 5U);
-    m_world = Matrix::Identity;
+    m_geometry = GeometricPrimitive::CreateSphere(deviceContext.Get(), 2.0f, 5U);
 }
 
 void LowDetailPlanetRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -25,6 +25,8 @@ void LowDetailPlanetRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX::
 void LowDetailPlanetRenderer::Update(float dt)
 {
     dt;
+
+    m_world *= Matrix::CreateScale(m_planet->GetRadius() / Constants::Scale);
 }
 
 void Galactic::LowDetailPlanetRenderer::Reset()
