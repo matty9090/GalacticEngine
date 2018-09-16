@@ -82,5 +82,8 @@ namespace Galactic
 
             DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
+
+            std::shared_ptr<TerrainNode> GetGreaterThanOrEqualNeighbours(int dir) const;
+            std::vector<std::shared_ptr<TerrainNode>> GetSmallerNeighbours(std::shared_ptr<TerrainNode> neighbour, int dir) const;
     };
 }

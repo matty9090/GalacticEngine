@@ -336,3 +336,144 @@ Vector3 TerrainNode::PointToSphere(DirectX::SimpleMath::Vector3 p)
                    p.y * sqrtf(1.0f - z2 * 0.5f - x2 * 0.5f + (z2 * x2) * 0.33333333f),
                    p.z * sqrtf(1.0f - x2 * 0.5f - y2 * 0.5f + (x2 * y2) * 0.33333333f));
 }
+
+std::vector<std::shared_ptr<TerrainNode>> TerrainNode::GetSmallerNeighbours(std::shared_ptr<TerrainNode> neighbour, int dir) const {
+    std::vector<std::shared_ptr<TerrainNode>> neighbours;
+    std::queue<std::shared_ptr<TerrainNode>> nodes;
+
+    if (neighbour)
+        nodes.push(neighbour);
+
+    switch (dir) {
+        case North: {
+            while (nodes.size() > 0) {
+                if (nodes.front()->IsLeaf())
+                    neighbours.push_back(nodes.front());
+                else {
+                    nodes.push(nodes.front()->GetChild(SW));
+                    nodes.push(nodes.front()->GetChild(SE));
+                }
+
+                nodes.pop();
+            }
+
+            break;
+        }
+
+        case South: {
+            while (nodes.size() > 0) {
+                if (nodes.front()->IsLeaf())
+                    neighbours.push_back(nodes.front());
+                else {
+                    nodes.push(nodes.front()->GetChild(NW));
+                    nodes.push(nodes.front()->GetChild(NE));
+                }
+
+                nodes.pop();
+            }
+
+            break;
+        }
+
+        case East: {
+            while (nodes.size() > 0) {
+                if (nodes.front()->IsLeaf())
+                    neighbours.push_back(nodes.front());
+                else {
+                    nodes.push(nodes.front()->GetChild(NW));
+                    nodes.push(nodes.front()->GetChild(SW));
+                }
+
+                nodes.pop();
+            }
+
+            break;
+        }
+
+        case West: {
+            while (nodes.size() > 0) {
+                if (nodes.front()->IsLeaf())
+                    neighbours.push_back(nodes.front());
+                else {
+                    nodes.push(nodes.front()->GetChild(NE));
+                    nodes.push(nodes.front()->GetChild(SE));
+                }
+
+                nodes.pop();
+            }
+
+            break;
+        }
+    }
+
+    return neighbours;
+}
+
+std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbours(int dir) const {
+    auto parent = m_parent.lock();
+    auto self = shared_from_this();
+    
+    switch (dir) {
+        case North: {
+            if (!parent) return nullptr;
+            if (parent->GetChild(SW) == self) return parent->GetChild(NW);
+            if (parent->GetChild(SE) == self) return parent->GetChild(NE);
+
+           auto node = parent->GetGreaterThanOrEqualNeighbours(dir);
+
+            if (!node || node->IsLeaf())
+                return node;
+
+            return (parent->GetChild(NW) == self) ? node->GetChild(SW) : node->GetChild(SE);
+
+            break;
+        }
+
+        case South: {
+            if (!parent) return nullptr;
+            if (parent->GetChild(NW) == self) return parent->GetChild(SW);
+            if (parent->GetChild(NE) == self) return parent->GetChild(SE);
+
+            auto node = parent->GetGreaterThanOrEqualNeighbours(dir);
+
+            if (!node || node->IsLeaf())
+                return node;
+
+            return (parent->GetChild(SW) == self) ? node->GetChild(NW) : node->GetChild(NE);
+
+            break;
+        }
+
+        case East: {
+            if (!parent) return nullptr;
+            if (parent->GetChild(NW) == self) return parent->GetChild(NE);
+            if (parent->GetChild(SW) == self) return parent->GetChild(SE);
+
+            auto node = parent->GetGreaterThanOrEqualNeighbours(dir);
+
+            if (!node || node->IsLeaf())
+                return node;
+
+            return (parent->GetChild(NE) == self) ? node->GetChild(NW) : node->GetChild(SW);
+
+            break;
+        }
+
+        case West: {
+            if (!parent) return nullptr;
+            if (parent->GetChild(NE) == self) return parent->GetChild(NW);
+            if (parent->GetChild(SE) == self) return parent->GetChild(SW);
+
+            auto node = parent->GetGreaterThanOrEqualNeighbours(dir);
+
+            if (!node || node->IsLeaf())
+                return node;
+
+            return (parent->GetChild(NW) == self) ? node->GetChild(NE) : node->GetChild(SE);
+
+            break;
+        }
+    }
+
+    return nullptr;
+}
