@@ -15,6 +15,7 @@ namespace Galactic
             virtual std::shared_ptr<Effect> GetEffect() const = 0;
             virtual Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const = 0;
 
+            virtual void SetRenderContext() = 0;
             virtual float GetHeight(DirectX::SimpleMath::Vector3 point) = 0;
     };
 }

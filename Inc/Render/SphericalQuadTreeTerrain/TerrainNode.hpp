@@ -50,6 +50,10 @@ namespace Galactic
             void Release();
 
             bool IsRoot() const { return !m_parent.lock(); }
+            void SetDebugName(std::string name) { m_dbgName = name; }
+            void SetDebugColour(DirectX::SimpleMath::Color col) { m_dbgCol = col; }
+
+            std::shared_ptr<TerrainNode> GetChild(int dir) const { return m_children[dir]; }
 
         private:
             int m_depth;
@@ -63,6 +67,14 @@ namespace Galactic
             std::weak_ptr<IPlanet> m_planet;
             std::shared_ptr<ISphericalTerrain> m_terrain;
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
+
+            // Debug
+            std::string m_dbgName;
+            DirectX::SimpleMath::Color m_dbgCol;
+            std::unique_ptr<DirectX::CommonStates> m_dbgStates;
+            std::unique_ptr<DirectX::BasicEffect> m_dbgEffect;
+            std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_dbgBatch;
+            Microsoft::WRL::ComPtr<ID3D11InputLayout> m_dbgInputLayout;
 
             std::array<std::shared_ptr<TerrainNode>, 4> m_children;
 

@@ -22,6 +22,22 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
     m_world = IsRoot() ? Matrix::Identity : m_parent.lock()->GetMatrix();
     m_depth = -(int)log2f(m_scale);
     m_diameter = m_scale * m_terrain->GetRadius() * 2;
+
+#ifdef _DEBUG
+    m_dbgCol = Color(0.0f, 0.0f, 1.0f, 0.25f);
+    m_dbgStates = std::make_unique<CommonStates>(device);
+    m_dbgEffect = std::make_unique<BasicEffect>(device);
+    m_dbgEffect->SetVertexColorEnabled(true);
+
+    void const* shaderByteCode;
+    size_t byteCodeLength;
+
+    m_dbgEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+    DX::ThrowIfFailed(device->CreateInputLayout(VertexPositionColor::InputElements, VertexPositionColor::InputElementCount, shaderByteCode, byteCodeLength, m_dbgInputLayout.ReleaseAndGetAddressOf()));
+
+    m_dbgBatch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(terrain->GetContext().Get());
+#endif
 }
 
 void TerrainNode::Generate()
@@ -31,7 +47,7 @@ void TerrainNode::Generate()
     float step = m_bounds.size / (gridsize - 1);
     bool hasParent = !IsRoot();
 
-    int sx, sy;
+    int sx = 0, sy = 0;
     int gh = (gridsize - 1) / 2;
 
     switch (m_quad)
@@ -114,6 +130,10 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         if (IsLeaf())
         {
+#ifdef _DEBUG
+            m_terrain->SetRenderContext();
+#endif
+
             PreDraw();
 
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
@@ -124,6 +144,42 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             m_terrain->GetContext()->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
             Draw();
+
+#ifdef _DEBUG
+            m_terrain->GetContext()->OMSetBlendState(m_dbgStates->AlphaBlend(), nullptr, 0xFFFFFFFF);
+            m_terrain->GetContext()->OMSetDepthStencilState(m_dbgStates->DepthNone(), 0);
+            m_terrain->GetContext()->RSSetState(m_dbgStates->CullNone());
+
+            m_dbgEffect->SetWorld(m_terrain->GetMatrix());
+            m_dbgEffect->SetView(view);
+            m_dbgEffect->SetProjection(proj);
+
+            m_dbgEffect->Apply(m_terrain->GetContext().Get());
+            m_terrain->GetContext()->IASetInputLayout(m_dbgInputLayout.Get());
+
+            m_dbgBatch->Begin();
+
+            Color col = m_dbgCol;
+            VertexPositionColor p1, p2, p3, p4;
+
+            int gs = m_terrain->GetGridSize();
+
+            if (m_depth == 3)
+                col = Color(1.0f, 0.0f, 0.0f, 1.0f);
+
+            p1.position = m_vertices[0].position;
+            p2.position = m_vertices[gs - 1].position;
+            p3.position = m_vertices[gs * gs - gs].position;
+            p4.position = m_vertices[gs * gs - 1].position;
+            
+            p1.color = m_dbgCol; p2.color = m_dbgCol;
+            p3.color = m_dbgCol; p4.color = m_dbgCol;
+
+            m_dbgBatch->DrawLine(p1, p2); m_dbgBatch->DrawLine(p1, p3);
+            m_dbgBatch->DrawLine(p2, p4); m_dbgBatch->DrawLine(p3, p4);
+
+            m_dbgBatch->End();
+#endif
         }
         else
         {
@@ -170,6 +226,13 @@ void TerrainNode::Reset()
 {
     m_terrain.reset();
     m_buffer.reset();
+    
+#ifdef _DEBUG
+    m_dbgStates.reset();
+    m_dbgEffect.reset();
+    m_dbgBatch.reset();
+    m_dbgInputLayout.Reset();
+#endif
 
     Cleanup();
 }
@@ -184,10 +247,17 @@ void TerrainNode::Split()
         float x = m_bounds.x, y = m_bounds.y;
         float d = m_bounds.size / 2;
 
-        m_children[0] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x    , y    , d }, NW);
-        m_children[1] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x + d, y    , d }, NE);
-        m_children[2] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x + d, y + d, d }, SE);
-        m_children[3] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x    , y + d, d }, SW);
+        m_children[NW] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x    , y    , d }, NW);
+        m_children[NE] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x + d, y    , d }, NE);
+        m_children[SE] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x + d, y + d, d }, SE);
+        m_children[SW] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x    , y + d, d }, SW);
+
+#ifdef _DEBUG
+        m_children[NW]->SetDebugName(m_dbgName + "_" + std::to_string(NW));
+        m_children[NE]->SetDebugName(m_dbgName + "_" + std::to_string(NE));
+        m_children[SE]->SetDebugName(m_dbgName + "_" + std::to_string(SE));
+        m_children[SW]->SetDebugName(m_dbgName + "_" + std::to_string(SW));
+#endif
 
         for (auto &child : m_children)
             child->Generate();

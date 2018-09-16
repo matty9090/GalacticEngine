@@ -68,6 +68,10 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
     {
         m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
         m_faces[i]->GetMatrix() = orientations[i];
+        
+#ifdef _DEBUG
+        m_faces[i]->SetDebugName(std::to_string(i));
+#endif
     }
     
     for (int i = 0; i < 6; ++i) {
@@ -75,7 +79,7 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
     }
 }
 
-void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
+void SphericalQuadTreeTerrain::SetRenderContext()
 {
     auto sampler = m_states->LinearWrap();
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -88,8 +92,13 @@ void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX:
     m_deviceContext->IASetInputLayout(m_effect->GetInputLayout());
     m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
+}
 
-    for(auto &face : m_faces)
+void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
+{
+    SetRenderContext();
+
+    for (auto &face : m_faces)
         face->Render(view, proj);
 }
 

@@ -21,10 +21,16 @@ namespace Galactic
             void Update(float dt);
             void Reset();
 
+#ifdef _DEBUG
+            int GetGridSize() const { return 9; }
+#else
             int GetGridSize() const { return 33; }
+#endif
+
             float GetRadius() const { return m_radius; }
             float GetHeight(DirectX::SimpleMath::Vector3 p);
-            
+
+            void SetRenderContext();
             DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
             std::shared_ptr<Effect> GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
