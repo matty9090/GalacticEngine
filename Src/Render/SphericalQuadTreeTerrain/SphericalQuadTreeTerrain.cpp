@@ -125,6 +125,11 @@ void SphericalQuadTreeTerrain::Reset()
 
 float Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p)
 {
-    float v = m_planet.lock()->GetHeight() * m_noise.GetNoise(p.x * 400.0f, p.y * 400.0f, p.z * 400.0f) / 200.0f;
-    return v;
+    auto planet = m_planet.lock();
+    float scale = planet->GetNoiseScale();
+    float minvalue = planet->GetMinValue();
+
+    float v = planet->GetHeight() * m_noise.GetNoise(p.x * 40.0f * scale, p.y * 40.0f * scale, p.z * 40.0f * scale) / 20.0f;
+    
+    return fmaxf(0.0f, v - minvalue);
 }

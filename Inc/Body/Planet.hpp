@@ -12,7 +12,7 @@ namespace Galactic
             ~Planet();
 
             void Generate(EDetail detail = EDetail::Medium);
-            void SetParameters(float freq = 0.1f, float lacunarity = 2.0f, float gain = 0.5f, float height = 1.0f, int octaves = 6);
+            void SetParameters(float freq = 0.1f, float lacunarity = 2.0f, float gain = 0.5f, float height = 1.0f, int octaves = 6, float noiseScale = 1.0f);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -29,11 +29,21 @@ namespace Galactic
             double GetRadius() const { return m_radius; }
             long double GetMass() const { return m_mass; }
 
+            void SetOctaves(int v) { m_octaves = v; }
+            void SetGain(float v) { m_gain = v; }
+            void SetHeight(float v) { m_height = v; }
+            void SetFrequency(float v) { m_freq = v; }
+            void SetLacunarity(float v) { m_lacunarity = v; }
+            void SetNoiseScale(float v) { m_noiseScale = v; }
+            void SetMinValue(float v) { m_minValue = v; }
+
             int GetOctaves() const { return m_octaves; }
             float GetGain() const { return m_gain; }
             float GetHeight() const { return m_height; }
             float GetFrequency() const { return m_freq; }
             float GetLacunarity() const { return m_lacunarity; }
+            float GetNoiseScale() const { return m_noiseScale; }
+            float GetMinValue() const { return m_minValue; }
 
             DirectX::SimpleMath::Matrix &GetMatrix()         { return m_world; };
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
@@ -51,7 +61,7 @@ namespace Galactic
             long double m_mass;
 
             int m_octaves;
-            float m_gain, m_lacunarity, m_freq, m_height;
+            float m_gain, m_lacunarity, m_freq, m_height, m_noiseScale, m_minValue;
 
             DirectX::SimpleMath::Matrix  m_world;
             DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation, m_camPos;

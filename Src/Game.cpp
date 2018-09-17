@@ -123,17 +123,23 @@ void Game::Update(DX::StepTimer const& timer)
     float height = planet->GetHeight();
     float lacunarity = planet->GetLacunarity();
     float frequency = planet->GetFrequency();
+    float scale = planet->GetNoiseScale();
+    float minvalue = planet->GetMinValue();
 
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad7)) { planet->SetParameters(frequency, lacunarity, gain - 0.1f, height, octaves); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad8)) { planet->SetParameters(frequency, lacunarity, gain + 0.1f, height, octaves); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad4)) { planet->SetParameters(frequency - 0.01f, lacunarity, gain, height, octaves); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad5)) { planet->SetParameters(frequency + 0.01f, lacunarity, gain, height, octaves); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad1)) { planet->SetParameters(frequency, lacunarity - 0.1f, gain, height, octaves); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad2)) { planet->SetParameters(frequency, lacunarity + 0.1f, gain, height, octaves); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad9)) { planet->SetParameters(frequency, lacunarity, gain, height, octaves + 1); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad6)) { planet->SetParameters(frequency, lacunarity, gain, height, octaves - 1); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D1)) { planet->SetParameters(frequency, lacunarity, gain, height - 0.25f, octaves); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D2)) { planet->SetParameters(frequency, lacunarity, gain, height + 0.25f, octaves); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad7)) { planet->SetGain(gain - 0.1f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad8)) { planet->SetGain(gain + 0.1f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad4)) { planet->SetFrequency(frequency - 0.01f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad5)) { planet->SetFrequency(frequency + 0.01f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad1)) { planet->SetLacunarity(lacunarity - 0.1f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad2)) { planet->SetLacunarity(lacunarity + 0.1f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad9)) { planet->SetOctaves(octaves + 1); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad6)) { planet->SetOctaves(octaves - 1); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D1)) { planet->SetHeight(height - 0.25f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D2)) { planet->SetHeight(height + 0.25f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D3)) { planet->SetNoiseScale(scale - 0.1f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D4)) { planet->SetNoiseScale(scale + 0.1f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D5)) { planet->SetMinValue(minvalue - 0.01f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D6)) { planet->SetMinValue(minvalue + 0.01f); planet->Generate(Galactic::High); }
 
     Quaternion q = Quaternion::CreateFromYawPitchRoll(m_yaw, -m_pitch, 0.f);
 
@@ -197,6 +203,8 @@ void Game::Render()
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Lacunarity", planet->GetLacunarity()).c_str(), Vector2(10, 180), Colors::White, 0.f, Vector2(0, 0));
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Octaves", (float)planet->GetOctaves()).c_str(), Vector2(10, 210), Colors::White, 0.f, Vector2(0, 0));
     m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", planet->GetHeight()).c_str(), Vector2(10, 240), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Scale", planet->GetNoiseScale()).c_str(), Vector2(10, 270), Colors::White, 0.f, Vector2(0, 0));
+    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Min", planet->GetMinValue()).c_str(), Vector2(10, 300), Colors::White, 0.f, Vector2(0, 0));
 
     m_spriteBatch->End();
 

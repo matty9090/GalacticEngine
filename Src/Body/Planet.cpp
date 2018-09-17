@@ -14,8 +14,10 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_freq(0.03f),
       m_gain(0.5f),
       m_octaves(13),
-      m_lacunarity(1.8f),
-      m_height(1.0f)
+      m_lacunarity(1.9f),
+      m_height(1.0f),
+      m_noiseScale(1.0f),
+      m_minValue(0.0f)
 {
     
 }
@@ -43,13 +45,14 @@ void Planet::Generate(EDetail detail)
     m_isGenerated = true;
 }
 
-void Galactic::Planet::SetParameters(float freq, float lacunarity, float gain, float height, int octaves)
+void Galactic::Planet::SetParameters(float freq, float lacunarity, float gain, float height, int octaves, float noiseScale)
 {
     m_freq = freq;
     m_gain = gain;
     m_height = height;
     m_octaves = octaves;
     m_lacunarity = lacunarity;
+    m_noiseScale = noiseScale;
 }
 
 void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
