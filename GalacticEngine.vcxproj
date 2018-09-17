@@ -172,6 +172,7 @@
     <ClInclude Include="Inc\Render\DirectX\ConstantBuffer.hpp" />
     <ClInclude Include="Inc\Render\DirectX\Effect.hpp" />
     <ClInclude Include="Inc\Render\Drawable.hpp" />
+    <ClInclude Include="Inc\Render\Gradient.hpp" />
     <ClInclude Include="Inc\Render\IPlanetRenderer.hpp" />
     <ClInclude Include="Inc\Render\IRenderable.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererFactory.hpp" />
@@ -202,6 +203,7 @@
     </ClCompile>
     <ClCompile Include="Src\Render\Cube.cpp" />
     <ClCompile Include="Src\Render\DirectX\Effect.cpp" />
+    <ClCompile Include="Src\Render\Gradient.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererHigh.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererLow.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererMed.cpp" />

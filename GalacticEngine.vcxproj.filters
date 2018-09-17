@@ -98,6 +98,9 @@
     <ClInclude Include="Inc\Render\Cube.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\Gradient.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -133,6 +136,9 @@
       <Filter>FastNoise</Filter>
     </ClCompile>
     <ClCompile Include="Src\Render\Cube.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\Gradient.cpp">
       <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>

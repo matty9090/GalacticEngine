@@ -1,6 +1,8 @@
 #pragma once
 
 #include "IPlanet.hpp"
+
+#include "Render/Gradient.hpp"
 #include "Render/IPlanetRenderer.hpp"
 
 namespace Galactic
