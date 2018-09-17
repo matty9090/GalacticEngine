@@ -31,7 +31,7 @@ void SphericalQuadTreeTerrain::CreateEffect()
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
-    m_effect = std::make_shared<Effect>(m_device.Get(), L"Shaders/BasicVS.fx", L"Shaders/BasicPS.fx", els, num, false);
+    m_effect = std::make_shared<Effect>(m_device.Get(), L"Shaders/PlanetVS.fx", L"Shaders/PlanetPS.fx", els, num, false);
 
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_NONE, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
@@ -76,6 +76,10 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
     
     for (int i = 0; i < 6; ++i) {
         m_faces[i]->Generate();
+    }
+
+    for (int i = 0; i < 6; ++i) {
+        m_faces[i]->Init();
     }
 }
 

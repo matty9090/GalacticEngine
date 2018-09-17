@@ -40,7 +40,7 @@ namespace Galactic
             void Update(float dt);
             void Reset();
 
-            PlanetVertex &GetVertex(int i) { return m_vertices[i]; }
+            PlanetVertex &GetVertex(int i) { return m_originalVertices[i]; }
             DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
 
             void Generate();
@@ -52,6 +52,10 @@ namespace Galactic
             bool IsRoot() const { return !m_parent.lock(); }
             void SetDebugName(std::string name) { m_dbgName = name; }
             void SetDebugColour(DirectX::SimpleMath::Color col) { m_dbgCol = col; }
+            void FixEdges();
+
+            int GetDepth() const { return m_depth; }
+            std::vector<uint16_t> GetEdge(EDir edge) const { return m_edges[edge]; }
 
             std::shared_ptr<TerrainNode> GetChild(int dir) const { return m_children[dir]; }
 
@@ -76,6 +80,8 @@ namespace Galactic
             std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_dbgBatch;
             Microsoft::WRL::ComPtr<ID3D11InputLayout> m_dbgInputLayout;
 
+            std::vector<PlanetVertex> m_originalVertices;
+            std::array<std::vector<uint16_t>, 4> m_edges;
             std::array<std::shared_ptr<TerrainNode>, 4> m_children;
 
             DirectX::SimpleMath::Matrix m_world;
@@ -83,7 +89,10 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
-            std::shared_ptr<TerrainNode> GetGreaterThanOrEqualNeighbours(int dir) const;
+            void NotifyNeighbours();
+            void FixEdge(EDir dir, std::shared_ptr<TerrainNode> neighbour, std::vector<uint16_t> nEdge, int depth);
+            
+            std::shared_ptr<TerrainNode> GetGreaterThanOrEqualNeighbour(int dir) const;
             std::vector<std::shared_ptr<TerrainNode>> GetSmallerNeighbours(std::shared_ptr<TerrainNode> neighbour, int dir) const;
     };
 }

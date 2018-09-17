@@ -24,7 +24,7 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
     m_diameter = m_scale * m_terrain->GetRadius() * 2;
 
 #ifdef _DEBUG
-    m_dbgCol = Color(0.0f, 0.0f, 1.0f, 0.25f);
+    m_dbgCol    = Color(0.0f, 0.0f, 1.0f, 0.15f);
     m_dbgStates = std::make_unique<CommonStates>(device);
     m_dbgEffect = std::make_unique<BasicEffect>(device);
     m_dbgEffect->SetVertexColorEnabled(true);
@@ -47,6 +47,7 @@ void TerrainNode::Generate()
     float step = m_bounds.size / (gridsize - 1);
     bool hasParent = !IsRoot();
 
+    uint16_t k = 0;
     int sx = 0, sy = 0;
     int gh = (gridsize - 1) / 2;
 
@@ -64,7 +65,7 @@ void TerrainNode::Generate()
     {
         float yy = m_bounds.y + y * step;
 
-        for (int x = 0; x < gridsize; ++x)
+        for (int x = 0; x < gridsize; ++x, ++k)
         {
             PlanetVertex v;
 
@@ -87,11 +88,19 @@ void TerrainNode::Generate()
 
                 v.color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
                 v.position = pos + pos * m_terrain->GetHeight(pos);
+                v.normal = Vector3::Zero;
             }
+
+            if (x == 0)             m_edges[West].push_back(k);
+            if (x >= gridsize - 1)  m_edges[East].push_back(k);
+            if (y == 0)             m_edges[North].push_back(k);
+            if (y >= gridsize - 1)  m_edges[South].push_back(k);
 
             m_vertices.push_back(v);
         }
     }
+
+    m_originalVertices = m_vertices;
 
     parent.reset();
 
@@ -120,8 +129,6 @@ void TerrainNode::Generate()
         m_vertices[m_indices[i + 1]].normal += n;
         m_vertices[m_indices[i + 2]].normal += n;
     }
-
-    Init();
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -261,6 +268,11 @@ void TerrainNode::Split()
 
         for (auto &child : m_children)
             child->Generate();
+
+        for (auto &child : m_children)
+            child->FixEdges();
+
+        NotifyNeighbours();
     }
     else
     {
@@ -284,6 +296,8 @@ void TerrainNode::Merge()
         m_children[1].reset();
         m_children[2].reset();
         m_children[3].reset();
+
+        NotifyNeighbours();
     }
     else
     {
@@ -301,6 +315,67 @@ void TerrainNode::Release()
     }
 
     Reset();
+}
+
+void TerrainNode::FixEdges()
+{    
+    auto n1 = GetGreaterThanOrEqualNeighbour(North);
+    auto n2 = GetGreaterThanOrEqualNeighbour(East);
+    auto n3 = GetGreaterThanOrEqualNeighbour(South);
+    auto n4 = GetGreaterThanOrEqualNeighbour(West);
+
+    if (n1) FixEdge(North, n1, n1->GetEdge(South), n1->GetDepth());
+    if (n2) FixEdge(East, n2, n2->GetEdge(West), n2->GetDepth());
+    if (n3) FixEdge(South, n3, n3->GetEdge(North), n3->GetDepth());
+    if (n4) FixEdge(West, n4, n4->GetEdge(East), n4->GetDepth());
+    
+    Init();
+}
+
+void Galactic::TerrainNode::NotifyNeighbours()
+{
+    std::vector<std::shared_ptr<TerrainNode>> neighbours;
+
+    auto n1 = GetGreaterThanOrEqualNeighbour(North);
+    auto n2 = GetGreaterThanOrEqualNeighbour(East);
+    auto n3 = GetGreaterThanOrEqualNeighbour(South);
+    auto n4 = GetGreaterThanOrEqualNeighbour(West);
+
+    auto l1 = GetSmallerNeighbours(n1, North);
+    auto l2 = GetSmallerNeighbours(n2, East);
+    auto l3 = GetSmallerNeighbours(n3, South);
+    auto l4 = GetSmallerNeighbours(n4, West);
+
+    neighbours.insert(neighbours.end(), l1.begin(), l1.end());
+    neighbours.insert(neighbours.end(), l2.begin(), l2.end());
+    neighbours.insert(neighbours.end(), l3.begin(), l3.end());
+    neighbours.insert(neighbours.end(), l4.begin(), l4.end());
+
+    for (auto n : neighbours)
+        n->FixEdges();
+}
+
+void TerrainNode::FixEdge(EDir dir, std::shared_ptr<TerrainNode> neighbour, std::vector<uint16_t> nEdge, int depth)
+{
+    int diff = m_depth - depth;
+    int grid = m_terrain->GetGridSize();
+
+    if (diff == 0)
+    {
+        for (int i = 0; i < grid; i++)
+            m_vertices[m_edges[dir][i]].position = m_originalVertices[m_edges[dir][i]].position;
+    }
+
+    if (diff < 1)
+        return;
+
+    for (int i = 0; i < grid - 2; i += 2)
+    {
+        const Vector3 p1 = m_originalVertices[m_edges[dir][i + 0]].position;
+        const Vector3 p2 = m_originalVertices[m_edges[dir][i + 2]].position;
+
+        m_vertices[m_edges[dir][i + 1]].position = (p1 + p2) / 2;
+    }
 }
 
 Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
@@ -409,7 +484,7 @@ std::vector<std::shared_ptr<TerrainNode>> TerrainNode::GetSmallerNeighbours(std:
     return neighbours;
 }
 
-std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbours(int dir) const {
+std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbour(int dir) const {
     auto parent = m_parent.lock();
     auto self = shared_from_this();
     
@@ -419,7 +494,7 @@ std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbours(int di
             if (parent->GetChild(SW) == self) return parent->GetChild(NW);
             if (parent->GetChild(SE) == self) return parent->GetChild(NE);
 
-           auto node = parent->GetGreaterThanOrEqualNeighbours(dir);
+           auto node = parent->GetGreaterThanOrEqualNeighbour(dir);
 
             if (!node || node->IsLeaf())
                 return node;
@@ -434,7 +509,7 @@ std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbours(int di
             if (parent->GetChild(NW) == self) return parent->GetChild(SW);
             if (parent->GetChild(NE) == self) return parent->GetChild(SE);
 
-            auto node = parent->GetGreaterThanOrEqualNeighbours(dir);
+            auto node = parent->GetGreaterThanOrEqualNeighbour(dir);
 
             if (!node || node->IsLeaf())
                 return node;
@@ -449,7 +524,7 @@ std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbours(int di
             if (parent->GetChild(NW) == self) return parent->GetChild(NE);
             if (parent->GetChild(SW) == self) return parent->GetChild(SE);
 
-            auto node = parent->GetGreaterThanOrEqualNeighbours(dir);
+            auto node = parent->GetGreaterThanOrEqualNeighbour(dir);
 
             if (!node || node->IsLeaf())
                 return node;
@@ -464,7 +539,7 @@ std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbours(int di
             if (parent->GetChild(NE) == self) return parent->GetChild(NW);
             if (parent->GetChild(SE) == self) return parent->GetChild(SW);
 
-            auto node = parent->GetGreaterThanOrEqualNeighbours(dir);
+            auto node = parent->GetGreaterThanOrEqualNeighbour(dir);
 
             if (!node || node->IsLeaf())
                 return node;

@@ -24,7 +24,7 @@ namespace Galactic
 #ifdef _DEBUG
             int GetGridSize() const { return 9; }
 #else
-            int GetGridSize() const { return 33; }
+            int GetGridSize() const { return 9; }
 #endif
 
             float GetRadius() const { return m_radius; }
