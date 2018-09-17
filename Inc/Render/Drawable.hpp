@@ -26,6 +26,8 @@ namespace Galactic
             ID3D11Device *m_device;
             ID3D11DeviceContext *m_context;
 
+            bool m_generated;
+
         protected:
             std::vector<VertexType> m_vertices;
             std::vector<uint16_t> m_indices;
@@ -34,7 +36,8 @@ namespace Galactic
     template<class VertexType>
     Drawable<VertexType>::Drawable(ID3D11DeviceContext *context, D3D_PRIMITIVE_TOPOLOGY topology)
         : m_context(context),
-          m_topology(topology)
+          m_topology(topology),
+          m_generated(false)
     {
         context->GetDevice(&m_device);
 
@@ -60,6 +63,8 @@ namespace Galactic
     template<class VertexType>
     inline void Drawable<VertexType>::Init()
     {
+        Cleanup();
+
         m_vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertices.size();
         m_indexBufferDesc.ByteWidth = sizeof(uint16_t) * m_indices.size();
         
@@ -68,6 +73,8 @@ namespace Galactic
 
         DX::ThrowIfFailed(m_device->CreateBuffer(&m_vertexBufferDesc, &m_vertexData, &m_vertexBuffer));
         DX::ThrowIfFailed(m_device->CreateBuffer(&m_indexBufferDesc, &m_indexData, &m_indexBuffer));
+
+        m_generated = true;
     }
 
     template<class VertexType>
@@ -90,7 +97,12 @@ namespace Galactic
     template<class VertexType>
     inline void Drawable<VertexType>::Cleanup()
     {
-        m_vertexBuffer->Release();
-        m_indexBuffer->Release();
+        if (m_generated)
+        {
+            m_vertexBuffer->Release();
+            m_indexBuffer->Release();
+
+            m_generated = false;
+        }
     }
 }
