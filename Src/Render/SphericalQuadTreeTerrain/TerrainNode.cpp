@@ -216,7 +216,7 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = distance < m_scale * 30.0f;
+        bool divide = m_depth < 3 || distance < m_scale * 40.0f;
 
         if (!divide)
             Merge();
@@ -396,7 +396,7 @@ Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
         }
     }
 
-    float scale = 1.0f;
+    float scale = 0.6f;
 
     n.x = scale * -(s[2] - s[0] + 2 * (s[5] - s[3]) + s[8] - s[6]);
     n.z = scale * -(s[6] - s[0] + 2 * (s[7] - s[1]) + s[8] - s[2]);
