@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IBody.hpp"
+#include "Render/Gradient.hpp"
 
 namespace Galactic
 {
@@ -26,5 +27,7 @@ namespace Galactic
             virtual float GetLacunarity() const = 0;
             virtual float GetNoiseScale() const = 0;
             virtual float GetMinValue() const = 0;
+
+            virtual Gradient::Gradient<Gradient::GradientColor> &GetGradient() = 0;
     };
 }

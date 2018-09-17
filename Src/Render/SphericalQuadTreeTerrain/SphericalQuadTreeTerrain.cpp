@@ -129,7 +129,7 @@ float Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3
     float scale = planet->GetNoiseScale();
     float minvalue = planet->GetMinValue();
 
-    float v = planet->GetHeight() * m_noise.GetNoise(p.x * 40.0f * scale, p.y * 40.0f * scale, p.z * 40.0f * scale) / 20.0f;
+    float v = planet->GetHeight() * m_noise.GetNoise(p.x * 40.0f * scale, p.y * 40.0f * scale, p.z * 40.0f * scale);
     
     return fmaxf(0.0f, v - minvalue);
 }

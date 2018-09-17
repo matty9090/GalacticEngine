@@ -15,11 +15,14 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_gain(0.5f),
       m_octaves(13),
       m_lacunarity(1.9f),
-      m_height(1.0f),
+      m_height(0.04f),
       m_noiseScale(1.0f),
       m_minValue(0.0f)
 {
-    
+    m_gradient.addColorStop(0.0f, Gradient::GradientColor(0.0f, 0.467f, 0.745f, 0.5f));
+    m_gradient.addColorStop(0.1f, Gradient::GradientColor(0.93f, 0.79f, 0.69f, 1.0f));
+    m_gradient.addColorStop(0.2f, Gradient::GradientColor(0.22f, 0.62f, 0.14f, 1.0f));
+    m_gradient.addColorStop(1.0f, Gradient::GradientColor(0.22f, 0.62f, 0.14f, 1.0f));
 }
 
 Planet::~Planet()

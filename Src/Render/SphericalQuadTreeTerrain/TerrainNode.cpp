@@ -46,6 +46,7 @@ void TerrainNode::Generate()
 
     float step = m_bounds.size / (gridsize - 1);
     bool hasParent = !IsRoot();
+    auto planet = m_planet.lock();
 
     uint16_t k = 0;
     int sx = 0, sy = 0;
@@ -86,8 +87,11 @@ void TerrainNode::Generate()
                 pos.Normalize();
                 pos = Vector3::Transform(pos, m_world);
 
-                v.color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-                v.position = pos + pos * m_terrain->GetHeight(pos);
+                float height = m_terrain->GetHeight(pos);
+                auto col = planet->GetGradient().getColorAt(height / planet->GetHeight());
+
+                v.color = Color(col.r, col.g, col.b, col.a);
+                v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
             }
 

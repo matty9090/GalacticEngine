@@ -134,12 +134,12 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::NumPad2)) { planet->SetLacunarity(lacunarity + 0.1f); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::NumPad9)) { planet->SetOctaves(octaves + 1); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::NumPad6)) { planet->SetOctaves(octaves - 1); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D1)) { planet->SetHeight(height - 0.25f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D2)) { planet->SetHeight(height + 0.25f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D1)) { planet->SetHeight(height - 0.01f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D2)) { planet->SetHeight(height + 0.01f); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::D3)) { planet->SetNoiseScale(scale - 0.1f); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::D4)) { planet->SetNoiseScale(scale + 0.1f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D5)) { planet->SetMinValue(minvalue - 0.01f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D6)) { planet->SetMinValue(minvalue + 0.01f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D5)) { planet->SetMinValue(minvalue + 0.005f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D6)) { planet->SetMinValue(minvalue - 0.005f); planet->Generate(Galactic::High); }
 
     Quaternion q = Quaternion::CreateFromYawPitchRoll(m_yaw, -m_pitch, 0.f);
 

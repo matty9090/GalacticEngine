@@ -26,7 +26,7 @@ void LowDetailPlanetRenderer::Update(float dt)
 {
     dt;
 
-    m_world *= Matrix::CreateScale(m_planet->GetRadius() / Constants::Scale);
+    m_world *= Matrix::CreateScale((float)(m_planet->GetRadius() / Constants::Scale));
 }
 
 void Galactic::LowDetailPlanetRenderer::Reset()

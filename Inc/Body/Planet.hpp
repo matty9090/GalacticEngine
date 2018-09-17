@@ -2,7 +2,6 @@
 
 #include "IPlanet.hpp"
 
-#include "Render/Gradient.hpp"
 #include "Render/IPlanetRenderer.hpp"
 
 namespace Galactic
@@ -53,6 +52,8 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 GetRotation() const { return m_rotation; }
             DirectX::SimpleMath::Vector3 GetCameraPos() const { return m_camPos; }
 
+            Gradient::Gradient<Gradient::GradientColor> &GetGradient() { return m_gradient; }
+
             bool IsGenerated() const { return m_isGenerated; }
 
         private:
@@ -61,6 +62,8 @@ namespace Galactic
             bool m_isGenerated;
             double m_radius;
             long double m_mass;
+
+            Gradient::Gradient<Gradient::GradientColor> m_gradient;
 
             int m_octaves;
             float m_gain, m_lacunarity, m_freq, m_height, m_noiseScale, m_minValue;
