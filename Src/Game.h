@@ -78,6 +78,7 @@ private:
     float                                           m_pitch;
     float                                           m_yaw;
     float                                           m_speed;
+    bool                                            m_showUI;
     
 	std::vector<std::shared_ptr<Galactic::IBody>>	m_bodies;
 };

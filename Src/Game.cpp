@@ -21,7 +21,8 @@ Game::Game() noexcept :
     m_featureLevel(D3D_FEATURE_LEVEL_11_1),
     m_yaw(0),
     m_pitch(0),
-    m_cameraPos(0.0f, 0.0f, -50.0f)
+    m_cameraPos(0.0f, 0.0f, -50.0f),
+    m_showUI(false)
 {
 }
 
@@ -126,6 +127,7 @@ void Game::Update(DX::StepTimer const& timer)
     float scale = planet->GetNoiseScale();
     float minvalue = planet->GetMinValue();
 
+    if (m_tracker.IsKeyReleased(Keyboard::U)) { m_showUI = !m_showUI; }
     if (m_tracker.IsKeyReleased(Keyboard::NumPad7)) { planet->SetGain(gain - 0.1f); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::NumPad8)) { planet->SetGain(gain + 0.1f); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::NumPad4)) { planet->SetFrequency(frequency - 0.01f); planet->Generate(Galactic::High); }
@@ -138,8 +140,8 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::D2)) { planet->SetHeight(height + 0.01f); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::D3)) { planet->SetNoiseScale(scale - 0.1f); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::D4)) { planet->SetNoiseScale(scale + 0.1f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D5)) { planet->SetMinValue(minvalue + 0.005f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D6)) { planet->SetMinValue(minvalue - 0.005f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D5)) { planet->SetMinValue(minvalue + 0.001f); planet->Generate(Galactic::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::D6)) { planet->SetMinValue(minvalue - 0.001f); planet->Generate(Galactic::High); }
 
     Quaternion q = Quaternion::CreateFromYawPitchRoll(m_yaw, -m_pitch, 0.f);
 
@@ -193,20 +195,23 @@ void Game::Render()
     for(auto &body : m_bodies)
         body->Render(view, m_proj);
 
-    m_spriteBatch->Begin();
+    if (m_showUI)
+    {
+        m_spriteBatch->Begin();
 
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Camera", m_cameraPos).c_str(), Vector2(10, 10), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", height).c_str(), Vector2(10, 40), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Speed", m_speed).c_str(), Vector2(10, 70), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Gain", planet->GetGain()).c_str(), Vector2(10, 120), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Frequency", planet->GetFrequency()).c_str(), Vector2(10, 150), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Lacunarity", planet->GetLacunarity()).c_str(), Vector2(10, 180), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Octaves", (float)planet->GetOctaves()).c_str(), Vector2(10, 210), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", planet->GetHeight()).c_str(), Vector2(10, 240), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Scale", planet->GetNoiseScale()).c_str(), Vector2(10, 270), Colors::White, 0.f, Vector2(0, 0));
-    m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Min", planet->GetMinValue()).c_str(), Vector2(10, 300), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Camera", m_cameraPos).c_str(), Vector2(10, 10), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", height).c_str(), Vector2(10, 40), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Speed", m_speed).c_str(), Vector2(10, 70), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Gain", planet->GetGain()).c_str(), Vector2(10, 120), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Frequency", planet->GetFrequency()).c_str(), Vector2(10, 150), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Lacunarity", planet->GetLacunarity()).c_str(), Vector2(10, 180), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Octaves", (float)planet->GetOctaves()).c_str(), Vector2(10, 210), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", planet->GetHeight()).c_str(), Vector2(10, 240), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Scale", planet->GetNoiseScale()).c_str(), Vector2(10, 270), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Min", planet->GetMinValue()).c_str(), Vector2(10, 300), Colors::White, 0.f, Vector2(0, 0));
 
-    m_spriteBatch->End();
+        m_spriteBatch->End();
+    }
 
     Present();
 }
