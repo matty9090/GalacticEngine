@@ -5,7 +5,7 @@
 
 namespace Galactic
 {
-    template <class VertexType>
+    template <class VertexType, class IndexType = uint16_t>
     class Drawable
     {
         public:
@@ -30,11 +30,11 @@ namespace Galactic
 
         protected:
             std::vector<VertexType> m_vertices;
-            std::vector<uint16_t> m_indices;
+            std::vector<IndexType> m_indices;
     };
 
-    template<class VertexType>
-    Drawable<VertexType>::Drawable(ID3D11DeviceContext *context, D3D_PRIMITIVE_TOPOLOGY topology)
+    template<class VertexType, class IndexType>
+    Drawable<VertexType, IndexType>::Drawable(ID3D11DeviceContext *context, D3D_PRIMITIVE_TOPOLOGY topology)
         : m_context(context),
           m_topology(topology),
           m_generated(false)
@@ -60,13 +60,13 @@ namespace Galactic
         m_indexData.SysMemSlicePitch = 0;
     }
 
-    template<class VertexType>
-    inline void Drawable<VertexType>::Init()
+    template<class VertexType, class IndexType>
+    inline void Drawable<VertexType, IndexType>::Init()
     {
         Cleanup();
 
         m_vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertices.size();
-        m_indexBufferDesc.ByteWidth = sizeof(uint16_t) * m_indices.size();
+        m_indexBufferDesc.ByteWidth = sizeof(IndexType) * m_indices.size();
         
         m_vertexData.pSysMem = &m_vertices[0];
         m_indexData.pSysMem = &m_indices[0];
@@ -77,8 +77,8 @@ namespace Galactic
         m_generated = true;
     }
 
-    template<class VertexType>
-    inline void Drawable<VertexType>::PreDraw()
+    template<class VertexType, class IndexType>
+    inline void Drawable<VertexType, IndexType>::PreDraw()
     {
         unsigned int stride = sizeof(VertexType);
         unsigned int offset = 0;
@@ -88,14 +88,14 @@ namespace Galactic
         m_context->IASetPrimitiveTopology(m_topology);
     }
 
-    template<class VertexType>
-    inline void Drawable<VertexType>::Draw()
+    template<class VertexType, class IndexType>
+    inline void Drawable<VertexType, IndexType>::Draw()
     {
         m_context->DrawIndexed(m_indices.size(), 0, 0);
     }
 
-    template<class VertexType>
-    inline void Drawable<VertexType>::Cleanup()
+    template<class VertexType, class IndexType>
+    inline void Drawable<VertexType, IndexType>::Cleanup()
     {
         if (m_generated)
         {

@@ -10,6 +10,7 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
     : m_name(name),
       m_deviceContext(deviceContext),
       m_renderer(nullptr),
+      m_atmosphere(nullptr),
       m_isGenerated(false),
       m_freq(0.03f),
       m_gain(0.5f),
@@ -17,7 +18,8 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_lacunarity(1.9f),
       m_height(0.04f),
       m_noiseScale(1.0f),
-      m_minValue(0.0f)
+      m_minValue(0.0f),
+      m_atmosphereHeight(400.0f)
 {
     m_gradient.addColorStop(0.0f, Gradient::GradientColor(0.0f, 0.467f, 0.745f, 0.5f));
     m_gradient.addColorStop(0.06f, Gradient::GradientColor(0.93f, 0.79f, 0.69f, 1.0f));
@@ -37,10 +39,16 @@ void Planet::Generate(EDetail detail)
     if (m_isGenerated)
     {
         matrix = m_renderer->GetMatrix();
+
         m_renderer->Reset();
+        m_renderer.reset();
+
+        m_atmosphere->Reset();
+        m_atmosphere.reset();
     }
 
     m_renderer = CreatePlanetRenderer(m_deviceContext, shared_from_this(), detail);
+    m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, shared_from_this());
 
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
@@ -60,8 +68,11 @@ void Galactic::Planet::SetParameters(float freq, float lacunarity, float gain, f
 
 void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
-    if(m_renderer)
+    if (m_renderer)
         m_renderer->Render(view, proj);
+
+    if (m_atmosphere)
+        m_atmosphere->Render(view, proj);
 }
 
 void Planet::Update(float dt)
@@ -79,10 +90,15 @@ void Planet::Update(float dt)
 
     if (m_renderer)
         m_renderer->Update(dt);
+
+    if (m_atmosphere)
+        m_atmosphere->Update(dt);
 }
 
 void Galactic::Planet::Reset()
 {
     if (m_renderer)
         m_renderer->Reset();
+
+    m_renderer.reset();
 }

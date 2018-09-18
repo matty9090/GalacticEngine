@@ -1,10 +1,11 @@
-float4x4 mWorldViewProj;
-//float4x4 mWorld;
-float3   lightDir;
-float	 planetRadius;
-float	 atmosphereRadius;
-float3   camPos;
-float	 camHeight;
+cbuffer MatrixBuffer : register(b0) {
+	matrix   mWorldViewProj;
+	float3   lightDir;
+	float	 planetRadius;
+	float3   camPos;
+	float	 atmosphereRadius;
+	float	 camHeight;
+}
 
 struct VS_OUTPUT {
 	float4 Position : SV_POSITION;
@@ -36,7 +37,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	float rayLength = distance(rayEnd, rayStart);
 	float atmosphereHeight = atmosphereRadius - planetRadius;
 	float alpha = rayLength / atmosphereRadius;
-
+    
 	alpha = 0.0f;
 
 	float stepSize = rayLength / float(5);
@@ -55,7 +56,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	alpha *= 1.6;
 
 	Output.Position = mul(float4(rayEnd, 1.0), mWorldViewProj);
-	Output.Colour	= float3(0.0f, 0.44f, 1.0f);
+	Output.Colour	= float3(0.0f, 0.7f, 1.0f);
 	Output.Alpha	= alpha;
 
 	return Output;

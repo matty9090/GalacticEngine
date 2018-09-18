@@ -3,6 +3,7 @@
 #include "IPlanet.hpp"
 
 #include "Render/IPlanetRenderer.hpp"
+#include "Render/IAtmosphereRenderer.hpp"
 
 namespace Galactic
 {
@@ -37,6 +38,7 @@ namespace Galactic
             void SetLacunarity(float v) { m_lacunarity = v; }
             void SetNoiseScale(float v) { m_noiseScale = v; }
             void SetMinValue(float v) { m_minValue = v; }
+            void SetAtmosphereHeight(float h) { m_atmosphereHeight = h; }
 
             int GetOctaves() const { return m_octaves; }
             float GetGain() const { return m_gain; }
@@ -45,6 +47,7 @@ namespace Galactic
             float GetLacunarity() const { return m_lacunarity; }
             float GetNoiseScale() const { return m_noiseScale; }
             float GetMinValue() const { return m_minValue; }
+            float GetAtmosphereHeight() const { return m_atmosphereHeight; }
 
             DirectX::SimpleMath::Matrix &GetMatrix()         { return m_world; };
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
@@ -66,13 +69,14 @@ namespace Galactic
             Gradient::Gradient<Gradient::GradientColor> m_gradient;
 
             int m_octaves;
-            float m_gain, m_lacunarity, m_freq, m_height, m_noiseScale, m_minValue;
+            float m_gain, m_lacunarity, m_freq, m_height, m_noiseScale, m_minValue, m_atmosphereHeight;
 
             DirectX::SimpleMath::Matrix  m_world;
             DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation, m_camPos;
 
             std::shared_ptr<IBody> m_influence;
-            std::shared_ptr<IPlanetRenderer> m_renderer;
+            std::unique_ptr<IPlanetRenderer> m_renderer;
+            std::unique_ptr<IAtmosphereRenderer> m_atmosphere;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
     };
 }

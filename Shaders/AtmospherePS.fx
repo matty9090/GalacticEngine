@@ -1,5 +1,5 @@
 struct VS_OUTPUT {
-	float4 Position : POSITION;
+	float4 Position : SV_POSITION;
 	float3 Colour	: COLOR0;
 	float  Alpha	: COLOR1;
 };

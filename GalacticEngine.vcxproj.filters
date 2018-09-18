@@ -101,6 +101,12 @@
     <ClInclude Include="Inc\Render\Gradient.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\IAtmosphereRenderer.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\SimpleAtmosphere.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -139,6 +145,9 @@
       <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="Src\Render\Gradient.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\SimpleAtmosphere.cpp">
       <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>

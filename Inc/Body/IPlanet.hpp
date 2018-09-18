@@ -19,6 +19,7 @@ namespace Galactic
             virtual void SetLacunarity(float v) = 0;
             virtual void SetNoiseScale(float v) = 0;
             virtual void SetMinValue(float v) = 0;
+            virtual void SetAtmosphereHeight(float h) = 0;
 
             virtual int GetOctaves() const = 0;
             virtual float GetGain() const = 0;
@@ -27,6 +28,7 @@ namespace Galactic
             virtual float GetLacunarity() const = 0;
             virtual float GetNoiseScale() const = 0;
             virtual float GetMinValue() const = 0;
+            virtual float GetAtmosphereHeight() const = 0;
 
             virtual Gradient::Gradient<Gradient::GradientColor> &GetGradient() = 0;
     };
