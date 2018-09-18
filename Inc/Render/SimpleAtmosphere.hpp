@@ -28,7 +28,7 @@ namespace Galactic
     class SimpleAtmosphere : public IAtmosphereRenderer, public Drawable<AtmosphereVertex>
     {
         public:
-            SimpleAtmosphere(ID3D11DeviceContext *context, std::shared_ptr<IPlanet> planet);
+            SimpleAtmosphere(ID3D11DeviceContext *context, IPlanet *planet);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -42,7 +42,7 @@ namespace Galactic
             ID3D11DeviceContext *m_context;
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
 
-            std::shared_ptr<IPlanet> m_planet;
+            IPlanet *m_planet;
             std::unique_ptr<Effect> m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::unique_ptr<ConstantBuffer<AtmosphereBuffer>> m_buffer;

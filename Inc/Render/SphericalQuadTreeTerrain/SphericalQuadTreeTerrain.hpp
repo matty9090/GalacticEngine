@@ -13,7 +13,7 @@ namespace Galactic
     class SphericalQuadTreeTerrain : public ISphericalTerrain, public std::enable_shared_from_this<SphericalQuadTreeTerrain>
     {
         public:
-            SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::weak_ptr<IPlanet> planet);
+            SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
             
             void Generate(float freq, float lacunarity, float gain, int octaves);
             void CreateEffect();
@@ -39,7 +39,7 @@ namespace Galactic
             FastNoise m_noise;
             DirectX::SimpleMath::Matrix &m_world;
 
-            std::weak_ptr<IPlanet> m_planet;
+            IPlanet *m_planet;
             std::shared_ptr<Effect> m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::array<std::shared_ptr<TerrainNode>, 6> m_faces;

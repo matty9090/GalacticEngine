@@ -6,7 +6,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-SimpleAtmosphere::SimpleAtmosphere(ID3D11DeviceContext *context, std::shared_ptr<IPlanet> planet)
+SimpleAtmosphere::SimpleAtmosphere(ID3D11DeviceContext *context, IPlanet *planet)
     : Drawable(context, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
       m_context(context),
       m_planet(planet),
@@ -14,9 +14,6 @@ SimpleAtmosphere::SimpleAtmosphere(ID3D11DeviceContext *context, std::shared_ptr
 {
     ID3D11Device *device;
     context->GetDevice(&device);
-
-    float radius = (float)(m_planet->GetRadius() / Constants::Scale);
-    float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
 
     CreateSphere(1.0f, 40U);
 

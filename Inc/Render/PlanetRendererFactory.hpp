@@ -10,7 +10,7 @@
 #include "PlanetRendererHigh.hpp"
 
 namespace Galactic {
-    std::unique_ptr<Galactic::IPlanetRenderer> CreatePlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::shared_ptr<IPlanet> planet, EDetail detail)
+    std::unique_ptr<Galactic::IPlanetRenderer> CreatePlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet, EDetail detail)
     {
         std::unique_ptr<IPlanetRenderer> renderer;
 
@@ -31,7 +31,7 @@ namespace Galactic {
         return renderer;
     }
 
-    std::unique_ptr<Galactic::IAtmosphereRenderer> CreateAtmosphereRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::shared_ptr<IPlanet> planet)
+    std::unique_ptr<Galactic::IAtmosphereRenderer> CreateAtmosphereRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
     {
         return std::make_unique<SimpleAtmosphere>(deviceContext.Get(), planet);
     }

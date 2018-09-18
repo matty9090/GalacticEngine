@@ -29,6 +29,9 @@
     <Filter Include="FastNoise">
       <UniqueIdentifier>{d62e84ce-a073-4e4b-9ba9-1962e6d2a730}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{eed66be2-c23a-48a4-afcf-8dbce1a89a3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="settings.manifest">
@@ -107,6 +110,15 @@
     <ClInclude Include="Inc\Render\SimpleAtmosphere.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Scene\IStarSystem.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Scene\ILightSource.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Scene\SimpleStarSystem.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -149,6 +161,9 @@
     </ClCompile>
     <ClCompile Include="Src\Render\SimpleAtmosphere.cpp">
       <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\SimpleStarSystem.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

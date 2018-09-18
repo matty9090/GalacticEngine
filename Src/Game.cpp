@@ -81,9 +81,11 @@ void Game::Update(DX::StepTimer const& timer)
 
     if (kb.Home) m_cameraPos = Vector3(0.0f, 5.0f, -10.0f);
 
-    if (m_tracker.IsKeyReleased(Keyboard::F1)) m_bodies[0]->Generate(Galactic::EDetail::Low);
-    if (m_tracker.IsKeyReleased(Keyboard::F2)) m_bodies[0]->Generate(Galactic::EDetail::Medium);
-    if (m_tracker.IsKeyReleased(Keyboard::F3)) m_bodies[0]->Generate(Galactic::EDetail::High);
+    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
+
+    if (m_tracker.IsKeyReleased(Keyboard::F1)) planet->Generate(Galactic::EDetail::Low);
+    if (m_tracker.IsKeyReleased(Keyboard::F2)) planet->Generate(Galactic::EDetail::Medium);
+    if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
 
     if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
 
@@ -117,8 +119,6 @@ void Game::Update(DX::StepTimer const& timer)
     if (kb.A) move.x += 1.f;
     if (kb.D) move.x -= 1.f;
 
-    auto planet = std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0]);
-
     int octaves = planet->GetOctaves();
     float gain = planet->GetGain();
     float height = planet->GetHeight();
@@ -149,7 +149,7 @@ void Game::Update(DX::StepTimer const& timer)
     move *= 0.05f;
 
     // TODO: Find actual closest body
-    std::shared_ptr<Galactic::IPlanet> closestBody = std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0]);
+    auto closestBody = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
     
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
@@ -160,12 +160,8 @@ void Game::Update(DX::StepTimer const& timer)
     m_speed = factor;
     m_cameraPos += move;
 
-    // TODO: Add your game logic here.
-    for (auto &body : m_bodies)
-    {
-        body->SetCameraPos(m_cameraPos);
-        body->Update(dt);
-    }
+    m_system->SetCameraPos(m_cameraPos);
+    m_system->Update(dt);
 }
 
 // Draws the scene.
@@ -187,13 +183,11 @@ void Game::Render()
     XMVECTOR lookAt = m_cameraPos + Vector3(x, y, z);
     XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
 
-    auto planet = std::dynamic_pointer_cast<Galactic::IPlanet>(m_bodies[0]);
+    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
 
-    float height = (m_cameraPos - m_bodies[0]->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
+    float height = (m_cameraPos - planet->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
 
-    // TODO: Add your rendering code here.
-    for(auto &body : m_bodies)
-        body->Render(view, m_proj);
+    m_system->Render(view, m_proj);
 
     if (m_showUI)
     {
@@ -357,11 +351,13 @@ void Game::CreateDevice()
     m_font = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"Resources/Fonts/Courier.font");
     m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
     
+    m_system = Galactic::CreateStarSystem("System", Galactic::EStarSystem::Simple);
+
     auto planet = Galactic::CreatePlanet(m_d3dContext, "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
     planet->Generate(Galactic::EDetail::High);
 
-    m_bodies.push_back(planet);
+    m_system->AddBody(std::move(planet));
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -473,8 +469,7 @@ void Game::OnDeviceLost()
     m_font.reset();
     m_spriteBatch.reset();
 
-    for (auto &body : m_bodies)
-        body->Reset();
+    m_system->Reset();
     
     CreateDevice();
     CreateResources();

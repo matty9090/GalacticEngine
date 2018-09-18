@@ -34,7 +34,7 @@ namespace Galactic
             enum EDir { North, East, South, West };
             enum EQuad { NE, NW, SE, SW };
 
-            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, std::weak_ptr<IPlanet> planet, Square bounds, int quad);
+            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, IPlanet *planet, Square bounds, int quad);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -67,8 +67,8 @@ namespace Galactic
             int m_quad;
             Square m_bounds;
 
+            IPlanet *m_planet;
             std::weak_ptr<TerrainNode> m_parent;
-            std::weak_ptr<IPlanet> m_planet;
             std::shared_ptr<ISphericalTerrain> m_terrain;
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
 

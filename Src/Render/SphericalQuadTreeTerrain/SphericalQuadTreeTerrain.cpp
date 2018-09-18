@@ -6,11 +6,11 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::weak_ptr<IPlanet> planet)
+SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
     : m_deviceContext(deviceContext),
       m_planet(planet),
-      m_world(planet.lock()->GetMatrix()),
-      m_radius((float)(planet.lock()->GetRadius() / Constants::Scale))
+      m_world(planet->GetMatrix()),
+      m_radius((float)(planet->GetRadius() / Constants::Scale))
 {
     m_deviceContext->GetDevice(&m_device);
 
@@ -125,11 +125,10 @@ void SphericalQuadTreeTerrain::Reset()
 
 float Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p)
 {
-    auto planet = m_planet.lock();
-    float scale = planet->GetNoiseScale();
-    float minvalue = planet->GetMinValue();
+    float scale = m_planet->GetNoiseScale();
+    float minvalue = m_planet->GetMinValue();
 
-    float v = planet->GetHeight() * m_noise.GetNoise(p.x * 40.0f * scale, p.y * 40.0f * scale, p.z * 40.0f * scale);
+    float v = m_planet->GetHeight() * m_noise.GetNoise(p.x * 40.0f * scale, p.y * 40.0f * scale, p.z * 40.0f * scale);
     
     return fmaxf(0.0f, v - minvalue);
 }

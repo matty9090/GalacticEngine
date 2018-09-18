@@ -7,7 +7,6 @@
 
 #include "Body/IBody.hpp"
 #include "Body/IPlanet.hpp"
-#include "Body/Planet.hpp"
 
 #include "Render/IRenderable.hpp"
 
@@ -15,8 +14,12 @@
 #include "Render/PlanetRendererMed.hpp"
 #include "Render/PlanetRendererHigh.hpp"
 
+#include "Scene/IStarSystem.hpp"
 #include "Physics/Constants.hpp"
 
 namespace Galactic {
-    std::shared_ptr<Galactic::IBody> CreatePlanet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name, long double mass, double radius);
+    enum class EStarSystem { Simple, NBody };
+
+    std::unique_ptr<Galactic::IStarSystem> CreateStarSystem(std::string name, EStarSystem type);
+    std::unique_ptr<Galactic::IPlanet> CreatePlanet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name, long double mass, double radius);
 }

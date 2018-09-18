@@ -7,7 +7,7 @@
 
 namespace Galactic
 {
-    class Planet : public IPlanet, public std::enable_shared_from_this<Planet>
+    class Planet : public IPlanet
     {
         public:
             Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name);
@@ -49,6 +49,7 @@ namespace Galactic
             float GetMinValue() const { return m_minValue; }
             float GetAtmosphereHeight() const { return m_atmosphereHeight; }
 
+            std::string                  GetName()     const { return m_name; }
             DirectX::SimpleMath::Matrix &GetMatrix()         { return m_world; };
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
             DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }

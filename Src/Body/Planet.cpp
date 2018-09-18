@@ -19,7 +19,7 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_height(0.04f),
       m_noiseScale(1.0f),
       m_minValue(0.0f),
-      m_atmosphereHeight(400.0f)
+      m_atmosphereHeight(800.0f)
 {
     m_gradient.addColorStop(0.0f, Gradient::GradientColor(0.0f, 0.467f, 0.745f, 0.5f));
     m_gradient.addColorStop(0.06f, Gradient::GradientColor(0.93f, 0.79f, 0.69f, 1.0f));
@@ -47,8 +47,8 @@ void Planet::Generate(EDetail detail)
         m_atmosphere.reset();
     }
 
-    m_renderer = CreatePlanetRenderer(m_deviceContext, shared_from_this(), detail);
-    m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, shared_from_this());
+    m_renderer = CreatePlanetRenderer(m_deviceContext, this, detail);
+    m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this);
 
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
