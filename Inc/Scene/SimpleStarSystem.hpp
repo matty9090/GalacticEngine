@@ -25,12 +25,12 @@ namespace Galactic
             std::string GetName() const { return m_name; }
             std::vector<ILightSource*> GetLightSources() const;
 
-            DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
+            DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
 
         private:
             std::string m_name;
 
-            DirectX::SimpleMath::Matrix m_world;;
+            DirectX::SimpleMath::Matrix m_world;
             DirectX::SimpleMath::Vector3 m_cameraPos;
 
             std::list<std::unique_ptr<ILightSource>> m_lights;

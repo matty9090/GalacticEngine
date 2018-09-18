@@ -5,7 +5,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, std::weak_ptr<IPlanet> planet, Square bounds, int quad)
+TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, IPlanet *planet, Square bounds, int quad)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
       m_terrain(terrain),
       m_parent(parent),
@@ -46,7 +46,6 @@ void TerrainNode::Generate()
 
     float step = m_bounds.size / (gridsize - 1);
     bool hasParent = !IsRoot();
-    auto planet = m_planet.lock();
 
     uint16_t k = 0;
     int sx = 0, sy = 0;
@@ -88,7 +87,7 @@ void TerrainNode::Generate()
                 pos = Vector3::Transform(pos, m_world);
 
                 float height = m_terrain->GetHeight(pos);
-                auto col = planet->GetGradient().getColorAt(height / planet->GetHeight());
+                auto col = m_planet->GetGradient().getColorAt(height / m_planet->GetHeight());
 
                 v.color = Color(col.r, col.g, col.b, col.a);
                 v.position = pos + pos * height;
@@ -204,12 +203,12 @@ void TerrainNode::Update(float dt)
 {
     int gridsize = m_terrain->GetGridSize();
 
-    Vector3 cam = m_planet.lock()->GetCameraPos();
+    Vector3 cam = m_planet->GetCameraPos();
     Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
     Vector3 mid = Vector3::Transform(midpoint, m_terrain->GetMatrix());
 
     float distance = Vector3::Distance(cam, mid);
-    float height = (cam - m_planet.lock()->GetPosition()).Length() - m_terrain->GetRadius() * 0.96f;
+    float height = (cam - m_planet->GetPosition()).Length() - m_terrain->GetRadius() * 0.96f;
 
     float horizon = sqrtf(height * (2 * m_terrain->GetRadius() + height));
     m_visible = distance - m_diameter < horizon;

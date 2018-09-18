@@ -31,13 +31,13 @@ namespace Galactic
             float GetHeight(DirectX::SimpleMath::Vector3 p);
 
             void SetRenderContext();
-            DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
+            DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             std::shared_ptr<Effect> GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
 
         private:
             FastNoise m_noise;
-            DirectX::SimpleMath::Matrix &m_world;
+            DirectX::SimpleMath::Matrix m_world;
 
             IPlanet *m_planet;
             std::shared_ptr<Effect> m_effect;

@@ -67,7 +67,7 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
     for (int i = 0; i < 6; ++i)
     {
         m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
-        m_faces[i]->GetMatrix() = orientations[i];
+        m_faces[i]->SetMatrix(orientations[i]);
         
 #ifdef _DEBUG
         m_faces[i]->SetDebugName(std::to_string(i));
@@ -108,7 +108,8 @@ void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX:
 
 void SphericalQuadTreeTerrain::Update(float dt)
 {
-    m_world *= Matrix::CreateScale(m_radius);
+    m_world = Matrix::CreateScale(m_radius);
+    m_world *= m_planet->GetMatrix();
 
     for (auto &face : m_faces)
         face->Update(dt);

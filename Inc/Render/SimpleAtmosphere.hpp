@@ -34,10 +34,10 @@ namespace Galactic
             void Update(float dt);
             void Reset();
 
-            DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
+            DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
 
         private:
-            DirectX::SimpleMath::Matrix &m_world;
+            DirectX::SimpleMath::Matrix m_world;
 
             ID3D11DeviceContext *m_context;
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;

@@ -77,8 +77,8 @@ void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matri
 
 void Planet::Update(float dt)
 {
-    //m_rotation.y += dt * 0.1f;
-    //m_position.x += dt * 0.4f;
+    //m_rotation.y -= dt * 0.1f;
+    //m_position.x += dt * 2.0f;
 
     Matrix rotX = Matrix::CreateRotationX(m_rotation.x);
     Matrix rotY = Matrix::CreateRotationY(m_rotation.y);

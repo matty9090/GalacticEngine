@@ -8,6 +8,6 @@ namespace Galactic
 {
     class IPlanetRenderer : public IRenderable {
         public:
-            virtual DirectX::SimpleMath::Matrix &GetMatrix() = 0;
+            virtual DirectX::SimpleMath::Matrix GetMatrix() const = 0;
     };
 }

@@ -9,8 +9,7 @@ using namespace DirectX::SimpleMath;
 SimpleAtmosphere::SimpleAtmosphere(ID3D11DeviceContext *context, IPlanet *planet)
     : Drawable(context, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
       m_context(context),
-      m_planet(planet),
-      m_world(planet->GetMatrix())
+      m_planet(planet)
 {
     ID3D11Device *device;
     context->GetDevice(&device);
@@ -60,8 +59,9 @@ void Galactic::SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, Direct
     float atmradius = atmheight + radius;
     float camHeight = (m_planet->GetCameraPos() - m_planet->GetPosition()).Length();
     
-    Matrix world = m_world * Matrix::CreateScale(1 / radius);
-    Matrix worldViewProj = world * view * proj;
+    m_world = m_planet->GetMatrix();
+
+    Matrix worldViewProj = m_world * view * proj;
 
     AtmosphereBuffer buffer = {
         worldViewProj.Transpose(),

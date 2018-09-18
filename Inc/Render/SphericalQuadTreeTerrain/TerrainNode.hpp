@@ -36,12 +36,13 @@ namespace Galactic
 
             TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, IPlanet *planet, Square bounds, int quad);
 
+            void SetMatrix(DirectX::SimpleMath::Matrix m) { m_world = m; }
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
             void Reset();
 
             PlanetVertex &GetVertex(int i) { return m_originalVertices[i]; }
-            DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
+            DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
 
             void Generate();
             bool IsLeaf() { return m_children[0] == nullptr; }

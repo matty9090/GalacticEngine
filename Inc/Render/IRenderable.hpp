@@ -13,6 +13,6 @@ namespace Galactic
             virtual void Update(float dt) = 0;
             virtual void Reset() = 0;
 
-            virtual DirectX::SimpleMath::Matrix &GetMatrix() = 0;
+            virtual DirectX::SimpleMath::Matrix GetMatrix() const = 0;
     };
 }

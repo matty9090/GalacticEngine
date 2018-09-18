@@ -10,8 +10,7 @@ using namespace DirectX::SimpleMath;
 
 HighDetailPlanetRenderer::HighDetailPlanetRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
     : m_deviceContext(deviceContext),
-      m_planet(planet),
-      m_world(planet->GetMatrix())
+      m_planet(planet)
 {
     m_world = Matrix::Identity;
     m_terrain = std::make_shared<SphericalQuadTreeTerrain>(deviceContext, planet);
