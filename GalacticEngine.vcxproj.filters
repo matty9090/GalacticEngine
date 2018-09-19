@@ -143,6 +143,12 @@
     <ClInclude Include="Inc\Render\Billboard.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Physics\Gravity.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Physics\Orbits.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -200,6 +206,12 @@
     </ClCompile>
     <ClCompile Include="Src\Render\Billboard.cpp">
       <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Physics\Gravity.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Physics\Orbits.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -148,7 +148,6 @@ void Game::Update(DX::StepTimer const& timer)
     move = Vector3::Transform(move, q);
     move *= 0.05f;
 
-
     auto closestBody = static_cast<Galactic::IPlanet*>(m_system->GetClosestBody(m_cameraPos));
     
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
@@ -161,7 +160,7 @@ void Game::Update(DX::StepTimer const& timer)
     m_cameraPos += move;
 
     m_system->SetCameraPos(m_cameraPos);
-    m_system->Update(dt);
+    m_system->Update(dt * 0.001f);
 }
 
 // Draws the scene.
@@ -357,15 +356,18 @@ void Game::CreateDevice()
     star->SetRadius(695508.0);
     star->SetTemperature(5777);
     star->SetPosition(Vector3(60000.0f, 0.0f, 0.0f));
-    star->Generate();
-    
-    m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
-    m_system->AddBody(std::move(star));
+    star->SetMass(5.972e24);
+    star->Generate(); 
 
     auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
+    planet->SetInfluence(star.get());
+    planet->SetMass(1.989e30);
+    planet->SetVelocity(Vector3(0.0f, 0.0f, 1000.0f));
     planet->Generate(Galactic::EDetail::High);
 
+    m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
+    m_system->AddBody(std::move(star));
     m_system->AddBody(std::move(planet));
 }
 

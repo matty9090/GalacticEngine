@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Scene/SimpleStarSystem.hpp"
+#include "Physics/Gravity.hpp"
 
 using namespace Galactic;
 using namespace DirectX;
@@ -39,7 +40,23 @@ IBody *SimpleStarSystem::GetClosestBody(DirectX::SimpleMath::Vector3 pos) const
 
 void SimpleStarSystem::Update(float dt)
 {
-    for (auto const &body : m_bodies) {
+    for (auto const &body : m_bodies)
+    {
+        IBody *inf = body->GetInfluence();
+
+        if (inf != nullptr)
+        {
+            Vector3 force = Gravity::Force(inf, body.get());
+            Vector3 vel = body->GetVelocity();
+
+            vel += (force / body->GetMass()) * dt;
+
+            body->SetVelocity(vel);
+        }
+    }
+    
+    for (auto const &body : m_bodies)
+    {
         body->SetCameraPos(m_cameraPos);
         body->Update(dt);
     }

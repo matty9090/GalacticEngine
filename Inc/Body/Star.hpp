@@ -27,8 +27,9 @@ namespace Galactic
             void SetVelocity(DirectX::SimpleMath::Vector3 vel) { m_velocity = vel; }
             void SetRotation(DirectX::SimpleMath::Vector3 vel) { m_rotation = vel; }
             void SetCameraPos(DirectX::SimpleMath::Vector3 camPos) { m_camPos = camPos; }
-            void SetInfluence(std::shared_ptr<IBody> body) { m_influence = body; }
+            void SetInfluence(IBody *body) { m_influence = body; }
 
+            IBody                       *GetInfluence() const { return m_influence; }
             int                          GetTemperature() const { return m_temperature; }
             double                       GetRadius()   const { return m_radius; }
             std::string                  GetName()     const { return m_name; }
@@ -50,7 +51,7 @@ namespace Galactic
                 double m_radius;
                 long double m_mass;
 
-                std::shared_ptr<IBody> m_influence;
+                IBody *m_influence;
                 std::unique_ptr<Billboard> m_billboard;
                 std::unique_ptr<IStarRenderer> m_renderer;
 

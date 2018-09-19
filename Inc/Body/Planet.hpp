@@ -26,7 +26,7 @@ namespace Galactic
             void SetVelocity(DirectX::SimpleMath::Vector3 vel) { m_velocity = vel; }
             void SetRotation(DirectX::SimpleMath::Vector3 vel) { m_rotation = vel; }
             void SetCameraPos(DirectX::SimpleMath::Vector3 camPos) { m_camPos = camPos; }
-            void SetInfluence(std::shared_ptr<IBody> body) { m_influence = body; }
+            void SetInfluence(IBody *body) { m_influence = body; }
 
             double GetRadius() const { return m_radius; }
             long double GetMass() const { return m_mass; }
@@ -50,6 +50,7 @@ namespace Galactic
             float GetAtmosphereHeight() const { return m_atmosphereHeight; }
 
             std::string                  GetName()     const { return m_name; }
+            IBody                       *GetInfluence() const { return m_influence; }
             DirectX::SimpleMath::Matrix  GetMatrix()   const { return m_world; }
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
             DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }
@@ -75,7 +76,7 @@ namespace Galactic
             DirectX::SimpleMath::Matrix  m_world;
             DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation, m_camPos;
 
-            std::shared_ptr<IBody> m_influence;
+            IBody *m_influence;
             std::unique_ptr<IPlanetRenderer> m_renderer;
             std::unique_ptr<IAtmosphereRenderer> m_atmosphere;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;

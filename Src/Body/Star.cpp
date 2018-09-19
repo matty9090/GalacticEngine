@@ -8,7 +8,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-Star::Star(std::string name, ID3D11DeviceContext *context) : m_name(name)
+Star::Star(std::string name, ID3D11DeviceContext *context) : m_name(name), m_influence(nullptr)
 {
     m_world = Matrix::Identity;
     m_renderer = CreateStarRenderer(context, this);
@@ -23,6 +23,8 @@ void Star::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix 
 
 void Star::Update(float dt)
 {
+    m_position += m_velocity * dt;
+
     m_world = Matrix::CreateScale((float)(m_radius / Constants::Scale)) * Matrix::CreateTranslation(m_position);
 
     float size = CalculateGlowSize(Vector3::Distance(m_camPos, m_position)) * 10.0f;
