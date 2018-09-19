@@ -213,7 +213,7 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = m_depth < 2 || distance < m_scale * 30.0f;
+        bool divide = m_depth < 3 || distance < m_scale * 30.0f;
 
         if (!divide)
             Merge();

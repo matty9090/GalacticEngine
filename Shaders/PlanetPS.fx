@@ -6,7 +6,7 @@ struct VS_OUTPUT {
 };
 	
 float4 main(VS_OUTPUT v) : SV_Target {
-	float3 lightPos = float3(100.0f, 50.0f, -100.0f);
+	float3 lightPos = float3(60000.0f, 0.0f, 0.0f);
 	float3 lightCol = float3(1.0f, 1.0f, 1.0f);
 	float3 ambientCol = float3(0.f, 0.f, 0.f);
 	

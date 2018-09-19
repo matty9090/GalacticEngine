@@ -16,7 +16,8 @@ namespace Galactic
 
     struct AtmosphereBuffer
     {
-        DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
+        DirectX::SimpleMath::Matrix viewProj;      // 64 bytes
+        DirectX::SimpleMath::Matrix world;         // 64 bytes
         DirectX::SimpleMath::Vector3 lightDir;     // 12 bytes
         float planetRadius;                        // 4 bytes
         DirectX::SimpleMath::Vector3 camPos;       // 12 bytes

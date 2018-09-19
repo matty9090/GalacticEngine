@@ -64,11 +64,12 @@ void Galactic::SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, Direct
     
     m_world = Matrix::CreateScale(1 / radius) * m_planet->GetMatrix();
 
-    Matrix worldViewProj = m_world * view * proj;
+    Matrix viewProj = view * proj;
 
     AtmosphereBuffer buffer = {
-        worldViewProj.Transpose(),
-        Vector3::Forward,
+        viewProj.Transpose(),
+        m_world.Transpose(),
+        Vector3::Right,
         radius,
         m_planet->GetCameraPos() - m_planet->GetPosition(),
         atmradius,
