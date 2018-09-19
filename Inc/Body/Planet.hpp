@@ -50,7 +50,7 @@ namespace Galactic
             float GetAtmosphereHeight() const { return m_atmosphereHeight; }
 
             std::string                  GetName()     const { return m_name; }
-            DirectX::SimpleMath::Matrix  GetMatrix()   const { return m_world; };
+            DirectX::SimpleMath::Matrix  GetMatrix()   const { return m_world; }
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
             DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }
             DirectX::SimpleMath::Vector3 GetRotation() const { return m_rotation; }

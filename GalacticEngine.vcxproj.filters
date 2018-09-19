@@ -32,6 +32,9 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{eed66be2-c23a-48a4-afcf-8dbce1a89a3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{4098630d-44df-4f13-8a9c-116931a0b7f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="settings.manifest">
@@ -119,6 +122,24 @@
     <ClInclude Include="Inc\Scene\SimpleStarSystem.hpp">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Body\IStar.hpp">
+      <Filter>Body</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Body\Star.hpp">
+      <Filter>Body</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\IStarRenderer.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\StarRendererFactory.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\SimpleStarRenderer.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Utils\Shapes.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -164,6 +185,15 @@
     </ClCompile>
     <ClCompile Include="Src\Scene\SimpleStarSystem.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Body\Star.cpp">
+      <Filter>Body</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Utils\Shapes.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\SimpleStarRenderer.cpp">
+      <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -16,7 +16,7 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
       m_quad(quad)
 {
     ID3D11Device *device;
-    terrain->GetContext()->GetDevice(&device);
+    m_context->GetDevice(&device);
 
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
     m_world = IsRoot() ? Matrix::Identity : m_parent.lock()->GetMatrix();
@@ -149,23 +149,23 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
             MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
 
-            m_buffer->SetData(m_terrain->GetContext().Get(), buffer);
+            m_buffer->SetData(m_context, buffer);
 
-            m_terrain->GetContext()->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+            m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
             Draw();
 
 #ifdef _DEBUG
-            m_terrain->GetContext()->OMSetBlendState(m_dbgStates->AlphaBlend(), nullptr, 0xFFFFFFFF);
-            m_terrain->GetContext()->OMSetDepthStencilState(m_dbgStates->DepthNone(), 0);
-            m_terrain->GetContext()->RSSetState(m_dbgStates->CullNone());
+            m_context->OMSetBlendState(m_dbgStates->AlphaBlend(), nullptr, 0xFFFFFFFF);
+            m_context->OMSetDepthStencilState(m_dbgStates->DepthNone(), 0);
+            m_context->RSSetState(m_dbgStates->CullNone());
 
             m_dbgEffect->SetWorld(m_terrain->GetMatrix());
             m_dbgEffect->SetView(view);
             m_dbgEffect->SetProjection(proj);
 
-            m_dbgEffect->Apply(m_terrain->GetContext().Get());
-            m_terrain->GetContext()->IASetInputLayout(m_dbgInputLayout.Get());
+            m_dbgEffect->Apply(m_context);
+            m_context->IASetInputLayout(m_dbgInputLayout.Get());
 
             m_dbgBatch->Begin();
 
@@ -215,7 +215,7 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = m_depth < 3 || distance < m_scale * 40.0f;
+        bool divide = m_depth < 2 || distance < m_scale * 30.0f;
 
         if (!divide)
             Merge();

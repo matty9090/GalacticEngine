@@ -6,7 +6,7 @@
 
 namespace Galactic
 {
-    class IPlanetRenderer : public IRenderable {
+    class IStarRenderer : public IRenderable {
         public:
             
     };

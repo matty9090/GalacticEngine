@@ -24,13 +24,14 @@ namespace Galactic
             ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
             
             ID3D11Device *m_device;
-            ID3D11DeviceContext *m_context;
 
             bool m_generated;
 
         protected:
             std::vector<VertexType> m_vertices;
             std::vector<IndexType> m_indices;
+
+            ID3D11DeviceContext *m_context;
     };
 
     template<class VertexType, class IndexType>

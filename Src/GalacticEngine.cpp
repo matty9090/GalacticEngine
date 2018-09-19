@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "GalacticEngine.hpp"
+#include "Body/Star.hpp"
 #include "Body/Planet.hpp"
 #include "Scene/SimpleStarSystem.hpp"
 
@@ -13,7 +14,14 @@ namespace Galactic {
         return system;
     }
 
-    std::unique_ptr<IPlanet> CreatePlanet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name, long double mass, double radius)
+    std::unique_ptr<IStar> CreateStar(ID3D11DeviceContext *deviceContext, std::string name)
+    {
+        std::unique_ptr<IStar> star = std::make_unique<Star>(name, deviceContext);
+
+        return star;
+    }
+
+    std::unique_ptr<IPlanet> CreatePlanet(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius)
     {
         std::unique_ptr<IPlanet> planet = std::make_unique<Planet>(deviceContext, name);
         planet->SetMass(mass);

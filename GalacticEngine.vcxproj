@@ -163,7 +163,9 @@
   <ItemGroup>
     <ClInclude Include="Inc\Body\IBody.hpp" />
     <ClInclude Include="Inc\Body\IPlanet.hpp" />
+    <ClInclude Include="Inc\Body\IStar.hpp" />
     <ClInclude Include="Inc\Body\Planet.hpp" />
+    <ClInclude Include="Inc\Body\Star.hpp" />
     <ClInclude Include="Inc\FastNoise\FastNoise.h" />
     <ClInclude Include="Inc\GalacticEngine.hpp" />
     <ClInclude Include="Inc\pch.h" />
@@ -176,22 +178,27 @@
     <ClInclude Include="Inc\Render\IAtmosphereRenderer.hpp" />
     <ClInclude Include="Inc\Render\IPlanetRenderer.hpp" />
     <ClInclude Include="Inc\Render\IRenderable.hpp" />
+    <ClInclude Include="Inc\Render\IStarRenderer.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererFactory.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererHigh.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererLow.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererMed.hpp" />
     <ClInclude Include="Inc\Render\SimpleAtmosphere.hpp" />
+    <ClInclude Include="Inc\Render\SimpleStarRenderer.hpp" />
     <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\ISphericalTerrain.hpp" />
     <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\SphericalQuadTreeTerrain.hpp" />
     <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\TerrainNode.hpp" />
+    <ClInclude Include="Inc\Render\StarRendererFactory.hpp" />
     <ClInclude Include="Inc\Scene\ILightSource.hpp" />
     <ClInclude Include="Inc\Scene\IStarSystem.hpp" />
     <ClInclude Include="Inc\Scene\SimpleStarSystem.hpp" />
+    <ClInclude Include="Inc\Utils\Shapes.hpp" />
     <ClInclude Include="Src\Game.h" />
     <ClInclude Include="Src\StepTimer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Body\Planet.cpp" />
+    <ClCompile Include="Src\Body\Star.cpp" />
     <ClCompile Include="Src\FastNoise\FastNoise.cpp" />
     <ClCompile Include="Src\GalacticEngine.cpp" />
     <ClCompile Include="Src\Game.cpp" />
@@ -213,9 +220,11 @@
     <ClCompile Include="Src\Render\PlanetRendererLow.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererMed.cpp" />
     <ClCompile Include="Src\Render\SimpleAtmosphere.cpp" />
+    <ClCompile Include="Src\Render\SimpleStarRenderer.cpp" />
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeTerrain.cpp" />
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\TerrainNode.cpp" />
     <ClCompile Include="Src\Scene\SimpleStarSystem.cpp" />
+    <ClCompile Include="Src\Utils\Shapes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Src\resource.rc" />

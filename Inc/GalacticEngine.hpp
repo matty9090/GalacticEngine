@@ -6,6 +6,7 @@
 #include <wrl/client.h>
 
 #include "Body/IBody.hpp"
+#include "Body/IStar.hpp"
 #include "Body/IPlanet.hpp"
 
 #include "Render/IRenderable.hpp"
@@ -21,5 +22,6 @@ namespace Galactic {
     enum class EStarSystem { Simple, NBody };
 
     std::unique_ptr<Galactic::IStarSystem> CreateStarSystem(std::string name, EStarSystem type);
-    std::unique_ptr<Galactic::IPlanet> CreatePlanet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name, long double mass, double radius);
+    std::unique_ptr<Galactic::IStar> CreateStar(ID3D11DeviceContext *deviceContext, std::string name);
+    std::unique_ptr<Galactic::IPlanet> CreatePlanet(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius);
 }

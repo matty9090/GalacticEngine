@@ -39,14 +39,11 @@ namespace Galactic
         private:
             DirectX::SimpleMath::Matrix m_world;
 
-            ID3D11DeviceContext *m_context;
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
 
             IPlanet *m_planet;
             std::unique_ptr<Effect> m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::unique_ptr<ConstantBuffer<AtmosphereBuffer>> m_buffer;
-
-            void CreateSphere(float radius, size_t tessellation);
     };
 }

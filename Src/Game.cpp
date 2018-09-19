@@ -154,7 +154,7 @@ void Game::Update(DX::StepTimer const& timer)
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
 
-    factor = std::fmaxf(factor, 5.0f);
+    factor = std::fminf(std::fmaxf(factor, 5.0f), 1500.0f);
 
     move = move * factor * dt;
     m_speed = factor;
@@ -353,7 +353,15 @@ void Game::CreateDevice()
     
     m_system = Galactic::CreateStarSystem("System", Galactic::EStarSystem::Simple);
 
-    auto planet = Galactic::CreatePlanet(m_d3dContext, "Planet", 5.962e24, 6371.0);
+    auto star = Galactic::CreateStar(m_d3dContext.Get(), "Star");
+    star->SetRadius(5000.0);
+    star->SetPosition(Vector3(30.0f, 0.0f, 0.0f));
+    star->Generate();
+    
+    m_system->AddBody(std::move(star));
+    //m_system->AddLightSource(star);
+
+    auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
     planet->Generate(Galactic::EDetail::High);
 
