@@ -2,6 +2,8 @@
 
 #include "Body/IStar.hpp"
 #include "Scene/ILightSource.hpp"
+
+#include "Render/Billboard.hpp"
 #include "Render/IStarRenderer.hpp"
 
 namespace Galactic
@@ -40,19 +42,22 @@ namespace Galactic
 
             bool IsGenerated() const { return m_isGenerated; }
 
-    private:
-            std::string m_name;
+        private:
+                std::string m_name;
 
-            bool m_isGenerated;
-            int m_temperature;
-            double m_radius;
-            long double m_mass;
+                bool m_isGenerated;
+                int m_temperature;
+                double m_radius;
+                long double m_mass;
 
-            std::shared_ptr<IBody> m_influence;
-            std::unique_ptr<IStarRenderer> m_renderer;
+                std::shared_ptr<IBody> m_influence;
+                std::unique_ptr<Billboard> m_billboard;
+                std::unique_ptr<IStarRenderer> m_renderer;
 
-            DirectX::SimpleMath::Color m_colour;
-            DirectX::SimpleMath::Matrix  m_world;
-            DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation, m_camPos;
+                DirectX::SimpleMath::Color m_colour;
+                DirectX::SimpleMath::Matrix  m_world;
+                DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation, m_camPos;
+
+                float CalculateGlowSize(float distance);
     };
 }

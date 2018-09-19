@@ -1,18 +1,20 @@
 #include "pch.h"
 #include "Render/Billboard.hpp"
+#include "Physics/Constants.hpp"
 
 using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-Billboard::Billboard(ID3D11DeviceContext *context, IBody *parent, std::string texture)
+Billboard::Billboard(ID3D11DeviceContext *context, IStar *parent, std::string texture)
     : Drawable(context, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
-      m_parent(parent)
+      m_parent(parent),
+      m_scale(1.0f)
 {
     m_vertices.push_back(VertexPositionTexture { Vector3(0.5f, 0.5f, 0.0f), Vector2(0.0f, 0.0f) });
-    m_vertices.push_back(VertexPositionTexture { Vector3(-0.5f, 0.5f, 0.0f), Vector2(0.0f, 0.0f) });
-    m_vertices.push_back(VertexPositionTexture { Vector3(0.5f, -0.5f, 0.0f), Vector2(0.0f, 0.0f) });
-    m_vertices.push_back(VertexPositionTexture { Vector3(-0.5f, -0.5f, 0.0f), Vector2(0.0f, 0.0f) });
+    m_vertices.push_back(VertexPositionTexture { Vector3(-0.5f, 0.5f, 0.0f), Vector2(1.0f, 0.0f) });
+    m_vertices.push_back(VertexPositionTexture { Vector3(0.5f, -0.5f, 0.0f), Vector2(0.0f, 1.0f) });
+    m_vertices.push_back(VertexPositionTexture { Vector3(-0.5f, -0.5f, 0.0f), Vector2(1.0f, 1.0f) });
 
     m_indices.push_back(0);
     m_indices.push_back(1);
@@ -32,7 +34,7 @@ Billboard::Billboard(ID3D11DeviceContext *context, IBody *parent, std::string te
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
-    m_effect = std::make_unique<Effect>(device, L"Shaders/PositionTexVS.fx", L"Shaders/PositionTexPS.fx", els, num, false);
+    m_effect = std::make_unique<Effect>(device, L"Shaders/BillboardVS.fx", L"Shaders/PositionTexPS.fx", els, num, false);
 
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_NONE, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
@@ -52,12 +54,12 @@ void Billboard::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Ma
 {
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    auto sampler = m_states->LinearWrap();
+    auto sampler = m_states->AnisotropicWrap();
 
     m_context->PSSetSamplers(0, 1, &sampler);
     m_context->RSSetState(m_raster.Get());
     m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-    m_context->OMSetBlendState(m_states->Opaque(), factor, 0xFFFFFFFF);
+    m_context->OMSetBlendState(m_states->Additive(), factor, 0xFFFFFFFF);
 
     m_context->IASetInputLayout(m_effect->GetInputLayout());
     m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
@@ -66,7 +68,8 @@ void Billboard::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Ma
 
     PreDraw();
 
-    m_world = m_parent ? m_parent->GetMatrix() : Matrix::Identity;
+    m_world = Matrix::CreateScale(m_scale);
+    m_world *= Matrix::CreateBillboard(m_parent->GetPosition(), m_parent->GetCameraPos(), Vector3::Up, &Vector3::Forward);
 
     Matrix worldViewProj = m_world * view * proj;
     BillboardBuffer buffer = { worldViewProj.Transpose() };

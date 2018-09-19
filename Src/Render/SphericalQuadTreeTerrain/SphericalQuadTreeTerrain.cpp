@@ -108,8 +108,7 @@ void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX:
 
 void SphericalQuadTreeTerrain::Update(float dt)
 {
-    m_world = Matrix::CreateScale(m_radius);
-    m_world *= m_planet->GetMatrix();
+    m_world = m_planet->GetMatrix();
 
     for (auto &face : m_faces)
         face->Update(dt);

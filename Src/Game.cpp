@@ -154,7 +154,7 @@ void Game::Update(DX::StepTimer const& timer)
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
 
-    factor = std::fminf(std::fmaxf(factor, 5.0f), 10000.0f);
+    factor = std::fminf(std::fmaxf(factor, 5.0f), 100000.0f);
 
     move = move * factor * dt;
     m_speed = factor;
@@ -214,7 +214,7 @@ void Game::Render()
 void Game::Clear()
 {
     // Clear the views.
-    m_d3dContext->ClearRenderTargetView(m_renderTargetView.Get(), Color(0.012f, 0.012f, 0.012f));
+    m_d3dContext->ClearRenderTargetView(m_renderTargetView.Get(), Color(0.0f, 0.0f, 0.0f));
     m_d3dContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     m_d3dContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthStencilView.Get());
@@ -355,6 +355,7 @@ void Game::CreateDevice()
 
     auto star = Galactic::CreateStar(m_d3dContext.Get(), "Star");
     star->SetRadius(695508.0);
+    star->SetTemperature(5777.0);
     star->SetPosition(Vector3(60000.0f, 0.0f, 0.0f));
     star->Generate();
     

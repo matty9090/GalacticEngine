@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Body/Planet.hpp"
 #include "Render/PlanetRendererFactory.hpp"
+#include "Physics/Constants.hpp"
 
 using namespace Galactic;
 using namespace DirectX;
@@ -84,9 +85,10 @@ void Planet::Update(float dt)
     Matrix rotY = Matrix::CreateRotationY(m_rotation.y);
     Matrix rotZ = Matrix::CreateRotationZ(m_rotation.z);
 
+    Matrix scale = Matrix::CreateScale((float)(m_radius / Constants::Scale));
     Matrix translation = Matrix::CreateTranslation(m_position);
 
-    m_world = rotX * rotY * rotZ * translation;
+    m_world = scale * rotX * rotY * rotZ * translation;
 
     if (m_renderer)
         m_renderer->Update(dt);

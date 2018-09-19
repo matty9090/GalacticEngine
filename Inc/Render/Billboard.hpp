@@ -4,7 +4,7 @@
 
 #include "Drawable.hpp"
 
-#include "Body/IBody.hpp"
+#include "Body/IStar.hpp"
 #include "Render/DirectX/Effect.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
@@ -22,11 +22,13 @@ namespace Galactic
     class Billboard : public Drawable<DirectX::VertexPositionTexture>
     {
         public:
-            Billboard(ID3D11DeviceContext *deviceContext, IBody *parent, std::string texture);
+            Billboard(ID3D11DeviceContext *deviceContext, IStar *parent, std::string texture);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
             void Reset();
+
+            void SetScale(float scale) { m_scale = scale; }
 
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
 
@@ -36,7 +38,9 @@ namespace Galactic
 
             DirectX::SimpleMath::Matrix m_world;
 
-            IBody *m_parent;
+            float m_scale;
+
+            IStar *m_parent;
             std::unique_ptr<Effect> m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::unique_ptr<ConstantBuffer<BillboardBuffer>> m_buffer;

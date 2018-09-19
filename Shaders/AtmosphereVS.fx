@@ -53,7 +53,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	}
 
 	alpha /= float(5);
-	alpha *= 1.6;
+	alpha *= 1.4;
 
 	Output.Position = mul(float4(rayEnd, 1.0), mWorldViewProj);
 	Output.Colour	= float3(0.0f, 0.7f, 1.0f);

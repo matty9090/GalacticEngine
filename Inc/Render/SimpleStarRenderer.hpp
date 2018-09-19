@@ -5,6 +5,7 @@
 
 #include "Body/IStar.hpp"
 
+#include "Render/Billboard.hpp"
 #include "Render/DirectX/Effect.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
@@ -38,6 +39,7 @@ namespace Galactic
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
 
             IStar *m_star;
+
             std::unique_ptr<Effect> m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::unique_ptr<ConstantBuffer<StarBuffer>> m_buffer;
