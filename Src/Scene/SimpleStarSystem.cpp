@@ -21,6 +21,22 @@ IBody *SimpleStarSystem::FindBody(std::string name) const
     return nullptr;
 }
 
+IBody *SimpleStarSystem::GetClosestBody(DirectX::SimpleMath::Vector3 pos) const
+{
+    IBody *body = nullptr;
+    float d = std::numeric_limits<float>::max();
+
+    for (auto &b : m_bodies)
+    {
+        float dist = Vector3::DistanceSquared(pos, b->GetPosition());
+
+        if (dist < d)
+            d = dist, body = b.get();
+    }
+
+    return body;
+}
+
 void SimpleStarSystem::Update(float dt)
 {
     for (auto const &body : m_bodies) {
@@ -44,12 +60,7 @@ void SimpleStarSystem::Reset()
     }
 }
 
-std::vector<ILightSource*> SimpleStarSystem::GetLightSources() const
+std::list<ILightSource*> SimpleStarSystem::GetLightSources() const
 {
-    std::vector<ILightSource*> lights;
-    
-    for (auto const &light : m_lights)
-        lights.push_back(light.get());
-
-    return lights;
+    return m_lights;
 }

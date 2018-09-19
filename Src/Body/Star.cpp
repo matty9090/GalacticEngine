@@ -21,7 +21,7 @@ void Star::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix 
 
 void Star::Update(float dt)
 {
-    m_world = Matrix::CreateTranslation(m_position) * Matrix::CreateScale((float)(m_radius / Constants::Scale));
+    m_world = Matrix::CreateScale((float)(m_radius / Constants::Scale)) * Matrix::CreateTranslation(m_position);
 
     m_renderer->Update(dt);
 }

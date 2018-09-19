@@ -148,8 +148,8 @@ void Game::Update(DX::StepTimer const& timer)
     move = Vector3::Transform(move, q);
     move *= 0.05f;
 
-    // TODO: Find actual closest body
-    auto closestBody = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
+
+    auto closestBody = static_cast<Galactic::IPlanet*>(m_system->GetClosestBody(m_cameraPos));
     
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
@@ -355,11 +355,11 @@ void Game::CreateDevice()
 
     auto star = Galactic::CreateStar(m_d3dContext.Get(), "Star");
     star->SetRadius(5000.0);
-    star->SetPosition(Vector3(30.0f, 0.0f, 0.0f));
+    star->SetPosition(Vector3(80.0f, 0.0f, 0.0f));
     star->Generate();
     
+    m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
     m_system->AddBody(std::move(star));
-    //m_system->AddLightSource(star);
 
     auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
