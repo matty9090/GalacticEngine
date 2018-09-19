@@ -1,30 +1,28 @@
 #pragma once
 
+#include <memory>
+
 #include "Drawable.hpp"
-#include "IStarRenderer.hpp"
 
-#include "Body/IStar.hpp"
-
+#include "Body/IBody.hpp"
 #include "Render/DirectX/Effect.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
+#include "SimpleMath.h"
+#include "VertexTypes.h"
+#include "CommonStates.h"
+
 namespace Galactic
 {
-    struct StarVertex
-    {
-        DirectX::SimpleMath::Vector3 position;
-        DirectX::SimpleMath::Color color;
-    };
-
-    struct StarBuffer
+    struct BillboardBuffer
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
     };
 
-    class SimpleStarRenderer : public IStarRenderer, public Drawable<StarVertex>
+    class Billboard : public Drawable<DirectX::VertexPositionTexture>
     {
         public:
-            SimpleStarRenderer(ID3D11DeviceContext *deviceContext, IStar *star);
+            Billboard(ID3D11DeviceContext *deviceContext, IBody *parent, std::string texture);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -33,13 +31,14 @@ namespace Galactic
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
 
         private:
+            Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
+            Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+
             DirectX::SimpleMath::Matrix m_world;
 
-            Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
-
-            IStar *m_star;
+            IBody *m_parent;
             std::unique_ptr<Effect> m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
-            std::unique_ptr<ConstantBuffer<StarBuffer>> m_buffer;
+            std::unique_ptr<ConstantBuffer<BillboardBuffer>> m_buffer;
     };
 }

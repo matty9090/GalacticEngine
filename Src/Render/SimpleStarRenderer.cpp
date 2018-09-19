@@ -29,7 +29,7 @@ SimpleStarRenderer::SimpleStarRenderer(ID3D11DeviceContext *context, IStar *plan
     
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
-    m_effect = std::make_unique<Effect>(device, L"Shaders/SimpleVS.fx", L"Shaders/SimplePS.fx", els, num, false);
+    m_effect = std::make_unique<Effect>(device, L"Shaders/PositionColourVS.fx", L"Shaders/PositionColourPS.fx", els, num, false);
 
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_BACK, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,

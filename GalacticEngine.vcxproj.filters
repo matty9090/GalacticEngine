@@ -140,6 +140,9 @@
     <ClInclude Include="Inc\Utils\Shapes.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\Billboard.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -193,6 +196,9 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Src\Render\SimpleStarRenderer.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\Billboard.cpp">
       <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>

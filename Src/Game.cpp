@@ -154,7 +154,7 @@ void Game::Update(DX::StepTimer const& timer)
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
 
-    factor = std::fminf(std::fmaxf(factor, 5.0f), 1500.0f);
+    factor = std::fminf(std::fmaxf(factor, 5.0f), 10000.0f);
 
     move = move * factor * dt;
     m_speed = factor;
@@ -354,8 +354,8 @@ void Game::CreateDevice()
     m_system = Galactic::CreateStarSystem("System", Galactic::EStarSystem::Simple);
 
     auto star = Galactic::CreateStar(m_d3dContext.Get(), "Star");
-    star->SetRadius(5000.0);
-    star->SetPosition(Vector3(80.0f, 0.0f, 0.0f));
+    star->SetRadius(695508.0);
+    star->SetPosition(Vector3(60000.0f, 0.0f, 0.0f));
     star->Generate();
     
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
@@ -462,7 +462,7 @@ void Game::CreateResources()
     DX::ThrowIfFailed(m_d3dDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, m_depthStencilView.ReleaseAndGetAddressOf()));
 
     // TODO: Initialize windows-size dependent objects here.
-    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(backBufferWidth) / float(backBufferHeight), 0.01f, 1000.f);
+    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(backBufferWidth) / float(backBufferHeight), 0.01f, 500000.f);
 }
 
 void Game::OnDeviceLost()
