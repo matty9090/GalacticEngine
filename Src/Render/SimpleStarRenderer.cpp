@@ -58,8 +58,6 @@ void SimpleStarRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX::Simpl
     m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
     
-    PreDraw();
-
     Matrix worldViewProj = m_star->GetMatrix() * view * proj;
     StarBuffer buffer = { worldViewProj.Transpose() };
 

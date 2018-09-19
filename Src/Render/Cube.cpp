@@ -73,8 +73,6 @@ void Cube::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix 
     m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-    PreDraw();
-
     m_world = Matrix::CreateScale(0.01f) * Matrix::CreateTranslation(m_position);
 
     Matrix worldViewProj = m_world * view * proj;

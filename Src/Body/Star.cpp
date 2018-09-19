@@ -43,6 +43,8 @@ void Star::Reset()
 
 void Star::Generate(EDetail detail)
 {
+    detail;
+
     m_isGenerated = true;
 }
 
@@ -54,5 +56,5 @@ float Galactic::Star::CalculateGlowSize(float distance)
     double d = distance / Constants::Scale;
     double D = m_radius * 2 * DSUN;
     double L = (D * D) * pow(m_temperature / TSUN, 4.0);
-    return 0.016 * pow(L, 0.25) / pow(d, 0.5);
+    return (float)(0.016 * pow(L, 0.25) / pow(d, 0.5));
 }

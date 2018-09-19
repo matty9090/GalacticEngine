@@ -66,8 +66,6 @@ void Billboard::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Ma
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
     m_context->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
 
-    PreDraw();
-
     m_world = Matrix::CreateScale(m_scale);
     m_world *= Matrix::CreateBillboard(m_parent->GetPosition(), m_parent->GetCameraPos(), Vector3::Up, &Vector3::Forward);
 

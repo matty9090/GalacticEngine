@@ -355,7 +355,7 @@ void Game::CreateDevice()
 
     auto star = Galactic::CreateStar(m_d3dContext.Get(), "Star");
     star->SetRadius(695508.0);
-    star->SetTemperature(5777.0);
+    star->SetTemperature(5777);
     star->SetPosition(Vector3(60000.0f, 0.0f, 0.0f));
     star->Generate();
     

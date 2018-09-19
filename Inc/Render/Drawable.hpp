@@ -12,7 +12,6 @@ namespace Galactic
             Drawable(ID3D11DeviceContext *context, D3D_PRIMITIVE_TOPOLOGY topology);
 
             void Init();
-            void PreDraw();
             void Draw();
             void Cleanup();
             
@@ -22,7 +21,6 @@ namespace Galactic
             D3D11_SUBRESOURCE_DATA m_vertexData, m_indexData;
 
             ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-            
             ID3D11Device *m_device;
 
             bool m_generated;
@@ -79,7 +77,7 @@ namespace Galactic
     }
 
     template<class VertexType, class IndexType>
-    inline void Drawable<VertexType, IndexType>::PreDraw()
+    inline void Drawable<VertexType, IndexType>::Draw()
     {
         unsigned int stride = sizeof(VertexType);
         unsigned int offset = 0;
@@ -87,11 +85,7 @@ namespace Galactic
         m_context->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
         m_context->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
         m_context->IASetPrimitiveTopology(m_topology);
-    }
 
-    template<class VertexType, class IndexType>
-    inline void Drawable<VertexType, IndexType>::Draw()
-    {
         m_context->DrawIndexed(m_indices.size(), 0, 0);
     }
 

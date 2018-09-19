@@ -144,8 +144,6 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             m_terrain->SetRenderContext();
 #endif
 
-            PreDraw();
-
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
             MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
 

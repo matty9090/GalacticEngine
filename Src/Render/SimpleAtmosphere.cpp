@@ -57,8 +57,6 @@ void Galactic::SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, Direct
     m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
     
-    PreDraw();
-
     float radius = (float)(m_planet->GetRadius() / Constants::Scale);
     float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
     float atmradius = atmheight + radius;

@@ -9,6 +9,7 @@ using Microsoft::WRL::ComPtr;
 namespace Galactic {
     std::unique_ptr<IStarSystem> CreateStarSystem(std::string name, EStarSystem type)
     {
+        type;
         std::unique_ptr<IStarSystem> system = std::make_unique<SimpleStarSystem>(name);
 
         return system;
