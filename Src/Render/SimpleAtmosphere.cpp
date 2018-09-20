@@ -62,7 +62,7 @@ void Galactic::SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, Direct
     float atmradius = atmheight + radius;
     float camHeight = (m_planet->GetCameraPos() - m_planet->GetPosition()).Length();
     
-    m_world = Matrix::CreateScale(1 / radius) * m_planet->GetMatrix();
+    m_world = Matrix::CreateTranslation(m_planet->GetPosition());
 
     Matrix viewProj = view * proj;
 

@@ -28,7 +28,7 @@ float getFirstRaySphereIntersection(float3 rayOrigin, float3 rayDir, float radiu
 VS_OUTPUT main(VS_INPUT v_in) {
 	VS_OUTPUT Output;
 
-	float3 rayEnd = mul(v_in.vPosition, world) * atmosphereRadius;
+	float3 rayEnd = v_in.vPosition * atmosphereRadius;
 	float3 rayDir = normalize(rayEnd - camPos);
 	float3 rayStart = camPos;
 
@@ -56,7 +56,8 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	alpha /= float(5);
 	alpha *= 1.4;
 
-	Output.Position = mul(float4(rayEnd, 1.0), viewProj);
+	Output.Position = mul(float4(rayEnd, 1.0), world);
+	Output.Position = mul(Output.Position, viewProj);
 	Output.Colour	= float3(0.0f, 0.7f, 1.0f);
 	Output.Alpha	= alpha;
 
