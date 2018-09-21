@@ -13,6 +13,7 @@ namespace Galactic
     {
         public:
             virtual void AddBody(std::unique_ptr<IBody> body) = 0;
+            virtual void RemoveBody(std::string name) = 0;
             virtual void AddLightSource(ILightSource *source) = 0;
             virtual void SetCameraPos(DirectX::SimpleMath::Vector3 pos) = 0;
             

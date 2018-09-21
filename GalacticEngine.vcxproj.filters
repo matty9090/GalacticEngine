@@ -149,6 +149,12 @@
     <ClInclude Include="Inc\Physics\Orbits.hpp">
       <Filter>Physics</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Utils\PlanetGenerator.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Utils\Random.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -212,6 +218,9 @@
     </ClCompile>
     <ClCompile Include="Src\Physics\Orbits.cpp">
       <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Utils\PlanetGenerator.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

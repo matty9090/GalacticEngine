@@ -22,7 +22,7 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_minValue(0.0f),
       m_atmosphereHeight(500.0f)
 {
-    m_gradient.addColorStop(0.0f, Gradient::GradientColor(0.0f, 0.467f, 0.745f, 0.5f));
+    m_gradient.addColorStop(0.0f, Gradient::GradientColor(0.0f, 0.467f, 0.745f, 1.0f));
     m_gradient.addColorStop(0.06f, Gradient::GradientColor(0.93f, 0.79f, 0.69f, 1.0f));
     m_gradient.addColorStop(0.2f, Gradient::GradientColor(0.22f, 0.62f, 0.14f, 1.0f));
     m_gradient.addColorStop(1.0f, Gradient::GradientColor(0.22f, 0.62f, 0.14f, 1.0f));

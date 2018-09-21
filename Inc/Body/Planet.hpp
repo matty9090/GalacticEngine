@@ -27,6 +27,7 @@ namespace Galactic
             void SetRotation(DirectX::SimpleMath::Vector3 vel) { m_rotation = vel; }
             void SetCameraPos(DirectX::SimpleMath::Vector3 camPos) { m_camPos = camPos; }
             void SetInfluence(IBody *body) { m_influence = body; }
+            void SetPalette(Gradient::Gradient<Gradient::GradientColor> gradient) { m_gradient = gradient; }
 
             double GetRadius() const { return m_radius; }
             long double GetMass() const { return m_mass; }
@@ -48,6 +49,7 @@ namespace Galactic
             float GetNoiseScale() const { return m_noiseScale; }
             float GetMinValue() const { return m_minValue; }
             float GetAtmosphereHeight() const { return m_atmosphereHeight; }
+            Gradient::Gradient<Gradient::GradientColor> GetPalette() const { return m_gradient; }
 
             std::string                  GetName()     const { return m_name; }
             IBody                       *GetInfluence() const { return m_influence; }
@@ -56,8 +58,6 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }
             DirectX::SimpleMath::Vector3 GetRotation() const { return m_rotation; }
             DirectX::SimpleMath::Vector3 GetCameraPos() const { return m_camPos; }
-
-            Gradient::Gradient<Gradient::GradientColor> &GetGradient() { return m_gradient; }
 
             bool IsGenerated() const { return m_isGenerated; }
 

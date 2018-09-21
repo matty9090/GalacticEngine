@@ -79,6 +79,7 @@ private:
     float                                           m_yaw;
     float                                           m_speed;
     bool                                            m_showUI;
+    bool                                            m_paused;
 
     std::unique_ptr<Galactic::IStarSystem>          m_system;
 };

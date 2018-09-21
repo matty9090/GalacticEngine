@@ -3,7 +3,7 @@
 
 #include <vector>
 
-Gradient::GradientColor::GradientColor(float _r, float _g, float _b, float _a) :r(_r), g(_g), b(_b), a(_a) {}
+Gradient::GradientColor::GradientColor(float _r, float _g, float _b, float _a) :r(_r / 255.0f), g(_g / 255.0f), b(_b / 255.0f), a(_a / 255.0f) {}
 Gradient::GradientColor::GradientColor() : r(), g(0), b(0), a(0) {}
 
 const Gradient::GradientColor & Gradient::GradientColor::operator+=(const GradientColor &lhs) {

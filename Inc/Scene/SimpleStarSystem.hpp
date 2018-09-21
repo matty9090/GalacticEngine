@@ -13,6 +13,7 @@ namespace Galactic
             SimpleStarSystem(std::string name);
 
             void AddBody(std::unique_ptr<IBody> body) { m_bodies.push_back(std::move(body)); }
+            void RemoveBody(std::string name);
             void AddLightSource(ILightSource *source) { m_lights.push_back(source); }
             void SetCameraPos(DirectX::SimpleMath::Vector3 pos) { m_cameraPos = pos; };
 

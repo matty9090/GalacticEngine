@@ -5,6 +5,8 @@
 #include "pch.h"
 #include "Game.h"
 
+#include "Utils/PlanetGenerator.hpp"
+
 extern void ExitGame();
 
 using namespace DirectX;
@@ -22,7 +24,8 @@ Game::Game() noexcept :
     m_yaw(0),
     m_pitch(0),
     m_cameraPos(0.0f, 0.0f, -50.0f),
-    m_showUI(false)
+    m_showUI(false),
+    m_paused(false)
 {
 }
 
@@ -51,12 +54,19 @@ void Game::Initialize(HWND window, int width, int height)
 // Executes the basic game loop.
 void Game::Tick()
 {
-    m_timer.Tick([&]()
-    {
-        Update(m_timer);
-    });
+    m_tracker.Update(m_keyboard->GetState());
 
-    Render();
+    if (m_tracker.IsKeyReleased(Keyboard::P)) { m_paused = !m_paused; }
+
+    if (!m_paused)
+    {
+        m_timer.Tick([&]()
+        {
+            Update(m_timer);
+        });
+
+        Render();
+    }
 }
 
 // Updates the world.
@@ -74,19 +84,29 @@ void Game::Update(DX::StepTimer const& timer)
     auto kb = m_keyboard->GetState();
     auto mouse = m_mouse->GetState();
 
-    m_tracker.Update(kb);
-
     if (kb.Escape)
         PostQuitMessage(0);
 
     if (kb.Home) m_cameraPos = Vector3(0.0f, 5.0f, -10.0f);
+
+    if (m_tracker.IsKeyReleased(Keyboard::R))
+    {
+        Galactic::PlanetGenerator gen(m_d3dContext.Get());
+        auto planet = gen.CreateRocky("Planet", 962e24, 6371.0);
+
+        planet->SetInfluence(m_system->FindBody("Star"));
+        planet->SetVelocity(Vector3(0.0f, 0.0f, 1000.0f));
+        planet->Generate(Galactic::EDetail::High);
+
+        m_system->RemoveBody("Planet");
+        m_system->AddBody(std::move(planet));
+    }
 
     auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
 
     if (m_tracker.IsKeyReleased(Keyboard::F1)) planet->Generate(Galactic::EDetail::Low);
     if (m_tracker.IsKeyReleased(Keyboard::F2)) planet->Generate(Galactic::EDetail::Medium);
     if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
-
     if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
 
     if (mouse.positionMode == Mouse::MODE_RELATIVE)
@@ -356,13 +376,19 @@ void Game::CreateDevice()
     star->SetRadius(695508.0);
     star->SetTemperature(5777);
     star->SetPosition(Vector3(60000.0f, 0.0f, 0.0f));
-    star->SetMass(5.972e24);
+    star->SetMass(1.989e30);
     star->Generate(); 
 
-    auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.962e24, 6371.0);
+    /*auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
     planet->SetInfluence(star.get());
-    planet->SetMass(1.989e30);
+    planet->SetVelocity(Vector3(0.0f, 0.0f, 1000.0f));
+    planet->Generate(Galactic::EDetail::High);*/
+
+    Galactic::PlanetGenerator gen(m_d3dContext.Get());
+
+    auto planet = gen.CreateRocky("Planet", 962e24, 6371.0);
+    planet->SetInfluence(star.get());
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1000.0f));
     planet->Generate(Galactic::EDetail::High);
 

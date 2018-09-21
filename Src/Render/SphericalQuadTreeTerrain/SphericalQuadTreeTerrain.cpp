@@ -15,6 +15,7 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     m_deviceContext->GetDevice(&m_device);
 
     m_states = std::make_unique<DirectX::CommonStates>(m_device.Get());
+    m_noise.SetSeed(rand() % RAND_MAX);
 
     CreateEffect();
 }

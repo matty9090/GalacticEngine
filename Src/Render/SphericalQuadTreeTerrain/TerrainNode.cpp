@@ -87,7 +87,7 @@ void TerrainNode::Generate()
                 pos = Vector3::Transform(pos, m_world);
 
                 float height = m_terrain->GetHeight(pos);
-                auto col = m_planet->GetGradient().getColorAt(height / m_planet->GetHeight());
+                auto col = m_planet->GetPalette().getColorAt(height / m_planet->GetHeight());
 
                 v.color = Color(col.r, col.g, col.b, col.a);
                 v.position = pos + pos * height;

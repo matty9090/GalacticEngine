@@ -13,6 +13,7 @@ namespace Gradient {
             friend class Gradient;
 
         public:
+            GradientStop() {}
             GradientStop(float _t, T _val) :t(_t), value(_val) {}
     };
 
@@ -45,38 +46,32 @@ namespace Gradient {
 
     template<class T>
     class Gradient {
-        std::vector<GradientStop<T>*> stops;
+        std::vector<GradientStop<T>> stops;
 
         public:
             void addColorStop(float t, T val) {
-                typename std::vector<GradientStop<T>*>::iterator it;
+                typename std::vector<GradientStop<T>>::iterator it;
 
                 for (it = stops.begin(); it != stops.end(); it++) {
-                    if ((*it)->t > t)break;
+                    if ((*it).t > t)break;
                 }
 
-                stops.insert(it, new GradientStop<T>(t, val));
+                stops.insert(it, GradientStop<T>(t, val));
             }
 
             T getColorAt(float t) {
-                typename std::vector<GradientStop<T>*>::iterator it;
-                GradientStop<T> *start, *stop;
+                typename std::vector<GradientStop<T>>::iterator it;
+                GradientStop<T> start, stop;
                 for (it = stops.begin(); it != stops.end(); it++) {
                     stop = *it;
-                    if (stop->t > t)
+                    if (stop.t > t)
                         break;
                 }
 
-                if (it == stops.begin() || it == stops.end()) return stop->value;
+                if (it == stops.begin() || it == stops.end()) return stop.value;
                 start = *(--it);
-                float frac = (t - start->t) / (stop->t - start->t);
-                return lerp(start->value, stop->value, frac);
-            }
-
-            ~Gradient() {
-                for (typename std::vector<GradientStop<T>*>::iterator it = stops.begin(); it != stops.end(); it++) {
-                    delete *it;
-                }
+                float frac = (t - start.t) / (stop.t - start.t);
+                return lerp(start.value, stop.value, frac);
             }
     };
 }

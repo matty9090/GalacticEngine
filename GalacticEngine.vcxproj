@@ -195,6 +195,8 @@
     <ClInclude Include="Inc\Scene\ILightSource.hpp" />
     <ClInclude Include="Inc\Scene\IStarSystem.hpp" />
     <ClInclude Include="Inc\Scene\SimpleStarSystem.hpp" />
+    <ClInclude Include="Inc\Utils\PlanetGenerator.hpp" />
+    <ClInclude Include="Inc\Utils\Random.hpp" />
     <ClInclude Include="Inc\Utils\Shapes.hpp" />
     <ClInclude Include="Src\Game.h" />
     <ClInclude Include="Src\StepTimer.h" />
@@ -230,6 +232,7 @@
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeTerrain.cpp" />
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\TerrainNode.cpp" />
     <ClCompile Include="Src\Scene\SimpleStarSystem.cpp" />
+    <ClCompile Include="Src\Utils\PlanetGenerator.cpp" />
     <ClCompile Include="Src\Utils\Shapes.cpp" />
   </ItemGroup>
   <ItemGroup>

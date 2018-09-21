@@ -11,6 +11,19 @@ SimpleStarSystem::SimpleStarSystem(std::string name) : m_name(name)
     m_world = Matrix::Identity;
 }
 
+void Galactic::SimpleStarSystem::RemoveBody(std::string name)
+{
+    for (auto it = m_bodies.begin(); it != m_bodies.end(); ++it)
+    {
+        if ((*it)->GetName() == name)
+        {
+            //(*it)->Reset();
+            m_bodies.erase(it);
+            return;
+        }
+    }
+}
+
 IBody *SimpleStarSystem::FindBody(std::string name) const
 {
     for (auto const &body : m_bodies)
@@ -49,7 +62,7 @@ void SimpleStarSystem::Update(float dt)
             Vector3 force = Gravity::Force(inf, body.get());
             Vector3 vel = body->GetVelocity();
 
-            vel += (force / body->GetMass()) * dt;
+            vel += (force / inf->GetMass()) * dt;
 
             body->SetVelocity(vel);
         }
