@@ -22,8 +22,8 @@ namespace Galactic
         float planetRadius;                        // 4 bytes
         DirectX::SimpleMath::Vector3 camPos;       // 12 bytes
         float atmosphereRadius;                    // 4 bytes
+        DirectX::SimpleMath::Vector3 atmColour;    // 12 bytes
         float camHeight;                           // 4 bytes
-        DirectX::SimpleMath::Vector3 _unused;      // 12 bytes
     };
 
     class SimpleAtmosphere : public IAtmosphereRenderer, public Drawable<AtmosphereVertex>

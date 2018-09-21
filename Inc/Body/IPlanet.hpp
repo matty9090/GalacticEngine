@@ -20,6 +20,7 @@ namespace Galactic
             virtual void SetNoiseScale(float v) = 0;
             virtual void SetMinValue(float v) = 0;
             virtual void SetAtmosphereHeight(float h) = 0;
+            virtual void SetAtmosphereColour(DirectX::SimpleMath::Color colour) = 0;
             virtual void SetPalette(Gradient::Gradient<Gradient::GradientColor> gradient) = 0;
 
             virtual int GetOctaves() const = 0;
@@ -30,6 +31,7 @@ namespace Galactic
             virtual float GetNoiseScale() const = 0;
             virtual float GetMinValue() const = 0;
             virtual float GetAtmosphereHeight() const = 0;
+            virtual DirectX::SimpleMath::Color GetAtmosphereColour() const = 0;
             virtual Gradient::Gradient<Gradient::GradientColor> GetPalette() const = 0;
     };
 }

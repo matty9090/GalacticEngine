@@ -5,6 +5,7 @@ cbuffer MatrixBuffer : register(b0) {
 	float	 planetRadius;
 	float3   camPos;
 	float	 atmosphereRadius;
+	float3   atmColour;
 	float	 camHeight;
 }
 
@@ -58,7 +59,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 
 	Output.Position = mul(float4(rayEnd, 1.0), world);
 	Output.Position = mul(Output.Position, viewProj);
-	Output.Colour	= float3(0.0f, 0.7f, 1.0f);
+	Output.Colour	= atmColour;
 	Output.Alpha	= alpha;
 
 	return Output;

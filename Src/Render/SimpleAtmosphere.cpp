@@ -73,6 +73,7 @@ void Galactic::SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, Direct
         radius,
         m_planet->GetCameraPos() - m_planet->GetPosition(),
         atmradius,
+        m_planet->GetAtmosphereColour(),
         camHeight
     };
 

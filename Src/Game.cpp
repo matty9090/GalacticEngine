@@ -92,7 +92,7 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::R))
     {
         Galactic::PlanetGenerator gen(m_d3dContext.Get());
-        auto planet = gen.CreateRocky("Planet", 962e24, 6371.0);
+        auto planet = gen.CreateGasGiant("Planet", 962e24, 6371.0);
 
         planet->SetInfluence(m_system->FindBody("Star"));
         planet->SetVelocity(Vector3(0.0f, 0.0f, 1000.0f));

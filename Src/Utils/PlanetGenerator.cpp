@@ -46,6 +46,29 @@ std::unique_ptr<IPlanet> PlanetGenerator::CreateRocky(std::string name, double m
     return planet;
 }
 
+std::unique_ptr<IPlanet> PlanetGenerator::CreateGasGiant(std::string name, double mass, double radius)
+{
+    auto col = RandomColour();
+    auto palette = Gradient::Gradient<Gradient::GradientColor>();
+    palette.addColorStop(0.0f, col);
+
+    auto planet = CreatePlanet(m_context, name, mass, radius);
+    planet->SetHeight(0.0f);
+    planet->SetOctaves(0);
+    planet->SetPalette(palette);
+    planet->SetAtmosphereColour(DirectX::SimpleMath::Color(col.r, col.g, col.b));
+
+    return planet;
+}
+
+Gradient::GradientColor Galactic::PlanetGenerator::RandomColour() {
+    float r = Utils::Rand(0.0f, 255.0f);
+    float g = Utils::Rand(0.0f, 255.0f);
+    float b = Utils::Rand(0.0f, 255.0f);
+
+    return Gradient::GradientColor(r, g, b, 255.0f);
+}
+
 Gradient::Gradient<Gradient::GradientColor> Galactic::PlanetGenerator::RandomPalette()
 {
     Gradient::Gradient<Gradient::GradientColor> gradient;
@@ -54,15 +77,12 @@ Gradient::Gradient<Gradient::GradientColor> Galactic::PlanetGenerator::RandomPal
 
     for (int i = 0; i < stops; ++i)
     {
-        float r = Utils::Rand(0.0f, 255.0f);
-        float g = Utils::Rand(0.0f, 255.0f);
-        float b = Utils::Rand(0.0f, 255.0f);
         float loc = Utils::Rand(0.0, 1.0f);
 
         if (i == 0) loc = 0.0f; 
         if (i == stops - 1) loc = 1.0f;
 
-        gradient.addColorStop(loc, Gradient::GradientColor(r, g, b, 255.0f));
+        gradient.addColorStop(loc, RandomColour());
     }
 
     return gradient;

@@ -40,6 +40,7 @@ namespace Galactic
             void SetNoiseScale(float v) { m_noiseScale = v; }
             void SetMinValue(float v) { m_minValue = v; }
             void SetAtmosphereHeight(float h) { m_atmosphereHeight = h; }
+            void SetAtmosphereColour(DirectX::SimpleMath::Color colour) { m_atmColour = colour; }
 
             int GetOctaves() const { return m_octaves; }
             float GetGain() const { return m_gain; }
@@ -49,6 +50,7 @@ namespace Galactic
             float GetNoiseScale() const { return m_noiseScale; }
             float GetMinValue() const { return m_minValue; }
             float GetAtmosphereHeight() const { return m_atmosphereHeight; }
+            DirectX::SimpleMath::Color GetAtmosphereColour() const { return m_atmColour; }
             Gradient::Gradient<Gradient::GradientColor> GetPalette() const { return m_gradient; }
 
             std::string                  GetName()     const { return m_name; }
@@ -73,6 +75,7 @@ namespace Galactic
             int m_octaves;
             float m_gain, m_lacunarity, m_freq, m_height, m_noiseScale, m_minValue, m_atmosphereHeight;
 
+            DirectX::SimpleMath::Color m_atmColour;
             DirectX::SimpleMath::Matrix  m_world;
             DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation, m_camPos;
 
