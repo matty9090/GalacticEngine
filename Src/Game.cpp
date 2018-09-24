@@ -89,10 +89,10 @@ void Game::Update(DX::StepTimer const& timer)
 
     if (kb.Home) m_cameraPos = Vector3(0.0f, 5.0f, -10.0f);
 
-    if (m_tracker.IsKeyReleased(Keyboard::R))
+    /*if (m_tracker.IsKeyReleased(Keyboard::R))
     {
         Galactic::PlanetGenerator gen(m_d3dContext.Get());
-        auto planet = gen.CreateGasGiant("Planet", 962e24, 6371.0);
+        auto planet = gen.CreateRocky("Planet", 962e24, 6371.0);
 
         planet->SetInfluence(m_system->FindBody("Star"));
         planet->SetVelocity(Vector3(0.0f, 0.0f, 1000.0f));
@@ -100,7 +100,7 @@ void Game::Update(DX::StepTimer const& timer)
 
         m_system->RemoveBody("Planet");
         m_system->AddBody(std::move(planet));
-    }
+    }*/
 
     auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
 
@@ -387,14 +387,22 @@ void Game::CreateDevice()
 
     Galactic::PlanetGenerator gen(m_d3dContext.Get());
 
-    auto planet = gen.CreateRocky("Planet", 962e24, 6371.0);
+    auto planet = gen.CreateGasGiant("Planet", 5.683e26, 58232.0);
     planet->SetInfluence(star.get());
-    planet->SetVelocity(Vector3(0.0f, 0.0f, 1000.0f));
+    planet->SetPosition(Vector3(1000.0f, 0.0f, 0.0f));
+    planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     planet->Generate(Galactic::EDetail::High);
+
+    auto moon = gen.CreateRocky("Moon", 962e24, 6371.0);
+    moon->SetInfluence(planet.get());
+    moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+    moon->SetVelocity(Vector3(0.0f, 0.0f, 1.4e6));
+    moon->Generate(Galactic::EDetail::High);
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
     m_system->AddBody(std::move(star));
     m_system->AddBody(std::move(planet));
+    m_system->AddBody(std::move(moon));
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

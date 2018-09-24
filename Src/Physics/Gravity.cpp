@@ -16,5 +16,5 @@ Vector3 Gravity::Force(IBody *b1, IBody *b2)
 
     f /= Constants::Scale;
 
-    return Vector3(dx * f / r, dy * f / r, dz * f / r);
+    return Vector3(f * dx / r, f * dy / r, f * dz / r);
 }
