@@ -75,7 +75,7 @@ Gradient::Gradient<Gradient::GradientColor> Galactic::PlanetGenerator::RandomPal
 
     size_t stops = (size_t)round(Utils::Rand(3.0f, 6.0f));
 
-    for (int i = 0; i < stops; ++i)
+    for (size_t i = 0; i < stops; ++i)
     {
         float loc = Utils::Rand(0.0, 1.0f);
 
