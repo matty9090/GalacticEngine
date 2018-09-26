@@ -13,7 +13,7 @@ namespace Galactic
 
             std::uniform_real_distribution<double> dist(min, max);
 
-            return dist(m_gen);
+            return (float)dist(m_gen);
         }
     }
 }

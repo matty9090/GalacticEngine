@@ -70,16 +70,11 @@ private:
     std::unique_ptr<DirectX::Mouse>                 m_mouse;
     std::unique_ptr<DirectX::SpriteFont>            m_font;
     std::unique_ptr<DirectX::SpriteBatch>           m_spriteBatch;
-
-    DirectX::SimpleMath::Matrix                     m_view;
-    DirectX::SimpleMath::Matrix                     m_proj;
-    DirectX::SimpleMath::Vector3                    m_cameraPos;
     
-    float                                           m_pitch;
-    float                                           m_yaw;
     float                                           m_speed;
     bool                                            m_showUI;
     bool                                            m_paused;
 
+    std::unique_ptr<Galactic::Camera>				m_camera;
     std::unique_ptr<Galactic::IStarSystem>          m_system;
 };

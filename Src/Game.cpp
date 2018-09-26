@@ -21,9 +21,6 @@ Game::Game() noexcept :
     m_outputWidth(1280),
     m_outputHeight(960),
     m_featureLevel(D3D_FEATURE_LEVEL_11_1),
-    m_yaw(0),
-    m_pitch(0),
-    m_cameraPos(0.0f, 0.0f, -50.0f),
     m_showUI(false),
     m_paused(false)
 {
@@ -87,8 +84,6 @@ void Game::Update(DX::StepTimer const& timer)
     if (kb.Escape)
         PostQuitMessage(0);
 
-    if (kb.Home) m_cameraPos = Vector3(0.0f, 5.0f, -10.0f);
-
     /*if (m_tracker.IsKeyReleased(Keyboard::R))
     {
         Galactic::PlanetGenerator gen(m_d3dContext.Get());
@@ -109,28 +104,7 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
     if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
 
-    if (mouse.positionMode == Mouse::MODE_RELATIVE)
-    {
-        Vector3 delta = Vector3(float(mouse.x), float(mouse.y), 0.f) * 0.002f;
-
-        m_pitch -= delta.y;
-        m_yaw -= delta.x;
-
-        float limit = XM_PI / 2.0f - 0.01f;
-        m_pitch = std::max(-limit, m_pitch);
-        m_pitch = std::min(+limit, m_pitch);
-
-        if (m_yaw > XM_PI)
-        {
-            m_yaw -= XM_PI * 2.0f;
-        }
-        else if (m_yaw < -XM_PI)
-        {
-            m_yaw += XM_PI * 2.0f;
-        }
-    }
-
-    m_mouse->SetMode(mouse.leftButton ? Mouse::MODE_RELATIVE : Mouse::MODE_ABSOLUTE);
+	m_camera->Events(m_mouse.get(), mouse);
 
     Vector3 move = Vector3::Zero;
 
@@ -163,24 +137,23 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::D5)) { planet->SetMinValue(minvalue + 0.001f); planet->Generate(Galactic::High); }
     if (m_tracker.IsKeyReleased(Keyboard::D6)) { planet->SetMinValue(minvalue - 0.001f); planet->Generate(Galactic::High); }
 
-    Quaternion q = Quaternion::CreateFromYawPitchRoll(m_yaw, -m_pitch, 0.f);
-
-    move = Vector3::Transform(move, q);
+    move = Vector3::Transform(move, m_camera->GetQuaternion());
     move *= 0.05f;
 
-    auto closestBody = static_cast<Galactic::IPlanet*>(m_system->GetClosestBody(m_cameraPos));
+    auto closestBody = static_cast<Galactic::IPlanet*>(m_system->GetClosestBody(m_camera->GetPosition()));
     
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
-    float factor = ((Vector3::Distance(m_cameraPos, closestBody->GetPosition()) - radius)) * 30.0f;
+    float factor = ((Vector3::Distance(m_camera->GetPosition(), closestBody->GetPosition()) - radius)) * 30.0f;
 
     factor = std::fminf(std::fmaxf(factor, 5.0f), 100000.0f);
 
     move = move * factor * dt;
     m_speed = factor;
-    m_cameraPos += move;
+	m_camera->Move(move);
 
-    m_system->SetCameraPos(m_cameraPos);
-    m_system->Update(dt * 0.001f);
+	m_camera->Update(dt);
+    m_system->SetCameraPos(m_camera->GetPosition());
+    m_system->Update(dt * 0.0002f);
 }
 
 // Draws the scene.
@@ -194,25 +167,20 @@ void Game::Render()
 
     Clear();
 
-    float y = sinf(m_pitch);
-    float r = cosf(m_pitch);
-    float z = r * cosf(m_yaw);
-    float x = r * sinf(m_yaw);
-
-    XMVECTOR lookAt = m_cameraPos + Vector3(x, y, z);
-    XMMATRIX view = XMMatrixLookAtRH(m_cameraPos, lookAt, Vector3::Up);
+	auto view = m_camera->GetViewMatrix();
+	auto proj = m_camera->GetProjectionMatrix();
 
     auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
 
-    float height = (m_cameraPos - planet->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
+    float height = (m_camera->GetPosition() - planet->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
 
-    m_system->Render(view, m_proj);
+    m_system->Render(view, proj);
 
     if (m_showUI)
     {
         m_spriteBatch->Begin();
 
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Camera", m_cameraPos).c_str(), Vector2(10, 10), Colors::White, 0.f, Vector2(0, 0));
+        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Camera", m_camera->GetPosition()).c_str(), Vector2(10, 10), Colors::White, 0.f, Vector2(0, 0));
         m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", height).c_str(), Vector2(10, 40), Colors::White, 0.f, Vector2(0, 0));
         m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Speed", m_speed).c_str(), Vector2(10, 70), Colors::White, 0.f, Vector2(0, 0));
         m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Gain", planet->GetGain()).c_str(), Vector2(10, 120), Colors::White, 0.f, Vector2(0, 0));
@@ -369,7 +337,7 @@ void Game::CreateDevice()
     // TODO: Initialize device dependent objects here (independent of window size).
     m_font = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"Resources/Fonts/Courier.font");
     m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
-    
+	
     m_system = Galactic::CreateStarSystem("System", Galactic::EStarSystem::Simple);
 
     auto star = Galactic::CreateStar(m_d3dContext.Get(), "Star");
@@ -389,14 +357,14 @@ void Game::CreateDevice()
 
     auto planet = gen.CreateGasGiant("Planet", 5.683e26, 58232.0);
     planet->SetInfluence(star.get());
-    planet->SetPosition(Vector3(1000.0f, 0.0f, 0.0f));
+    planet->SetPosition(Vector3(500.0f, 0.0f, 0.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 962e24, 6371.0);
     moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-    moon->SetVelocity(Vector3(0.0f, 0.0f, 1.4e6));
+    moon->SetVelocity(Vector3(0.0f, 0.0f, 1.3e6));
     moon->Generate(Galactic::EDetail::High);
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
@@ -499,7 +467,7 @@ void Game::CreateResources()
     DX::ThrowIfFailed(m_d3dDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, m_depthStencilView.ReleaseAndGetAddressOf()));
 
     // TODO: Initialize windows-size dependent objects here.
-    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(backBufferWidth) / float(backBufferHeight), 0.01f, 500000.f);
+	m_camera = std::make_unique<Galactic::Camera>(backBufferWidth, backBufferHeight);
 }
 
 void Game::OnDeviceLost()

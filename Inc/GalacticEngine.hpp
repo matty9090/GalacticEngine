@@ -16,6 +16,8 @@
 #include "Render/PlanetRendererHigh.hpp"
 
 #include "Scene/IStarSystem.hpp"
+#include "Scene/Camera.hpp"
+
 #include "Physics/Constants.hpp"
 
 namespace Galactic {

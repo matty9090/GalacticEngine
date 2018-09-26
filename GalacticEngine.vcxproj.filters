@@ -155,6 +155,9 @@
     <ClInclude Include="Inc\Utils\Random.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Scene\Camera.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -221,6 +224,9 @@
     </ClCompile>
     <ClCompile Include="Src\Utils\PlanetGenerator.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Camera.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
