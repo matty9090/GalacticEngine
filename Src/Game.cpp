@@ -97,7 +97,7 @@ void Game::Update(DX::StepTimer const& timer)
         m_system->AddBody(std::move(planet));
     }*/
 
-    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
+    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Moon"));
 
     if (m_tracker.IsKeyReleased(Keyboard::F1)) planet->Generate(Galactic::EDetail::Low);
     if (m_tracker.IsKeyReleased(Keyboard::F2)) planet->Generate(Galactic::EDetail::Medium);
@@ -145,7 +145,7 @@ void Game::Update(DX::StepTimer const& timer)
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_camera->GetPosition(), closestBody->GetPosition()) - radius)) * 30.0f;
 
-    factor = std::fminf(std::fmaxf(factor, 5.0f), 100000.0f);
+    factor = std::fminf(std::fmaxf(factor, 1.0f), 100000.0f);
 
     move = move * factor * dt;
     m_speed = factor;
@@ -153,7 +153,7 @@ void Game::Update(DX::StepTimer const& timer)
 
 	m_camera->Update(dt);
     m_system->SetCameraPos(m_camera->GetPosition());
-    m_system->Update(dt * 0.0002f);
+    m_system->Update(dt * 0.000f);
 }
 
 // Draws the scene.
@@ -170,7 +170,7 @@ void Game::Render()
 	auto view = m_camera->GetViewMatrix();
 	auto proj = m_camera->GetProjectionMatrix();
 
-    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
+    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Moon"));
 
     float height = (m_camera->GetPosition() - planet->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
 
