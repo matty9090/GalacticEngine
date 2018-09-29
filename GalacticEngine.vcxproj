@@ -186,6 +186,7 @@
     <ClInclude Include="Inc\Render\PlanetRendererHigh.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererLow.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererMed.hpp" />
+    <ClInclude Include="Inc\Render\ScatteredAtmosphere.hpp" />
     <ClInclude Include="Inc\Render\SimpleAtmosphere.hpp" />
     <ClInclude Include="Inc\Render\SimpleStarRenderer.hpp" />
     <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\ISphericalTerrain.hpp" />
@@ -228,6 +229,7 @@
     <ClCompile Include="Src\Render\PlanetRendererHigh.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererLow.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererMed.cpp" />
+    <ClCompile Include="Src\Render\ScatteredAtmosphere.cpp" />
     <ClCompile Include="Src\Render\SimpleAtmosphere.cpp" />
     <ClCompile Include="Src\Render\SimpleStarRenderer.cpp" />
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeTerrain.cpp" />

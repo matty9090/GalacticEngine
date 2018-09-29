@@ -97,7 +97,7 @@ void Game::Update(DX::StepTimer const& timer)
         m_system->AddBody(std::move(planet));
     }*/
 
-    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
+    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Moon"));
 
     if (m_tracker.IsKeyReleased(Keyboard::F1)) planet->Generate(Galactic::EDetail::Low);
     if (m_tracker.IsKeyReleased(Keyboard::F2)) planet->Generate(Galactic::EDetail::Medium);
@@ -153,7 +153,7 @@ void Game::Update(DX::StepTimer const& timer)
 
 	m_camera->Update(dt);
     m_system->SetCameraPos(m_camera->GetPosition());
-    m_system->Update(dt * 0.0002f);
+    m_system->Update(dt * 0.000f);
 }
 
 // Draws the scene.
@@ -170,7 +170,7 @@ void Game::Render()
 	auto view = m_camera->GetViewMatrix();
 	auto proj = m_camera->GetProjectionMatrix();
 
-    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Planet"));
+    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Moon"));
 
     float height = (m_camera->GetPosition() - planet->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
 
@@ -359,12 +359,14 @@ void Game::CreateDevice()
     planet->SetInfluence(star.get());
     planet->SetPosition(Vector3(500.0f, 0.0f, 0.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
+    planet->SetAtmosphereHeight(800.0f);
     planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 962e24, 6371.0);
     moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
     moon->SetVelocity(Vector3(0.0f, 0.0f, 1.3e6));
+	//moon->SetAtmosphereHeight(6371.0 * 1.025f);
     moon->Generate(Galactic::EDetail::High);
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
