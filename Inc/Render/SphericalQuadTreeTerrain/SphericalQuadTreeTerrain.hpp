@@ -47,6 +47,7 @@ namespace Galactic
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
+            Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture, m_surface;
 
             float m_radius;
     };

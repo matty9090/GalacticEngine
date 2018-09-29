@@ -26,8 +26,9 @@ void SphericalQuadTreeTerrain::CreateEffect()
         // Semantic   Index  Format							 Slot   Offset	Slot Class					 Instance Step
         { "POSITION", 0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		0,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL",   0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		12,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",	  0,	 DXGI_FORMAT_R32G32B32A32_FLOAT, 0,		24,		D3D11_INPUT_PER_VERTEX_DATA, 0 }
-        //{ "TANGENT",  0,	 DXGI_FORMAT_R32G32B32_FLOAT,    0,		24,		D3D11_INPUT_PER_VERTEX_DATA, 0 }
+        { "TANGENT",  0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		24,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",	  0,	 DXGI_FORMAT_R32G32B32A32_FLOAT, 0,		36,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0,	 DXGI_FORMAT_R32G32_FLOAT,		 0,		52,		D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -44,6 +45,9 @@ void SphericalQuadTreeTerrain::CreateEffect()
 
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
+
+	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
+	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
 }
 
 void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain, int octaves)
@@ -86,7 +90,7 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
 
 void SphericalQuadTreeTerrain::SetRenderContext()
 {
-    auto sampler = m_states->LinearWrap();
+    auto sampler = m_states->AnisotropicWrap();
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
     m_deviceContext->PSSetSamplers(0, 1, &sampler);
@@ -97,6 +101,9 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_deviceContext->IASetInputLayout(m_effect->GetInputLayout());
     m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
+
+	m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
+	m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
 }
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)

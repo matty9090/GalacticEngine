@@ -92,6 +92,8 @@ void TerrainNode::Generate()
                 v.color = Color(col.r, col.g, col.b, col.a);
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
+				v.sphere = pos;
+				v.uv = Vector2(xx * 80.0f, yy * 80.0f);
             }
 
             if (x == 0)             m_edges[West].push_back(k);
