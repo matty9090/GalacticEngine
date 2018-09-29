@@ -64,7 +64,7 @@ void ScatteredAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::Simp
     float atmradius = atmheight + radius;
     float camHeight = (m_planet->GetCameraPos() - m_planet->GetPosition()).Length();
 
-	Vector3 wavelength = m_planet->GetAtmosphereColour();
+	Vector3 wavelength = Vector3(0.65f, 0.57f, 0.475f);
 	wavelength.x = 1.0f / powf(wavelength.x, 4.0f);
 	wavelength.y = 1.0f / powf(wavelength.y, 4.0f);
 	wavelength.z = 1.0f / powf(wavelength.z, 4.0f);
