@@ -75,7 +75,7 @@ void TerrainNode::Generate()
                 int yh = sy + y / 2;
 
                 v = parent->GetVertex(xh + yh * gridsize);
-                v.normal = Vector3::Zero;
+                //v.normal = Vector3::Zero;
             }
             else
             {
@@ -84,14 +84,14 @@ void TerrainNode::Generate()
                 Vector3 pos = Vector3(xx, 0.5f, yy);
 
                 pos.Normalize();
-                pos = Vector3::Transform(pos, m_world);
+                
+				pos = Vector3::Transform(pos, m_world);
 
-                float height = m_terrain->GetHeight(pos);
-                auto col = m_planet->GetPalette().getColorAt(height / m_planet->GetHeight());
+                auto col = m_planet->GetPalette().getColorAt(0.0f);
 
                 v.color = Color(col.r, col.g, col.b, col.a);
-                v.position = pos + pos * height;
-                v.normal = Vector3::Zero;
+                v.position = pos;
+                v.normal = pos;
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -120,7 +120,7 @@ void TerrainNode::Generate()
         }
     }
 
-    for (size_t i = 0; i < m_indices.size() - 3; i += 3)
+    /*for (size_t i = 0; i < m_indices.size() - 3; i += 3)
     {
         Vector3 p1 = m_vertices[m_indices[i + 0]].position;
         Vector3 p2 = m_vertices[m_indices[i + 1]].position;
@@ -131,7 +131,7 @@ void TerrainNode::Generate()
         m_vertices[m_indices[i + 0]].normal += n;
         m_vertices[m_indices[i + 1]].normal += n;
         m_vertices[m_indices[i + 2]].normal += n;
-    }
+    }*/
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -145,11 +145,20 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 #endif
 
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
-            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
+
+            MatrixBuffer buffer = {
+				worldViewProj.Transpose(),
+				m_terrain->GetMatrix().Transpose(),
+				m_planet->GetFrequency(),
+				m_planet->GetLacunarity(),
+				m_planet->GetNoiseScale(),
+				m_planet->GetGain()
+			};
 
             m_buffer->SetData(m_context, buffer);
 
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+            m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
             Draw();
 
@@ -214,6 +223,10 @@ void TerrainNode::Update(float dt)
     if (m_visible)
     {
         bool divide = m_depth < 3 || distance < m_scale * 30.0f;
+
+#ifdef _DEBUG
+		divide = distance < m_scale * 30.0f;
+#endif
 
         if (!divide)
             Merge();

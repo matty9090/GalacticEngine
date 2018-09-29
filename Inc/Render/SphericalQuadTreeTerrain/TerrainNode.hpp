@@ -20,6 +20,11 @@ namespace Galactic
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
         DirectX::SimpleMath::Matrix world; // 64 bytes
+
+		float frequency;
+		float lacunarity;
+		float scale;
+		float gain;
     };
 
     struct Square
