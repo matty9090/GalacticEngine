@@ -8,6 +8,6 @@ namespace Galactic
 		const float Kr = 0.0025f;
 		const float Km = 0.0010f;
 		const float Af = -0.990f;
-		const float ESun = 20.0f;
+		const float ESun = 15.0f;
     }
 }

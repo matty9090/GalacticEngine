@@ -46,8 +46,10 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
 
-	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Earth.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
+	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
 	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
+
+	m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
 
 void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain, int octaves)
@@ -95,7 +97,7 @@ void SphericalQuadTreeTerrain::SetRenderContext()
 
     m_deviceContext->PSSetSamplers(0, 1, &sampler);
     m_deviceContext->RSSetState(IBody::Wireframe ? m_rasterWire.Get() : m_raster.Get());
-    m_deviceContext->OMSetBlendState(m_states->AlphaBlend(), factor, 0xFFFFFFFF);
+    m_deviceContext->OMSetBlendState(m_states->Opaque(), factor, 0xFFFFFFFF);
     m_deviceContext->OMSetDepthStencilState(m_states->DepthDefault(), 1);
 
     m_deviceContext->IASetInputLayout(m_effect->GetInputLayout());
@@ -104,6 +106,12 @@ void SphericalQuadTreeTerrain::SetRenderContext()
 
 	m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
 	m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
+
+	ScatterBuffer buffer = GetScatterBuffer(m_planet);
+	m_buffer->SetData(m_deviceContext.Get(), buffer);
+
+	m_deviceContext->VSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
+	m_deviceContext->PSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
 }
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)

@@ -45,13 +45,13 @@ Effect::Effect(ID3D11Device *device, std::wstring vs, std::wstring ps, D3D11_INP
     p_buffer->Release();
 }
 
-void Galactic::Effect::Reset()
+void Effect::Reset()
 {
     m_vertexShader->Release();
     m_pixelShader->Release();
 }
 
-void Galactic::Effect::LogErrors(ID3DBlob *error)
+void Effect::LogErrors(ID3DBlob *error)
 {
     if (!error)
         return;

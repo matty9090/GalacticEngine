@@ -366,7 +366,7 @@ void Game::CreateDevice()
     moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
     moon->SetVelocity(Vector3(0.0f, 0.0f, 1.3e6));
-	//moon->SetAtmosphereHeight(6371.0 * 1.025f);
+	moon->SetAtmosphereHeight(200.0f);
     moon->Generate(Galactic::EDetail::High);
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));

@@ -1,3 +1,5 @@
+#include "Common.fx"
+
 cbuffer MatrixBuffer : register(b0) {
 	matrix   viewProj;
 	matrix   world;
@@ -61,6 +63,8 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	Output.Position = mul(Output.Position, viewProj);
 	Output.Colour	= atmColour;
 	Output.Alpha	= alpha;
+	
+	Output.Position.z = LogDepthBuffer(Output.Position.w);
 
 	return Output;
 }

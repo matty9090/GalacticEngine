@@ -167,6 +167,9 @@
     <ClInclude Include="Inc\Render\IStarRenderer.hpp">
       <Filter>Render\Body</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\Scatter.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">

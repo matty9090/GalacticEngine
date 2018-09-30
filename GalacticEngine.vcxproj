@@ -186,6 +186,7 @@
     <ClInclude Include="Inc\Render\PlanetRendererHigh.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererLow.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererMed.hpp" />
+    <ClInclude Include="Inc\Render\Scatter.hpp" />
     <ClInclude Include="Inc\Render\ScatteredAtmosphere.hpp" />
     <ClInclude Include="Inc\Render\SimpleAtmosphere.hpp" />
     <ClInclude Include="Inc\Render\SimpleStarRenderer.hpp" />

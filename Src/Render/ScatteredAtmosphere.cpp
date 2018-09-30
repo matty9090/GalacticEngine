@@ -37,7 +37,7 @@ ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *
     DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
 
     m_buffer  = std::make_unique<ConstantBuffer<ScatteredAtmosphereBuffer>>(device);
-    m_buffer2 = std::make_unique<ConstantBuffer<ScatteredAtmosphereBufferPS>>(device);
+    m_buffer2 = std::make_unique<ConstantBuffer<ScatterBuffer>>(device);
 
     m_states  = std::make_unique<CommonStates>(device);
 
@@ -58,55 +58,28 @@ void ScatteredAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::Simp
     m_context->IASetInputLayout(m_effect->GetInputLayout());
     m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
-    
-    float radius = (float)(m_planet->GetRadius() / Constants::Scale);
-    float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
-    float atmradius = atmheight + radius;
-    float camHeight = (m_planet->GetCameraPos() - m_planet->GetPosition()).Length();
 
-	Vector3 wavelength = Vector3(0.65f, 0.57f, 0.475f);
-	wavelength.x = 1.0f / powf(wavelength.x, 4.0f);
-	wavelength.y = 1.0f / powf(wavelength.y, 4.0f);
-	wavelength.z = 1.0f / powf(wavelength.z, 4.0f);
-
-	float scale = 1 / (atmradius - radius);
-	float scaleDepth = 0.25f;
+	float radius = (float)(m_planet->GetRadius() / Constants::Scale);
+	float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
+	float atmradius = atmheight + radius;
 
     m_world = Matrix::CreateScale(atmradius) * Matrix::CreateTranslation(m_planet->GetPosition());
 
     Matrix worldViewProj =  m_world * view * proj;
 
 	ScatteredAtmosphereBuffer buffer = {
-		worldViewProj.Transpose(),
-		m_planet->GetCameraPos() - m_planet->GetPosition(),
-		camHeight,
-		Vector3::Right,
-		camHeight * camHeight,
-		wavelength,
-		atmradius,
-		atmradius * atmradius,
-		radius,
-		radius * radius,
-		Constants::Kr * Constants::ESun,
-		Constants::Km * Constants::ESun,
-		Constants::Kr * 4.0f * XM_PI,
-		Constants::Km * 4.0f * XM_PI,
-		scale,
-		scaleDepth,
-		scale / scaleDepth
+		worldViewProj.Transpose()
     };
 
-	ScatteredAtmosphereBufferPS buffer2 = {
-		Vector3::Right,
-		Constants::Af,
-		Constants::Af * Constants::Af
-	};
+	ScatterBuffer buffer2 = GetScatterBuffer(m_planet);
 
     m_buffer->SetData(m_context, buffer);
     m_buffer2->SetData(m_context, buffer2);
 
     m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
-    m_context->PSSetConstantBuffers(0, 1, m_buffer2->GetBuffer());
+    m_context->VSSetConstantBuffers(1, 1, m_buffer2->GetBuffer());
+    m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+    m_context->PSSetConstantBuffers(1, 1, m_buffer2->GetBuffer());
 
     Draw();
 }
