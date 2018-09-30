@@ -4,6 +4,7 @@
 #include <wrl/client.h>
 
 #include "SimpleAtmosphere.hpp"
+#include "ScatteredAtmosphere.hpp"
 
 #include "PlanetRendererLow.hpp"
 #include "PlanetRendererMed.hpp"
@@ -31,8 +32,22 @@ namespace Galactic {
         return renderer;
     }
 
-    std::unique_ptr<IAtmosphereRenderer> CreateAtmosphereRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
+    std::unique_ptr<IAtmosphereRenderer> CreateAtmosphereRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet, EDetail detail)
     {
-        return std::make_unique<SimpleAtmosphere>(deviceContext.Get(), planet);
+
+		std::unique_ptr<IAtmosphereRenderer> renderer;
+
+		switch (detail) {
+			case EDetail::Low:
+				renderer = std::make_unique<SimpleAtmosphere>(deviceContext.Get(), planet);
+				break;
+
+			case EDetail::Medium:
+			case EDetail::High:
+				renderer = std::make_unique<ScatteredAtmosphere>(deviceContext.Get(), planet);
+				break;
+		}
+
+		return renderer;
     }
 }

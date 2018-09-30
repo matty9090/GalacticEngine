@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Render/SimpleAtmosphere.hpp"
+#include "Render/ScatteredAtmosphere.hpp"
 #include "Physics/Constants.hpp"
 #include "Utils/Shapes.hpp"
 
@@ -7,16 +7,16 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-SimpleAtmosphere::SimpleAtmosphere(ID3D11DeviceContext *context, IPlanet *planet)
+ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *planet)
     : Drawable(context, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
       m_planet(planet)
 {
     std::vector<VertexPositionTexture> vertices;
 
-    Utils::CreateSphere(1.0f, 40U, vertices, m_indices);
+    Utils::CreateSphere(1.0f, 100U, vertices, m_indices);
 
     for (auto &v : vertices)
-        m_vertices.push_back(AtmosphereVertex { v.position });
+        m_vertices.push_back(ScatteredAtmosphereVertex{ v.position });
 
     ID3D11Device *device;
     context->GetDevice(&device);
@@ -28,7 +28,7 @@ SimpleAtmosphere::SimpleAtmosphere(ID3D11DeviceContext *context, IPlanet *planet
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
-    m_effect = std::make_unique<Effect>(device, L"Shaders/AtmosphereVS.fx", L"Shaders/AtmospherePS.fx", els, num, false);
+    m_effect = std::make_unique<Effect>(device, L"Shaders/ScatteredAtmosphereVS.fx", L"Shaders/ScatteredAtmospherePS.fx", els, num, false);
 
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_BACK, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
@@ -36,13 +36,15 @@ SimpleAtmosphere::SimpleAtmosphere(ID3D11DeviceContext *context, IPlanet *planet
 
     DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
 
-    m_buffer = std::make_unique<ConstantBuffer<AtmosphereBuffer>>(device);
-    m_states = std::make_unique<CommonStates>(device);
+    m_buffer  = std::make_unique<ConstantBuffer<ScatteredAtmosphereBuffer>>(device);
+    m_buffer2 = std::make_unique<ConstantBuffer<ScatteredAtmosphereBufferPS>>(device);
+
+    m_states  = std::make_unique<CommonStates>(device);
 
     Init();
 }
 
-void SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
+void ScatteredAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
@@ -61,34 +63,60 @@ void SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleM
     float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
     float atmradius = atmheight + radius;
     float camHeight = (m_planet->GetCameraPos() - m_planet->GetPosition()).Length();
-    
-    m_world = Matrix::CreateTranslation(m_planet->GetPosition());
 
-    Matrix viewProj = view * proj;
+	Vector3 wavelength = Vector3(0.65f, 0.57f, 0.475f);
+	wavelength.x = 1.0f / powf(wavelength.x, 4.0f);
+	wavelength.y = 1.0f / powf(wavelength.y, 4.0f);
+	wavelength.z = 1.0f / powf(wavelength.z, 4.0f);
 
-    AtmosphereBuffer buffer = {
-        viewProj.Transpose(),
-        m_world.Transpose(),
-        Vector3::Right,
-        radius,
-        m_planet->GetCameraPos() - m_planet->GetPosition(),
-        atmradius,
-        m_planet->GetAtmosphereColour(),
-        camHeight
+	float scale = 1 / (atmradius - radius);
+	float scaleDepth = 0.25f;
+
+    m_world = Matrix::CreateScale(atmradius) * Matrix::CreateTranslation(m_planet->GetPosition());
+
+    Matrix worldViewProj =  m_world * view * proj;
+
+	ScatteredAtmosphereBuffer buffer = {
+		worldViewProj.Transpose(),
+		m_planet->GetCameraPos() - m_planet->GetPosition(),
+		camHeight,
+		Vector3::Right,
+		camHeight * camHeight,
+		wavelength,
+		atmradius,
+		atmradius * atmradius,
+		radius,
+		radius * radius,
+		Constants::Kr * Constants::ESun,
+		Constants::Km * Constants::ESun,
+		Constants::Kr * 4.0f * XM_PI,
+		Constants::Km * 4.0f * XM_PI,
+		scale,
+		scaleDepth,
+		scale / scaleDepth
     };
 
+	ScatteredAtmosphereBufferPS buffer2 = {
+		Vector3::Right,
+		Constants::Af,
+		Constants::Af * Constants::Af
+	};
+
     m_buffer->SetData(m_context, buffer);
+    m_buffer2->SetData(m_context, buffer2);
+
     m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+    m_context->PSSetConstantBuffers(0, 1, m_buffer2->GetBuffer());
 
     Draw();
 }
 
-void SimpleAtmosphere::Update(float dt)
+void ScatteredAtmosphere::Update(float dt)
 {
     dt;
 }
 
-void SimpleAtmosphere::Reset()
+void ScatteredAtmosphere::Reset()
 {
     m_buffer.reset();
     m_effect.reset();

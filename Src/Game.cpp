@@ -359,12 +359,14 @@ void Game::CreateDevice()
     planet->SetInfluence(star.get());
     planet->SetPosition(Vector3(500.0f, 0.0f, 0.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
+    planet->SetAtmosphereHeight(800.0f);
     planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 962e24, 6371.0);
     moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
     moon->SetVelocity(Vector3(0.0f, 0.0f, 1.3e6));
+	//moon->SetAtmosphereHeight(6371.0 * 1.025f);
     moon->Generate(Galactic::EDetail::High);
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
