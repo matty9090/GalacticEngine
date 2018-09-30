@@ -40,6 +40,8 @@ void Game::Initialize(HWND window, int width, int height)
     m_mouse = std::make_unique<Mouse>();
     m_mouse->SetWindow(window);
 
+	m_camera->Attach(m_system->FindBody("Moon"));
+
     // TODO: Change the timer settings if you want something other than the default variable timestep mode.
     // e.g. for 60 FPS fixed timestep update logic, call:
     /*
@@ -153,7 +155,7 @@ void Game::Update(DX::StepTimer const& timer)
 
 	m_camera->Update(dt);
     m_system->SetCameraPos(m_camera->GetPosition());
-    m_system->Update(dt * 0.000f);
+    m_system->Update(dt * 0.0002f);
 }
 
 // Draws the scene.
@@ -365,7 +367,7 @@ void Game::CreateDevice()
     auto moon = gen.CreateRocky("Moon", 962e24, 6371.0);
     moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-    moon->SetVelocity(Vector3(0.0f, 0.0f, 1.3e6));
+    moon->SetVelocity(Vector3(-1.0e5, 0.0f, 1.3e6));
 	moon->SetAtmosphereHeight(200.0f);
     moon->Generate(Galactic::EDetail::High);
 

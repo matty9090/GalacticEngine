@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Body/IBody.hpp"
 #include "SimpleMath.h"
 
 namespace Galactic
@@ -12,7 +13,8 @@ namespace Galactic
 			void Update(float dt);
 			void Events(DirectX::Mouse *mouse, DirectX::Mouse::State &ms);
 			
-			void Move(DirectX::SimpleMath::Vector3 v) { m_cameraPos += v; }
+			void Move(DirectX::SimpleMath::Vector3 v) { m_relPos += v; }
+			void Attach(IBody *body) { m_body = body; }
 
 			DirectX::XMMATRIX GetViewMatrix() const { return m_view; }
 			DirectX::XMMATRIX GetProjectionMatrix() const { return m_proj; }
@@ -23,7 +25,9 @@ namespace Galactic
 			size_t m_width, m_height;
 			float m_pitch, m_yaw;
 
+			IBody *m_body;
+
 			DirectX::XMMATRIX m_view, m_proj;
-			DirectX::SimpleMath::Vector3 m_cameraPos;
+			DirectX::SimpleMath::Vector3 m_cameraPos, m_relPos;
 	};
 }

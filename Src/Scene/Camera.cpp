@@ -8,7 +8,9 @@ using namespace DirectX::SimpleMath;
 Camera::Camera(size_t width, size_t height)
 	: m_width(width),
 	  m_height(height),
-	  m_cameraPos(0.0f, 0.0f, -50.0f)
+	  m_body(nullptr),
+	  m_cameraPos(0.0f, 0.0f, 0.0f),
+	  m_relPos(0.0f, 0.0f, -150.0f)
 {
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(width) / float(height), 0.01f, 500000.f);
 }
@@ -24,6 +26,8 @@ void Camera::Update(float dt)
 
 	XMVECTOR look = m_cameraPos + Vector3(x, y, z);
 	m_view = XMMatrixLookAtRH(m_cameraPos, look, Vector3::Up);
+
+	m_cameraPos = m_relPos + ((m_body != nullptr) ? m_body->GetPosition() : Vector3::Zero);
 }
 
 void Camera::Events(DirectX::Mouse *mouse, DirectX::Mouse::State &ms)
