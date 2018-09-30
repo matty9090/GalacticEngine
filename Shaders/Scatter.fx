@@ -152,7 +152,7 @@ void scatter_surf(float3 pos) {
 	float fCameraOffset = fDepth * fCameraScale;
 	float fTemp = (fLightScale + fCameraScale);
 
-	const float fSamples = 2.0f;
+	const float fSamples = 3.0f;
 	
 	// Initialize the scattering loop variables
 	float fSampleLength = fFar / fSamples;
