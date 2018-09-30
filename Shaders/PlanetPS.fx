@@ -32,7 +32,7 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	DiffuseLight = ambientCol + DiffuseLight;
 
 	float4 colour;
-	colour.rgb = /*Tex.Sample(Sampler, tex) * Surf.Sample(Sampler, v.UV) **/ DiffuseLight * v.Color;
+	colour.rgb = Tex.Sample(Sampler, tex) /** Surf.Sample(Sampler, v.UV)*/ *  DiffuseLight;
 	colour.a = 1.0f;
 
 	return colour;
