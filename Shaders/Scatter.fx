@@ -41,18 +41,13 @@ float getRayleighPhase(float fCos2) {
 
 float scale(float fCos) {
 	float x = 1.0 - fCos;
-	return 0.25 * exp(-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
-}
-
-float scale_surf(float fCos) {
-	float x = 1.0 - fCos;
 	return fScaleDepth * exp(-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
 }
 
 void scatter(float3 pos) {
 	// Get the ray from the camera to the vertex and its length (which
 	// is the far point of the ray passing through the atmosphere)
-		
+	
 	float3 v3Pos = pos;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
@@ -147,8 +142,8 @@ void scatter_surf(float3 pos) {
 	float fDepth = exp((fInnerRadius - fOuterRadius) / fScaleDepth);
 	float fCameraAngle = dot(-v3Ray, v3Pos) / length(v3Pos);
 	float fLightAngle = dot(v3LightDir, v3Pos) / length(v3Pos);
-	float fCameraScale = scale_surf(fCameraAngle);
-	float fLightScale = scale_surf(fLightAngle);
+	float fCameraScale = scale(fCameraAngle);
+	float fLightScale = scale(fLightAngle);
 	float fCameraOffset = fDepth * fCameraScale;
 	float fTemp = (fLightScale + fCameraScale);
 
