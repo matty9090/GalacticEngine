@@ -6,6 +6,8 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+size_t SphericalQuadTreeTerrain::FrameSplits = 0;
+
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
     : m_deviceContext(deviceContext),
       m_planet(planet),

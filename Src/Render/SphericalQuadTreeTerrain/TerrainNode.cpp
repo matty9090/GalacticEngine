@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Render/SphericalQuadTreeTerrain/TerrainNode.hpp"
+#include "Render/SphericalQuadTreeTerrain/SphericalQuadTreeTerrain.hpp"
 
 using namespace Galactic;
 using namespace DirectX;
@@ -215,7 +216,7 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = m_depth < 3 || distance < m_scale * 30.0f;
+        bool divide = m_depth < 3 || distance < m_scale * 40.0f;
 
         if (!divide)
             Merge();
@@ -249,11 +250,13 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (m_depth >= 9)
+    if (m_depth >= 9 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
         return;
 
     if (IsLeaf())
     {
+		SphericalQuadTreeTerrain::FrameSplits++;
+
         float x = m_bounds.x, y = m_bounds.y;
         float d = m_bounds.size / 2;
 

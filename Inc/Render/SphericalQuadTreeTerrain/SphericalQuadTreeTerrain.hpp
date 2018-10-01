@@ -36,6 +36,9 @@ namespace Galactic
             std::shared_ptr<Effect> GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
 
+			static const size_t MaxSplitsPerFrame = 2;
+			static size_t FrameSplits;
+
         private:
             FastNoise m_noise;
             DirectX::SimpleMath::Matrix m_world;

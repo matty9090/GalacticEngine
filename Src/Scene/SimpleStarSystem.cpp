@@ -1,6 +1,7 @@
 #include "pch.h"
-#include "Scene/SimpleStarSystem.hpp"
 #include "Physics/Gravity.hpp"
+#include "Scene/SimpleStarSystem.hpp"
+#include "Render/SphericalQuadTreeTerrain/SphericalQuadTreeTerrain.hpp"
 
 using namespace Galactic;
 using namespace DirectX;
@@ -53,6 +54,8 @@ IBody *SimpleStarSystem::GetClosestBody(DirectX::SimpleMath::Vector3 pos) const
 
 void SimpleStarSystem::Update(float dt)
 {
+	SphericalQuadTreeTerrain::FrameSplits = 0;
+
     for (auto const &body : m_bodies)
     {
         IBody *inf = body->GetInfluence();

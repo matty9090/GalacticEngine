@@ -168,7 +168,7 @@
       <Filter>Render\Body</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Render\Scatter.hpp">
-      <Filter>Render</Filter>
+      <Filter>Render\Atmosphere</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
