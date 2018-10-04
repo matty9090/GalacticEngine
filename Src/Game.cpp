@@ -40,7 +40,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_mouse = std::make_unique<Mouse>();
     m_mouse->SetWindow(window);
 
-	m_camera->Attach(m_system->FindBody("Moon"));
+	//m_camera->Attach(m_system->FindBody("Moon"));
 
     // TODO: Change the timer settings if you want something other than the default variable timestep mode.
     // e.g. for 60 FPS fixed timestep update logic, call:
@@ -106,7 +106,7 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
     if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
 
-	m_camera->Events(m_mouse.get(), mouse);
+	m_camera->Events(m_mouse.get(), mouse, dt);
 
     Vector3 move = Vector3::Zero;
 
@@ -155,7 +155,7 @@ void Game::Update(DX::StepTimer const& timer)
 
 	m_camera->Update(dt);
     m_system->SetCameraPos(m_camera->GetPosition());
-    m_system->Update(dt * 0.0002f);
+    m_system->Update(dt * 0.000f);
 }
 
 // Draws the scene.
@@ -359,7 +359,7 @@ void Game::CreateDevice()
 
     auto planet = gen.CreateGasGiant("Planet", 5.683e26, 58232.0);
     planet->SetInfluence(star.get());
-    planet->SetPosition(Vector3(500.0f, 0.0f, 0.0f));
+    planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     planet->SetAtmosphereHeight(800.0f);
     planet->Generate(Galactic::EDetail::High);

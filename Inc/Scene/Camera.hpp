@@ -11,7 +11,7 @@ namespace Galactic
 			Camera(size_t width, size_t size_t);
 
 			void Update(float dt);
-			void Events(DirectX::Mouse *mouse, DirectX::Mouse::State &ms);
+			void Events(DirectX::Mouse *mouse, DirectX::Mouse::State &ms, float dt);
 			
 			void Move(DirectX::SimpleMath::Vector3 v) { m_relPos += v; }
 			void Attach(IBody *body) { m_body = body; }
@@ -27,7 +27,7 @@ namespace Galactic
 
 			IBody *m_body;
 
-			DirectX::XMMATRIX m_view, m_proj;
+			DirectX::SimpleMath::Matrix m_view, m_proj;
 			DirectX::SimpleMath::Vector3 m_cameraPos, m_relPos;
 	};
 }
