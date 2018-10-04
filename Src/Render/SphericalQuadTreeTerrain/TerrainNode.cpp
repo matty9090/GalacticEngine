@@ -143,10 +143,6 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         if (IsLeaf())
         {
-#ifdef _DEBUG
-            m_terrain->SetRenderContext();
-#endif
-
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
             MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
 
@@ -155,42 +151,6 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
             Draw();
-
-#ifdef _DEBUG
-            m_context->OMSetBlendState(m_dbgStates->AlphaBlend(), nullptr, 0xFFFFFFFF);
-            m_context->OMSetDepthStencilState(m_dbgStates->DepthNone(), 0);
-            m_context->RSSetState(m_dbgStates->CullNone());
-
-            m_dbgEffect->SetWorld(m_terrain->GetMatrix());
-            m_dbgEffect->SetView(view);
-            m_dbgEffect->SetProjection(proj);
-
-            m_dbgEffect->Apply(m_context);
-            m_context->IASetInputLayout(m_dbgInputLayout.Get());
-
-            m_dbgBatch->Begin();
-
-            Color col = m_dbgCol;
-            VertexPositionColor p1, p2, p3, p4;
-
-            int gs = m_terrain->GetGridSize();
-
-            if (m_depth == 3)
-                col = Color(1.0f, 0.0f, 0.0f, 1.0f);
-
-            p1.position = m_vertices[0].position;
-            p2.position = m_vertices[gs - 1].position;
-            p3.position = m_vertices[gs * gs - gs].position;
-            p4.position = m_vertices[gs * gs - 1].position;
-            
-            p1.color = m_dbgCol; p2.color = m_dbgCol;
-            p3.color = m_dbgCol; p4.color = m_dbgCol;
-
-            m_dbgBatch->DrawLine(p1, p2); m_dbgBatch->DrawLine(p1, p3);
-            m_dbgBatch->DrawLine(p2, p4); m_dbgBatch->DrawLine(p3, p4);
-
-            m_dbgBatch->End();
-#endif
         }
         else
         {
