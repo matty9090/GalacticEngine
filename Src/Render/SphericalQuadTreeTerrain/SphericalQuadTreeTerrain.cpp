@@ -48,8 +48,9 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
 
-	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
-	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
+	// TODO: Cache resources as this is very slow
+	//D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
+	//D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
 
 	m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
@@ -106,8 +107,8 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-	m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
-	m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
+	//m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
+	//m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
 
 	ScatterBuffer buffer = GetScatterBuffer(m_planet);
 	m_buffer->SetData(m_deviceContext.Get(), buffer);
