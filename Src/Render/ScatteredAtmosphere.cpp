@@ -13,7 +13,7 @@ ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *
 {
     std::vector<VertexPositionTexture> vertices;
 
-    Utils::CreateSphere(1.0f, 120U, vertices, m_indices);
+    Utils::CreateSphere(1.0f, 100U, vertices, m_indices);
 
     for (auto &v : vertices)
         m_vertices.push_back(ScatteredAtmosphereVertex{ v.position });
