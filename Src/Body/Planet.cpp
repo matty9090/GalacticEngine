@@ -55,7 +55,7 @@ void Planet::Generate(EDetail detail)
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
 
-    m_isGenerated = true;
+    //m_isGenerated = true;
 }
 
 void Galactic::Planet::SetParameters(float freq, float lacunarity, float gain, float height, int octaves, float noiseScale)

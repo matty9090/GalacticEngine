@@ -30,13 +30,13 @@ namespace Galactic
         float size;
     };
     
-    class TerrainNode : public IRenderable, public Drawable<PlanetVertex>, public std::enable_shared_from_this<TerrainNode>
+    class TerrainNode : public IRenderable, public Drawable<PlanetVertex>
     {
         public:
             enum EDir { North, East, South, West };
             enum EQuad { NE, NW, SE, SW };
 
-            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, IPlanet *planet, Square bounds, int quad);
+            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad);
 
             void SetMatrix(DirectX::SimpleMath::Matrix m) { m_world = m; }
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
@@ -52,7 +52,7 @@ namespace Galactic
             void Merge();
             void Release();
 
-            bool IsRoot() const { return !m_parent.lock(); }
+            bool IsRoot() const { return !m_parent; }
             void SetDebugName(std::string name) { m_dbgName = name; }
             void SetDebugColour(DirectX::SimpleMath::Color col) { m_dbgCol = col; }
             void FixEdges();
@@ -71,7 +71,7 @@ namespace Galactic
             Square m_bounds;
 
             IPlanet *m_planet;
-            std::weak_ptr<TerrainNode> m_parent;
+            TerrainNode *m_parent;
             std::shared_ptr<ISphericalTerrain> m_terrain;
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
 

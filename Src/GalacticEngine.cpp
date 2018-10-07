@@ -2,11 +2,21 @@
 #include "GalacticEngine.hpp"
 #include "Body/Star.hpp"
 #include "Body/Planet.hpp"
+#include "Noise/Biome.hpp"
 #include "Scene/SimpleStarSystem.hpp"
 
 using Microsoft::WRL::ComPtr;
+using DirectX::SimpleMath::Color;
 
 namespace Galactic {
+	void InitEngine()
+	{
+		Biomes[EBiomes::Grass] = { 10, 0.45f, 1.9f, 0.04f, 0.04f, 1.0f, Color(0.0f, 1.0f, 0.0f) };
+		Biomes[EBiomes::Desert] = { 10, 0.45f, 1.9f, 0.04f, 0.04f, 1.0f, Color(1.0f, 1.0f, 0.0f) };
+		Biomes[EBiomes::Mountains] = { 10, 0.6f, 1.9f, 0.04f, 0.04f, 1.0f, Color(0.6f, 0.6f, 0.6f) };
+		Biomes[EBiomes::Ocean].colour = Color(0.0f, 0.0f, 1.0f);
+	}
+
     std::unique_ptr<IStarSystem> CreateStarSystem(std::string name, EStarSystem type)
     {
         type;

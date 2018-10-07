@@ -33,6 +33,8 @@ void Game::Initialize(HWND window, int width, int height)
     m_outputWidth = std::max(width, 1);
     m_outputHeight = std::max(height, 1);
 
+	Galactic::InitEngine();
+
     CreateDevice();
     CreateResources();
 
@@ -347,7 +349,7 @@ void Game::CreateDevice()
     star->SetTemperature(5777);
     star->SetPosition(Vector3(60000.0f, 0.0f, 0.0f));
     star->SetMass(1.989e30);
-    star->Generate(); 
+    star->Generate();
 
     /*auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);

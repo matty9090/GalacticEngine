@@ -17,7 +17,6 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     m_deviceContext->GetDevice(&m_device);
 
     m_states = std::make_unique<DirectX::CommonStates>(m_device.Get());
-    m_noise.SetSeed(rand() % RAND_MAX);
 
     CreateEffect();
 }
@@ -63,6 +62,15 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
     m_noise.SetFractalGain(gain);
     m_noise.SetFractalLacunarity(lacunarity);
     m_noise.SetFrequency(freq);
+	m_noise.SetSeed(rand() % RAND_MAX);
+
+	m_bnoise = m_noise;
+	m_bnoise.SetSeed(rand() % RAND_MAX);
+
+	m_biomes[EBiomes::Grass] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Grass]);
+	m_biomes[EBiomes::Mountains] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Mountains]);
+	m_biomes[EBiomes::Desert] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Desert]);
+	m_biomes[EBiomes::Ocean] = std::make_unique<OceanBiome>(m_noise, Biomes[EBiomes::Ocean]);
 
     std::array<Matrix, 6> orientations = 
     {
@@ -76,7 +84,7 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
 
     for (int i = 0; i < 6; ++i)
     {
-        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
+        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), nullptr, m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
         m_faces[i]->SetMatrix(orientations[i]);
         
 #ifdef _DEBUG
@@ -142,12 +150,27 @@ void SphericalQuadTreeTerrain::Reset()
         face->Release();
 }
 
-float Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p)
+void Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, DirectX::SimpleMath::Color &col)
 {
     float scale = m_planet->GetNoiseScale();
     float minvalue = m_planet->GetMinValue();
 
-    float v = m_planet->GetHeight() * m_noise.GetNoise(p.x * 40.0f * scale, p.y * 40.0f * scale, p.z * 40.0f * scale);
+	float x = p.x * 40.0f * scale;
+	float y = p.y * 40.0f * scale;
+	float z = p.z * 40.0f * scale;
+
+	//float h = (m_bnoise.GetNoise(x, y, z) + 1.0f) / 2.0f;
+
+	/*EBiomes biome;
+
+	if (h < 0.55f) biome = EBiomes::Ocean;
+	else if (h < 0.7f) biome = EBiomes::Grass;
+	else if (h < 0.85f) biome = EBiomes::Mountains;
+	else biome = EBiomes::Desert;
+	*/
+	float v = m_bnoise.GetNoise(x, y, z) * m_planet->GetHeight();
+    //float v = m_biomes[biome]->GetHeight(x, y, z);
     
-    return fmaxf(0.0f, v - minvalue);
+    height = std::fmaxf(0.0f, v);
+	//col = m_biomes[biome]->GetColour(height);
 }

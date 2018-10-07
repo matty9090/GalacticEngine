@@ -26,9 +26,6 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{f2c13dd2-f616-4675-adc2-d472667b665a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FastNoise">
-      <UniqueIdentifier>{d62e84ce-a073-4e4b-9ba9-1962e6d2a730}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{eed66be2-c23a-48a4-afcf-8dbce1a89a3a}</UniqueIdentifier>
     </Filter>
@@ -40,6 +37,9 @@
     </Filter>
     <Filter Include="Render\Body">
       <UniqueIdentifier>{6806604f-31af-47b8-b8eb-395b237d1dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Noise">
+      <UniqueIdentifier>{d62e84ce-a073-4e4b-9ba9-1962e6d2a730}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -90,7 +90,7 @@
       <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="Inc\FastNoise\FastNoise.h">
-      <Filter>FastNoise</Filter>
+      <Filter>Noise</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Render\Cube.hpp">
       <Filter>Render</Filter>
@@ -170,6 +170,9 @@
     <ClInclude Include="Inc\Render\Scatter.hpp">
       <Filter>Render\Atmosphere</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Noise\Biome.hpp">
+      <Filter>Noise</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -191,9 +194,6 @@
     </ClCompile>
     <ClCompile Include="Src\Render\DirectX\Effect.cpp">
       <Filter>Render\DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\FastNoise\FastNoise.cpp">
-      <Filter>FastNoise</Filter>
     </ClCompile>
     <ClCompile Include="Src\Render\Cube.cpp">
       <Filter>Render</Filter>
@@ -242,6 +242,12 @@
     </ClCompile>
     <ClCompile Include="Src\Render\SimpleStarRenderer.cpp">
       <Filter>Render\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\Biome.cpp">
+      <Filter>Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoise.cpp">
+      <Filter>Noise</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

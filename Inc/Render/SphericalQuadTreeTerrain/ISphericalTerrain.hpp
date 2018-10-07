@@ -2,7 +2,7 @@
 
 #include "Render/IRenderable.hpp"
 #include "Render/DirectX/Effect.hpp"
-#include "FastNoise/FastNoise.h"
+#include "Noise/FastNoise.h"
 
 namespace Galactic
 {
@@ -16,6 +16,6 @@ namespace Galactic
             virtual Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const = 0;
 
             virtual void SetRenderContext() = 0;
-            virtual float GetHeight(DirectX::SimpleMath::Vector3 point) = 0;
+            virtual void GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Color &col) = 0;
     };
 }

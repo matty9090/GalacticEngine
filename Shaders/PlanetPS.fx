@@ -38,7 +38,7 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	float3 sColour = v.Colour1 + 0.25f * v.Colour2;
 	sColour = 1.0 - exp(sColour * -0.8f);
 	
-	v.Color *= sColour.b;
+	//v.Color *= sColour.b;
 	
 	float4 colour;
 	colour.rgb = DiffuseLight * v.Color + sColour;

@@ -4,7 +4,8 @@
 #include "TerrainNode.hpp"
 #include "ISphericalTerrain.hpp"
 
-#include "FastNoise/FastNoise.h"
+#include "Noise/Biome.hpp"
+#include "Noise/FastNoise.h"
 #include "Render/Scatter.hpp"
 #include "Render/DirectX/Effect.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
@@ -29,7 +30,7 @@ namespace Galactic
 #endif
 
             float GetRadius() const { return m_radius; }
-            float GetHeight(DirectX::SimpleMath::Vector3 p);
+			void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Color &col);
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
@@ -40,7 +41,8 @@ namespace Galactic
 			static size_t FrameSplits;
 
         private:
-            FastNoise m_noise;
+			std::map<EBiomes, std::unique_ptr<Biome>> m_biomes;
+            FastNoise m_noise, m_bnoise;
             DirectX::SimpleMath::Matrix m_world;
 
             IPlanet *m_planet;
