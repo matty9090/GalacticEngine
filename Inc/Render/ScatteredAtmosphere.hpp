@@ -15,16 +15,16 @@ namespace Galactic
         DirectX::SimpleMath::Vector3 position;
     };
 
-	struct ScatteredAtmosphereBuffer
-	{
-		DirectX::SimpleMath::Matrix worldViewProj;
-	};
+    struct ScatteredAtmosphereBuffer
+    {
+        DirectX::SimpleMath::Matrix worldViewProj;
+    };
 
     class ScatteredAtmosphere : public IAtmosphereRenderer, public Drawable<ScatteredAtmosphereVertex>
     {
         public:
-			ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *planet);
-			virtual ~ScatteredAtmosphere();
+            ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *planet);
+            virtual ~ScatteredAtmosphere();
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);

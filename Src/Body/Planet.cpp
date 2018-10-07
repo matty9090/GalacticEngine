@@ -16,7 +16,8 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_atmosphereHeight(200.0f),
       m_atmColour(Color(0.0f, 0.7f, 1.0f))
 {
-
+    m_params.resize(20);
+    SetParam(EParams::Biomes, 0.0f);
 }
 
 Planet::~Planet()
@@ -34,7 +35,7 @@ void Planet::Generate(EDetail detail)
 
         m_renderer->Reset();
         m_renderer.reset();
-		
+        
         m_atmosphere->Reset();
         m_atmosphere.reset();
     }
@@ -45,7 +46,7 @@ void Planet::Generate(EDetail detail)
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
 
-	m_isGenerated = true;
+    m_isGenerated = true;
 }
 
 void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -81,10 +82,10 @@ void Planet::Reset()
 {
     if (m_renderer)
         m_renderer->Reset();
-	
-	if(m_atmosphere)
-		m_atmosphere->Reset();
+    
+    if(m_atmosphere)
+        m_atmosphere->Reset();
 
     m_renderer.reset();
-	m_atmosphere.reset();
+    m_atmosphere.reset();
 }

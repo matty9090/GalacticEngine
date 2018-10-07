@@ -89,16 +89,16 @@ void TerrainNode::Generate()
                 pos.Normalize();
                 pos = Vector3::Transform(pos, m_world);
 
-				float height;
-				DirectX::SimpleMath::Color col;
+                float height;
+                DirectX::SimpleMath::Color col;
 
                 m_terrain->GetHeight(pos, height, col);
 
                 v.color = col;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
-				v.sphere = pos;
-				v.uv = Vector2(xx * 80.0f, yy * 80.0f);
+                v.sphere = pos;
+                v.uv = Vector2(xx * 80.0f, yy * 80.0f);
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -189,8 +189,8 @@ void TerrainNode::Update(float dt)
         }
         else if (!IsLeaf())
         {
-			for (auto &child : m_children)
-				child->Update(dt);
+            for (auto &child : m_children)
+                child->Update(dt);
         }
     }
 }
@@ -216,7 +216,7 @@ void TerrainNode::Split()
 
     if (IsLeaf())
     {
-		SphericalQuadTreeTerrain::FrameSplits++;
+        SphericalQuadTreeTerrain::FrameSplits++;
 
         float x = m_bounds.x, y = m_bounds.y;
         float d = m_bounds.size / 2;
@@ -299,7 +299,7 @@ void TerrainNode::FixEdges()
     Init();
 }
 
-void Galactic::TerrainNode::NotifyNeighbours()
+void TerrainNode::NotifyNeighbours()
 {
     std::vector<TerrainNode*> neighbours;
 

@@ -15,6 +15,6 @@ namespace Galactic
 
             virtual DirectX::SimpleMath::Matrix GetMatrix() const = 0;
 
-			virtual ~IRenderable() {}
+            virtual ~IRenderable() {}
     };
 }

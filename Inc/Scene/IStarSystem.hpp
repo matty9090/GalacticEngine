@@ -23,6 +23,6 @@ namespace Galactic
             virtual std::string GetName() const = 0;
             virtual std::list<ILightSource*> GetLightSources() const = 0;
 
-			virtual ~IStarSystem() {}
+            virtual ~IStarSystem() {}
     };
 }

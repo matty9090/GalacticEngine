@@ -14,6 +14,6 @@ namespace Galactic
             virtual double GetRadius() const = 0;
             virtual int GetTemperature() const = 0;
 
-			virtual ~IStar() {}
+            virtual ~IStar() {}
     };
 }

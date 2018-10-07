@@ -54,7 +54,7 @@ IBody *SimpleStarSystem::GetClosestBody(DirectX::SimpleMath::Vector3 pos) const
 
 void SimpleStarSystem::Update(float dt)
 {
-	SphericalQuadTreeTerrain::FrameSplits = 0;
+    SphericalQuadTreeTerrain::FrameSplits = 0;
 
     for (auto const &body : m_bodies)
     {

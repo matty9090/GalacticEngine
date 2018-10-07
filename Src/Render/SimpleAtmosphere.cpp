@@ -22,8 +22,8 @@ SimpleAtmosphere::SimpleAtmosphere(ID3D11DeviceContext *context, IPlanet *planet
     context->GetDevice(&device);
 
     D3D11_INPUT_ELEMENT_DESC els[] = {
-        // Semantic   Index  Format							 Slot   Offset	Slot Class					 Instance Step
-        { "POSITION", 0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		0,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        // Semantic   Index  Format                             Slot   Offset    Slot Class                     Instance Step
+        { "POSITION", 0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -93,6 +93,6 @@ void SimpleAtmosphere::Reset()
     m_buffer.reset();
     m_states.reset();
     m_raster.Reset();
-	
-	Cleanup();
+    
+    Cleanup();
 }

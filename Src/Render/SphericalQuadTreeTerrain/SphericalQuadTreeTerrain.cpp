@@ -7,12 +7,13 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 #ifdef _DEBUG
-	size_t SphericalQuadTreeTerrain::GridSize = 9;
+    size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-	size_t SphericalQuadTreeTerrain::GridSize = 33;
+    size_t SphericalQuadTreeTerrain::GridSize = 33;
 #endif
 
 size_t SphericalQuadTreeTerrain::FrameSplits = 0;
+size_t SphericalQuadTreeTerrain::MaxSplitsPerFrame = 2;
 
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
     : m_deviceContext(deviceContext),
@@ -24,18 +25,23 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
 
     m_states = std::make_unique<DirectX::CommonStates>(m_device.Get());
 
+    m_gradient.addColorStop(0.0f, Gradient::GradientColor(0.0f * 255.0f, 0.467f * 255.0f, 0.745f * 255.0f, 255.0f));
+    m_gradient.addColorStop(0.06f, Gradient::GradientColor(0.93f * 255.0f, 0.79f * 255.0f, 0.69f * 255.0f, 255.0f));
+    m_gradient.addColorStop(0.2f, Gradient::GradientColor(0.22f * 255.0f, 0.62f * 255.0f, 0.14f * 255.0f, 255.0f));
+    m_gradient.addColorStop(1.0f, Gradient::GradientColor(0.22f * 255.0f, 0.62f * 255.0f, 0.14f * 255.0f, 255.0f));
+
     CreateEffect();
 }
 
 void SphericalQuadTreeTerrain::CreateEffect()
 {
     D3D11_INPUT_ELEMENT_DESC els[] = {
-        // Semantic   Index  Format							 Slot   Offset	Slot Class					 Instance Step
-        { "POSITION", 0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		0,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "NORMAL",   0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		12,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TANGENT",  0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		24,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",	  0,	 DXGI_FORMAT_R32G32B32A32_FLOAT, 0,		36,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD", 0,	 DXGI_FORMAT_R32G32_FLOAT,		 0,		52,		D3D11_INPUT_PER_VERTEX_DATA, 0 }
+        // Semantic   Index  Format                           Slot      Offset     Slot Class                   Instance Step
+        { "POSITION", 0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,         D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL",   0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        12,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TANGENT",  0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",    0,     DXGI_FORMAT_R32G32B32A32_FLOAT,  0,        36,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0,     DXGI_FORMAT_R32G32_FLOAT,        0,        52,        D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -53,30 +59,30 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
 
-	// TODO: Cache resources as this is very slow
-	//D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
-	//D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
+    // TODO: Cache resources as this is very slow
+    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
+    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
 
-	m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
+    m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
 
 void SphericalQuadTreeTerrain::Generate()
 {
     m_noise.SetInterp(FastNoise::Quintic);
     m_noise.SetNoiseType(FastNoise::SimplexFractal);
-    m_noise.SetFractalOctaves((int)m_planet->GetParam("Octaves"));
-    m_noise.SetFractalGain(m_planet->GetParam("Gain"));
-    m_noise.SetFractalLacunarity(m_planet->GetParam("Lacunarity"));
-    m_noise.SetFrequency(m_planet->GetParam("Frequency"));
-	m_noise.SetSeed(m_planet->GetSeed());
+    m_noise.SetFractalOctaves((int)m_planet->GetParam(EParams::Octaves));
+    m_noise.SetFractalGain(m_planet->GetParam(EParams::Gain));
+    m_noise.SetFractalLacunarity(m_planet->GetParam(EParams::Lacunarity));
+    m_noise.SetFrequency(m_planet->GetParam(EParams::Frequency));
+    m_noise.SetSeed(m_planet->GetSeed());
 
-	m_bnoise = m_noise;
-	m_bnoise.SetSeed(m_planet->GetSeed() + 1);
-
-	m_biomes[EBiomes::Grass] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Grass]);
-	m_biomes[EBiomes::Mountains] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Mountains]);
-	m_biomes[EBiomes::Desert] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Desert]);
-	m_biomes[EBiomes::Ocean] = std::make_unique<OceanBiome>(m_noise, Biomes[EBiomes::Ocean]);
+    m_bnoise = m_noise;
+    m_bnoise.SetSeed(m_planet->GetSeed() + 1);
+    
+    m_biomes[EBiomes::Grass] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Grass]);
+    m_biomes[EBiomes::Mountains] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Mountains]);
+    m_biomes[EBiomes::Desert] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Desert]);
+    m_biomes[EBiomes::Ocean] = std::make_unique<OceanBiome>(m_noise, Biomes[EBiomes::Ocean]);
 
     std::array<Matrix, 6> orientations = 
     {
@@ -121,14 +127,14 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-	//m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
-	//m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
+    //m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
+    //m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
 
-	ScatterBuffer buffer = GetScatterBuffer(m_planet);
-	m_buffer->SetData(m_deviceContext.Get(), buffer);
+    ScatterBuffer buffer = GetScatterBuffer(m_planet);
+    m_buffer->SetData(m_deviceContext.Get(), buffer);
 
-	m_deviceContext->VSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
-	m_deviceContext->PSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
+    m_deviceContext->VSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
+    m_deviceContext->PSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
 }
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -158,25 +164,31 @@ void SphericalQuadTreeTerrain::Reset()
 
 void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, DirectX::SimpleMath::Color &col)
 {
-	float scale = m_planet->GetParam("NoiseScale");
-    //float minvalue = m_planet->GetParam("MinValue");
+    bool biomes_enabled = (bool)m_planet->GetParam(EParams::Biomes);
+    float scale = m_planet->GetParam(EParams::NoiseScale);
+    float minvalue = m_planet->GetParam(EParams::MinValue);
 
-	float x = p.x * 40.0f * scale;
-	float y = p.y * 40.0f * scale;
-	float z = p.z * 40.0f * scale;
+    float x = p.x * 40.0f * scale;
+    float y = p.y * 40.0f * scale;
+    float z = p.z * 40.0f * scale;
 
-	//float h = (m_bnoise.GetNoise(x, y, z) + 1.0f) / 2.0f;
+    //float h = (m_bnoise.GetNoise(x, y, z) + 1.0f) / 2.0f;
 
-	/*EBiomes biome;
+    /*EBiomes biome;
 
-	if (h < 0.55f) biome = EBiomes::Ocean;
-	else if (h < 0.7f) biome = EBiomes::Grass;
-	else if (h < 0.85f) biome = EBiomes::Mountains;
-	else biome = EBiomes::Desert;
-	*/
-	float v = m_bnoise.GetNoise(x, y, z) * m_planet->GetParam("Height");
+    if (h < 0.55f) biome = EBiomes::Ocean;
+    else if (h < 0.7f) biome = EBiomes::Grass;
+    else if (h < 0.85f) biome = EBiomes::Mountains;
+    else biome = EBiomes::Desert;
+    */
+
+    float noise = m_noise.GetNoise(x, y, z);
+    float v = noise * m_planet->GetParam(EParams::Height);
     //float v = m_biomes[biome]->GetHeight(x, y, z);
     
-    height = std::fmaxf(0.0f, v);
-	//col = m_biomes[biome]->GetColour(height);
+    auto colour = m_gradient.getColorAt(noise);
+
+    height = std::fmaxf(0.0f, v - minvalue);
+    col = Color(colour.r, colour.g, colour.b, 1.0f);
+    //col = m_biomes[biome]->GetColour(height);
 }
