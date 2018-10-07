@@ -18,6 +18,8 @@ ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *
     for (auto &v : vertices)
         m_vertices.push_back(ScatteredAtmosphereVertex{ v.position });
 
+	vertices.clear();
+
     ID3D11Device *device;
     context->GetDevice(&device);
 
@@ -92,6 +94,14 @@ void ScatteredAtmosphere::Update(float dt)
 void ScatteredAtmosphere::Reset()
 {
     m_buffer.reset();
+	m_buffer2.reset();
     m_states.reset();
     m_raster.Reset();
+
+	Cleanup();
+}
+
+ScatteredAtmosphere::~ScatteredAtmosphere()
+{
+	
 }

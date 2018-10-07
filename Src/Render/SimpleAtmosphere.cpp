@@ -93,4 +93,6 @@ void SimpleAtmosphere::Reset()
     m_buffer.reset();
     m_states.reset();
     m_raster.Reset();
+	
+	Cleanup();
 }

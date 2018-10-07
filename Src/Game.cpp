@@ -430,19 +430,22 @@ void Game::CreateResources()
 	m_camera = std::make_unique<Galactic::Camera>(backBufferWidth, backBufferHeight);
 }
 
+void Game::Cleanup()
+{
+	m_depthStencilView.Reset();
+	m_renderTargetView.Reset();
+	m_swapChain.Reset();
+	m_d3dContext.Reset();
+	m_d3dDevice.Reset();
+	m_font.reset();
+	m_spriteBatch.reset();
+
+	m_system->Reset();
+}
+
 void Game::OnDeviceLost()
 {
-    // TODO: Add Direct3D resource cleanup here.
-
-    m_depthStencilView.Reset();
-    m_renderTargetView.Reset();
-    m_swapChain.Reset();
-    m_d3dContext.Reset();
-    m_d3dDevice.Reset();
-    m_font.reset();
-    m_spriteBatch.reset();
-
-    m_system->Reset();
+	Cleanup();
     
     CreateDevice();
     CreateResources();

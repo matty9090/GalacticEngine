@@ -90,7 +90,7 @@ void SphericalQuadTreeTerrain::Generate()
 
     for (int i = 0; i < 6; ++i)
     {
-        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), nullptr, m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
+        m_faces[i] = std::make_unique<TerrainNode>(this, nullptr, m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
         m_faces[i]->SetMatrix(orientations[i]);
         
 #ifdef _DEBUG

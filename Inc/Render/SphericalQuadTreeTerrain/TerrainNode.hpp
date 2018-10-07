@@ -36,7 +36,7 @@ namespace Galactic
             enum EDir { North, East, South, West };
             enum EQuad { NE, NW, SE, SW };
 
-            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad);
+            TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad);
 
             void SetMatrix(DirectX::SimpleMath::Matrix m) { m_world = m; }
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
@@ -52,14 +52,14 @@ namespace Galactic
             void Merge();
             void Release();
 
-            bool IsRoot() const { return !m_parent; }
+            bool IsRoot() const { return m_parent == nullptr; }
             void SetDebugName(std::string name) { m_dbgName = name; }
             void SetDebugColour(DirectX::SimpleMath::Color col) { m_dbgCol = col; }
             void FixEdges();
 
             int GetDepth() const { return m_depth; }
             std::vector<uint16_t> GetEdge(EDir edge) const { return m_edges[edge]; }
-            std::shared_ptr<TerrainNode> GetChild(int dir) const { return m_children[dir]; }
+            TerrainNode *GetChild(int dir) const { return m_children[dir].get(); }
 
 			static float SplitDistance;
 
@@ -73,7 +73,7 @@ namespace Galactic
 
             IPlanet *m_planet;
             TerrainNode *m_parent;
-            std::shared_ptr<ISphericalTerrain> m_terrain;
+            ISphericalTerrain *m_terrain;
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
 
             // Debug
@@ -86,7 +86,7 @@ namespace Galactic
 
             std::vector<PlanetVertex> m_originalVertices;
             std::array<std::vector<uint16_t>, 4> m_edges;
-            std::array<std::shared_ptr<TerrainNode>, 4> m_children;
+            std::array<std::unique_ptr<TerrainNode>, 4> m_children;
 
             DirectX::SimpleMath::Matrix m_world;
 
@@ -94,9 +94,9 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
             void NotifyNeighbours();
-            void FixEdge(EDir dir, std::shared_ptr<TerrainNode> neighbour, std::vector<uint16_t> nEdge, int depth);
+            void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             
-            std::shared_ptr<TerrainNode> GetGreaterThanOrEqualNeighbour(int dir) const;
-            std::vector<std::shared_ptr<TerrainNode>> GetSmallerNeighbours(std::shared_ptr<TerrainNode> neighbour, int dir) const;
+            TerrainNode *GetGreaterThanOrEqualNeighbour(int dir) const;
+            std::vector<TerrainNode*> GetSmallerNeighbours(TerrainNode *neighbour, int dir) const;
     };
 }

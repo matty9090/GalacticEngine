@@ -12,7 +12,7 @@
 
 namespace Galactic
 {
-    class SphericalQuadTreeTerrain : public ISphericalTerrain, public std::enable_shared_from_this<SphericalQuadTreeTerrain>
+    class SphericalQuadTreeTerrain : public ISphericalTerrain
     {
         public:
             SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
@@ -42,8 +42,9 @@ namespace Galactic
 
             IPlanet *m_planet;
             Effect *m_effect;
+
             std::unique_ptr<DirectX::CommonStates> m_states;
-            std::array<std::shared_ptr<TerrainNode>, 6> m_faces;
+            std::array<std::unique_ptr<TerrainNode>, 6> m_faces;
 			std::unique_ptr<ConstantBuffer<ScatterBuffer>> m_buffer;
 
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;

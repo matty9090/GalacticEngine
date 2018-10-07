@@ -34,7 +34,7 @@ void Planet::Generate(EDetail detail)
 
         m_renderer->Reset();
         m_renderer.reset();
-
+		
         m_atmosphere->Reset();
         m_atmosphere.reset();
     }
@@ -77,10 +77,14 @@ void Planet::Update(float dt)
         m_atmosphere->Update(dt);
 }
 
-void Galactic::Planet::Reset()
+void Planet::Reset()
 {
     if (m_renderer)
         m_renderer->Reset();
+	
+	if(m_atmosphere)
+		m_atmosphere->Reset();
 
     m_renderer.reset();
+	m_atmosphere.reset();
 }

@@ -12,5 +12,7 @@ namespace Galactic
 
             virtual DirectX::SimpleMath::Color GetColour() const = 0;
             virtual DirectX::SimpleMath::Vector3 GetPosition() const = 0;
+
+			virtual ~ILightSource() {}
     };
 }

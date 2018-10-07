@@ -24,6 +24,7 @@ namespace Galactic
     {
         public:
 			ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *planet);
+			virtual ~ScatteredAtmosphere();
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);

@@ -8,6 +8,6 @@ namespace Galactic
 {
     class IPlanetRenderer : public IRenderable {
         public:
-            
+			virtual ~IPlanetRenderer() {}
     };
 }

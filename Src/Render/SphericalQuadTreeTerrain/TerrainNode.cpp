@@ -8,7 +8,7 @@ using namespace DirectX::SimpleMath;
 
 float TerrainNode::SplitDistance = 35.0f;
 
-TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad)
+TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
       m_terrain(terrain),
       m_parent(parent),
@@ -189,15 +189,14 @@ void TerrainNode::Update(float dt)
         }
         else if (!IsLeaf())
         {
-            for (auto &child : m_children)
-                child->Update(dt);
+			for (auto &child : m_children)
+				child->Update(dt);
         }
     }
 }
 
 void TerrainNode::Reset()
 {
-    m_terrain.reset();
     m_buffer.reset();
     
 #ifdef _DEBUG
@@ -222,10 +221,10 @@ void TerrainNode::Split()
         float x = m_bounds.x, y = m_bounds.y;
         float d = m_bounds.size / 2;
 
-        m_children[NW] = std::make_shared<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y    , d }, NW);
-        m_children[NE] = std::make_shared<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y    , d }, NE);
-        m_children[SE] = std::make_shared<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y + d, d }, SE);
-        m_children[SW] = std::make_shared<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y + d, d }, SW);
+        m_children[NW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y    , d }, NW);
+        m_children[NE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y    , d }, NE);
+        m_children[SE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y + d, d }, SE);
+        m_children[SW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y + d, d }, SW);
 
 #ifdef _DEBUG
         m_children[NW]->SetDebugName(m_dbgName + "_" + std::to_string(NW));
@@ -302,7 +301,7 @@ void TerrainNode::FixEdges()
 
 void Galactic::TerrainNode::NotifyNeighbours()
 {
-    std::vector<std::shared_ptr<TerrainNode>> neighbours;
+    std::vector<TerrainNode*> neighbours;
 
     auto n1 = GetGreaterThanOrEqualNeighbour(North);
     auto n2 = GetGreaterThanOrEqualNeighbour(East);
@@ -323,7 +322,7 @@ void Galactic::TerrainNode::NotifyNeighbours()
         n->FixEdges();
 }
 
-void TerrainNode::FixEdge(EDir dir, std::shared_ptr<TerrainNode> neighbour, std::vector<uint16_t> nEdge, int depth)
+void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth)
 {
     int diff = m_depth - depth;
     int grid = SphericalQuadTreeTerrain::GridSize;
@@ -380,9 +379,9 @@ Vector3 TerrainNode::PointToSphere(DirectX::SimpleMath::Vector3 p)
                    p.z * sqrtf(1.0f - x2 * 0.5f - y2 * 0.5f + (x2 * y2) * 0.33333333f));
 }
 
-std::vector<std::shared_ptr<TerrainNode>> TerrainNode::GetSmallerNeighbours(std::shared_ptr<TerrainNode> neighbour, int dir) const {
-    std::vector<std::shared_ptr<TerrainNode>> neighbours;
-    std::queue<std::shared_ptr<TerrainNode>> nodes;
+std::vector<TerrainNode*> TerrainNode::GetSmallerNeighbours(TerrainNode *neighbour, int dir) const {
+    std::vector<TerrainNode*> neighbours;
+    std::queue<TerrainNode*> nodes;
 
     if (neighbour)
         nodes.push(neighbour);
@@ -452,67 +451,67 @@ std::vector<std::shared_ptr<TerrainNode>> TerrainNode::GetSmallerNeighbours(std:
     return neighbours;
 }
 
-std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbour(int dir) const {
+TerrainNode *TerrainNode::GetGreaterThanOrEqualNeighbour(int dir) const {
     auto parent = m_parent;
     auto self = this;
     
     switch (dir) {
         case North: {
             if (!parent) return nullptr;
-            if (parent->GetChild(SW).get() == self) return parent->GetChild(NW);
-            if (parent->GetChild(SE).get() == self) return parent->GetChild(NE);
+            if (parent->GetChild(SW) == self) return parent->GetChild(NW);
+            if (parent->GetChild(SE) == self) return parent->GetChild(NE);
 
            auto node = parent->GetGreaterThanOrEqualNeighbour(dir);
 
             if (!node || node->IsLeaf())
                 return node;
 
-            return (parent->GetChild(NW).get() == self) ? node->GetChild(SW) : node->GetChild(SE);
+            return (parent->GetChild(NW) == self) ? node->GetChild(SW) : node->GetChild(SE);
 
             break;
         }
 
         case South: {
             if (!parent) return nullptr;
-            if (parent->GetChild(NW).get() == self) return parent->GetChild(SW);
-            if (parent->GetChild(NE).get() == self) return parent->GetChild(SE);
+            if (parent->GetChild(NW) == self) return parent->GetChild(SW);
+            if (parent->GetChild(NE) == self) return parent->GetChild(SE);
 
             auto node = parent->GetGreaterThanOrEqualNeighbour(dir);
 
             if (!node || node->IsLeaf())
                 return node;
 
-            return (parent->GetChild(SW).get() == self) ? node->GetChild(NW) : node->GetChild(NE);
+            return (parent->GetChild(SW) == self) ? node->GetChild(NW) : node->GetChild(NE);
 
             break;
         }
 
         case East: {
             if (!parent) return nullptr;
-            if (parent->GetChild(NW).get() == self) return parent->GetChild(NE);
-            if (parent->GetChild(SW).get() == self) return parent->GetChild(SE);
+            if (parent->GetChild(NW) == self) return parent->GetChild(NE);
+            if (parent->GetChild(SW) == self) return parent->GetChild(SE);
 
             auto node = parent->GetGreaterThanOrEqualNeighbour(dir);
 
             if (!node || node->IsLeaf())
                 return node;
 
-            return (parent->GetChild(NE).get() == self) ? node->GetChild(NW) : node->GetChild(SW);
+            return (parent->GetChild(NE) == self) ? node->GetChild(NW) : node->GetChild(SW);
 
             break;
         }
 
         case West: {
             if (!parent) return nullptr;
-            if (parent->GetChild(NE).get() == self) return parent->GetChild(NW);
-            if (parent->GetChild(SE).get() == self) return parent->GetChild(SW);
+            if (parent->GetChild(NE) == self) return parent->GetChild(NW);
+            if (parent->GetChild(SE) == self) return parent->GetChild(SW);
 
             auto node = parent->GetGreaterThanOrEqualNeighbour(dir);
 
             if (!node || node->IsLeaf())
                 return node;
 
-            return (parent->GetChild(NW).get() == self) ? node->GetChild(NE) : node->GetChild(SE);
+            return (parent->GetChild(NW) == self) ? node->GetChild(NE) : node->GetChild(SE);
 
             break;
         }

@@ -22,5 +22,7 @@ namespace Galactic
 
             virtual float GetAtmosphereHeight() const = 0;
             virtual DirectX::SimpleMath::Color GetAtmosphereColour() const = 0;
+
+			virtual ~IPlanet() {}
     };
 }

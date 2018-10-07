@@ -57,7 +57,6 @@ namespace Galactic
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             void SetInfluence(IBody *body) { m_influence = body; }
 
-
         private:
             std::string m_name;
 
