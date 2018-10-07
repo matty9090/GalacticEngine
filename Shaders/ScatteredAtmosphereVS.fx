@@ -18,7 +18,7 @@ struct VS_INPUT {
 VS_OUTPUT main(VS_INPUT v_in) {
 	VS_OUTPUT Output;
 	
-	//scatter(v_in.vPosition * fOuterRadius);
+	scatter(v_in.vPosition * fOuterRadius);
 	
 	Output.Position = mul(float4(v_in.vPosition, 1.0f), worldViewProj);
 	Output.Colour1	= PrimaryColour;

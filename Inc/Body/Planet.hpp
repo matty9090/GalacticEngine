@@ -5,6 +5,8 @@
 #include "Render/IPlanetRenderer.hpp"
 #include "Render/IAtmosphereRenderer.hpp"
 
+#include <map>
+
 namespace Galactic
 {
     class Planet : public IPlanet
@@ -14,66 +16,58 @@ namespace Galactic
             ~Planet();
 
             void Generate(EDetail detail = EDetail::Medium);
-            void SetParameters(float freq = 0.1f, float lacunarity = 2.0f, float gain = 0.5f, float height = 1.0f, int octaves = 6, float noiseScale = 1.0f);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
             void Reset();
 
-            void SetRadius(double r) { m_radius = r; }
-            void SetMass(long double mass) { m_mass = mass; }
-            void SetPosition(DirectX::SimpleMath::Vector3 pos) { m_position = pos; }
-            void SetVelocity(DirectX::SimpleMath::Vector3 vel) { m_velocity = vel; }
-            void SetRotation(DirectX::SimpleMath::Vector3 vel) { m_rotation = vel; }
-            void SetCameraPos(DirectX::SimpleMath::Vector3 camPos) { m_camPos = camPos; }
-            void SetInfluence(IBody *body) { m_influence = body; }
-            void SetPalette(Gradient::Gradient<Gradient::GradientColor> gradient) { m_gradient = gradient; }
-
+			void SetParam(std::string name, float value) { m_params[name] = value; }
+			float GetParam(std::string name) { return m_params[name]; }
+            
+			void SetRadius(double r) { m_radius = r; }
             double GetRadius() const { return m_radius; }
+            
+			void SetMass(long double mass) { m_mass = mass; }
             long double GetMass() const { return m_mass; }
-
-            void SetOctaves(int v) { m_octaves = v; }
-            void SetGain(float v) { m_gain = v; }
-            void SetHeight(float v) { m_height = v; }
-            void SetFrequency(float v) { m_freq = v; }
-            void SetLacunarity(float v) { m_lacunarity = v; }
-            void SetNoiseScale(float v) { m_noiseScale = v; }
-            void SetMinValue(float v) { m_minValue = v; }
-            void SetAtmosphereHeight(float h) { m_atmosphereHeight = h; }
-            void SetAtmosphereColour(DirectX::SimpleMath::Color colour) { m_atmColour = colour; }
-
-            int GetOctaves() const { return m_octaves; }
-            float GetGain() const { return m_gain; }
-            float GetHeight() const { return m_height; }
-            float GetFrequency() const { return m_freq; }
-            float GetLacunarity() const { return m_lacunarity; }
-            float GetNoiseScale() const { return m_noiseScale; }
-            float GetMinValue() const { return m_minValue; }
-            float GetAtmosphereHeight() const { return m_atmosphereHeight; }
-            DirectX::SimpleMath::Color GetAtmosphereColour() const { return m_atmColour; }
-            Gradient::Gradient<Gradient::GradientColor> GetPalette() const { return m_gradient; }
-
-            std::string                  GetName()     const { return m_name; }
-            IBody                       *GetInfluence() const { return m_influence; }
-            DirectX::SimpleMath::Matrix  GetMatrix()   const { return m_world; }
+            
+			void SetPosition(DirectX::SimpleMath::Vector3 pos) { m_position = pos; }
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
+            
+			void SetVelocity(DirectX::SimpleMath::Vector3 vel) { m_velocity = vel; }
             DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }
+            
+			void SetRotation(DirectX::SimpleMath::Vector3 vel) { m_rotation = vel; }
             DirectX::SimpleMath::Vector3 GetRotation() const { return m_rotation; }
+            
+			void SetCameraPos(DirectX::SimpleMath::Vector3 camPos) { m_camPos = camPos; }
             DirectX::SimpleMath::Vector3 GetCameraPos() const { return m_camPos; }
 
+            void SetAtmosphereHeight(float h) { m_atmosphereHeight = h; }
+            float GetAtmosphereHeight() const { return m_atmosphereHeight; }
+            
+			void SetAtmosphereColour(DirectX::SimpleMath::Color colour) { m_atmColour = colour; }
+            DirectX::SimpleMath::Color GetAtmosphereColour() const { return m_atmColour; }
+
+			void SetSeed(int seed) { m_seed = seed; }
+			int GetSeed() { return m_seed; }
+
+            std::string GetName() const { return m_name; }
+            IBody *GetInfluence() const { return m_influence; }
             bool IsGenerated() const { return m_isGenerated; }
+            DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
+            void SetInfluence(IBody *body) { m_influence = body; }
+
 
         private:
             std::string m_name;
 
+			int m_seed;
             bool m_isGenerated;
             double m_radius;
             long double m_mass;
+			float m_atmosphereHeight;
 
-            Gradient::Gradient<Gradient::GradientColor> m_gradient;
-
-            int m_octaves;
-            float m_gain, m_lacunarity, m_freq, m_height, m_noiseScale, m_minValue, m_atmosphereHeight;
+			std::map<std::string, float> m_params;
 
             DirectX::SimpleMath::Color m_atmColour;
             DirectX::SimpleMath::Matrix  m_world;

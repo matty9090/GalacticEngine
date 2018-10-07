@@ -6,6 +6,8 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+float TerrainNode::SplitDistance = 35.0f;
+
 TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
       m_terrain(terrain),
@@ -43,7 +45,7 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, TerrainNode
 
 void TerrainNode::Generate()
 {
-    uint16_t gridsize = (uint16_t)m_terrain->GetGridSize();
+    uint16_t gridsize = (uint16_t)SphericalQuadTreeTerrain::GridSize;
 
     float step = m_bounds.size / (gridsize - 1);
     bool hasParent = !IsRoot();
@@ -91,10 +93,8 @@ void TerrainNode::Generate()
 				DirectX::SimpleMath::Color col;
 
                 m_terrain->GetHeight(pos, height, col);
-                auto colour = m_planet->GetPalette().getColorAt(height / m_planet->GetHeight());
 
-				v.color = Color(colour.r, colour.g, colour.b, 1.0f);
-                //v.color = Color(col.r, col.g, col.b, col.a);
+                v.color = col;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
 				v.sphere = pos;
@@ -164,7 +164,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 
 void TerrainNode::Update(float dt)
 {
-    int gridsize = m_terrain->GetGridSize();
+    int gridsize = SphericalQuadTreeTerrain::GridSize;
 
     Vector3 cam = m_planet->GetCameraPos();
     Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
@@ -178,7 +178,7 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = m_depth < 3 || distance < m_scale * 35.0f;
+        bool divide = m_depth < 3 || distance < m_scale * SplitDistance;
 
         if (!divide)
             Merge();
@@ -326,7 +326,7 @@ void Galactic::TerrainNode::NotifyNeighbours()
 void TerrainNode::FixEdge(EDir dir, std::shared_ptr<TerrainNode> neighbour, std::vector<uint16_t> nEdge, int depth)
 {
     int diff = m_depth - depth;
-    int grid = m_terrain->GetGridSize();
+    int grid = SphericalQuadTreeTerrain::GridSize;
 
     if (diff == 0)
     {

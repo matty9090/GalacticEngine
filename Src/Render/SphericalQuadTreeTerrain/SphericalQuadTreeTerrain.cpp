@@ -6,6 +6,12 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+#ifdef _DEBUG
+	size_t SphericalQuadTreeTerrain::GridSize = 9;
+#else
+	size_t SphericalQuadTreeTerrain::GridSize = 33;
+#endif
+
 size_t SphericalQuadTreeTerrain::FrameSplits = 0;
 
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
@@ -54,18 +60,18 @@ void SphericalQuadTreeTerrain::CreateEffect()
 	m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
 
-void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain, int octaves)
+void SphericalQuadTreeTerrain::Generate()
 {
     m_noise.SetInterp(FastNoise::Quintic);
     m_noise.SetNoiseType(FastNoise::SimplexFractal);
-    m_noise.SetFractalOctaves(octaves);
-    m_noise.SetFractalGain(gain);
-    m_noise.SetFractalLacunarity(lacunarity);
-    m_noise.SetFrequency(freq);
-	m_noise.SetSeed(rand() % RAND_MAX);
+    m_noise.SetFractalOctaves((int)m_planet->GetParam("Octaves"));
+    m_noise.SetFractalGain(m_planet->GetParam("Gain"));
+    m_noise.SetFractalLacunarity(m_planet->GetParam("Lacunarity"));
+    m_noise.SetFrequency(m_planet->GetParam("Frequency"));
+	m_noise.SetSeed(m_planet->GetSeed());
 
 	m_bnoise = m_noise;
-	m_bnoise.SetSeed(rand() % RAND_MAX);
+	m_bnoise.SetSeed(m_planet->GetSeed() + 1);
 
 	m_biomes[EBiomes::Grass] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Grass]);
 	m_biomes[EBiomes::Mountains] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Mountains]);
@@ -150,10 +156,10 @@ void SphericalQuadTreeTerrain::Reset()
         face->Release();
 }
 
-void Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, DirectX::SimpleMath::Color &col)
+void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, DirectX::SimpleMath::Color &col)
 {
-    float scale = m_planet->GetNoiseScale();
-    float minvalue = m_planet->GetMinValue();
+	float scale = m_planet->GetParam("NoiseScale");
+    float minvalue = m_planet->GetParam("MinValue");
 
 	float x = p.x * 40.0f * scale;
 	float y = p.y * 40.0f * scale;
@@ -168,7 +174,7 @@ void Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 
 	else if (h < 0.85f) biome = EBiomes::Mountains;
 	else biome = EBiomes::Desert;
 	*/
-	float v = m_bnoise.GetNoise(x, y, z) * m_planet->GetHeight();
+	float v = m_bnoise.GetNoise(x, y, z) * m_planet->GetParam("Height");
     //float v = m_biomes[biome]->GetHeight(x, y, z);
     
     height = std::fmaxf(0.0f, v);
