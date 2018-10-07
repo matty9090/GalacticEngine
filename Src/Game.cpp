@@ -33,6 +33,8 @@ void Game::Initialize(HWND window, int width, int height)
     m_outputWidth = std::max(width, 1);
     m_outputHeight = std::max(height, 1);
 
+	Galactic::InitEngine();
+
     CreateDevice();
     CreateResources();
 
@@ -115,30 +117,6 @@ void Game::Update(DX::StepTimer const& timer)
     if (kb.A) move.x += 1.f;
     if (kb.D) move.x -= 1.f;
 
-    int octaves = planet->GetOctaves();
-    float gain = planet->GetGain();
-    float height = planet->GetHeight();
-    float lacunarity = planet->GetLacunarity();
-    float frequency = planet->GetFrequency();
-    float scale = planet->GetNoiseScale();
-    float minvalue = planet->GetMinValue();
-
-    if (m_tracker.IsKeyReleased(Keyboard::U)) { m_showUI = !m_showUI; }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad7)) { planet->SetGain(gain - 0.1f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad8)) { planet->SetGain(gain + 0.1f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad4)) { planet->SetFrequency(frequency - 0.01f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad5)) { planet->SetFrequency(frequency + 0.01f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad1)) { planet->SetLacunarity(lacunarity - 0.1f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad2)) { planet->SetLacunarity(lacunarity + 0.1f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad9)) { planet->SetOctaves(octaves + 1); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::NumPad6)) { planet->SetOctaves(octaves - 1); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D1)) { planet->SetHeight(height - 0.01f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D2)) { planet->SetHeight(height + 0.01f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D3)) { planet->SetNoiseScale(scale - 0.1f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D4)) { planet->SetNoiseScale(scale + 0.1f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D5)) { planet->SetMinValue(minvalue + 0.001f); planet->Generate(Galactic::High); }
-    if (m_tracker.IsKeyReleased(Keyboard::D6)) { planet->SetMinValue(minvalue - 0.001f); planet->Generate(Galactic::High); }
-
     move = Vector3::Transform(move, m_camera->GetQuaternion());
     move *= 0.05f;
 
@@ -172,29 +150,7 @@ void Game::Render()
 	auto view = m_camera->GetViewMatrix();
 	auto proj = m_camera->GetProjectionMatrix();
 
-    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Moon"));
-
-    float height = (m_camera->GetPosition() - planet->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
-
     m_system->Render(view, proj);
-
-    if (m_showUI)
-    {
-        m_spriteBatch->Begin();
-
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Camera", m_camera->GetPosition()).c_str(), Vector2(10, 10), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", height).c_str(), Vector2(10, 40), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Speed", m_speed).c_str(), Vector2(10, 70), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Gain", planet->GetGain()).c_str(), Vector2(10, 120), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Frequency", planet->GetFrequency()).c_str(), Vector2(10, 150), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Lacunarity", planet->GetLacunarity()).c_str(), Vector2(10, 180), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Octaves", (float)planet->GetOctaves()).c_str(), Vector2(10, 210), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Height", planet->GetHeight()).c_str(), Vector2(10, 240), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Scale", planet->GetNoiseScale()).c_str(), Vector2(10, 270), Colors::White, 0.f, Vector2(0, 0));
-        m_font->DrawString(m_spriteBatch.get(), ValueToString(L"Min", planet->GetMinValue()).c_str(), Vector2(10, 300), Colors::White, 0.f, Vector2(0, 0));
-
-        m_spriteBatch->End();
-    }
 
     Present();
 }
@@ -347,7 +303,7 @@ void Game::CreateDevice()
     star->SetTemperature(5777);
     star->SetPosition(Vector3(60000.0f, 0.0f, 0.0f));
     star->SetMass(1.989e30);
-    star->Generate(); 
+    star->Generate();
 
     /*auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.962e24, 6371.0);
     planet->SetPosition(Vector3::Zero);
@@ -474,19 +430,22 @@ void Game::CreateResources()
 	m_camera = std::make_unique<Galactic::Camera>(backBufferWidth, backBufferHeight);
 }
 
+void Game::Cleanup()
+{
+	m_depthStencilView.Reset();
+	m_renderTargetView.Reset();
+	m_swapChain.Reset();
+	m_d3dContext.Reset();
+	m_d3dDevice.Reset();
+	m_font.reset();
+	m_spriteBatch.reset();
+
+	m_system->Reset();
+}
+
 void Game::OnDeviceLost()
 {
-    // TODO: Add Direct3D resource cleanup here.
-
-    m_depthStencilView.Reset();
-    m_renderTargetView.Reset();
-    m_swapChain.Reset();
-    m_d3dContext.Reset();
-    m_d3dDevice.Reset();
-    m_font.reset();
-    m_spriteBatch.reset();
-
-    m_system->Reset();
+	Cleanup();
     
     CreateDevice();
     CreateResources();

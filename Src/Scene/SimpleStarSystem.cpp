@@ -65,7 +65,7 @@ void SimpleStarSystem::Update(float dt)
             Vector3 force = Gravity::Force(inf, body.get());
             Vector3 vel = body->GetVelocity();
 
-            vel += (force / body->GetMass()) * dt;
+            vel += (force / (double)body->GetMass()) * dt;
 
             body->SetVelocity(vel);
         }

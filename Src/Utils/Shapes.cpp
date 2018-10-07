@@ -1,8 +1,13 @@
 #include "pch.h"
 #include "Utils/Shapes.hpp"
 
+#include <map>
+
 using namespace Galactic;
 using namespace DirectX;
+
+std::map<size_t, std::vector<VertexPositionTexture>> SphereVertexCache;
+std::map<size_t, std::vector<uint16_t>> SphereIndexCache;
 
 void Utils::CreateSphere(float radius, size_t tessellation, std::vector<VertexPositionTexture> &vertices, std::vector<uint16_t> &indices)
 {
@@ -11,6 +16,14 @@ void Utils::CreateSphere(float radius, size_t tessellation, std::vector<VertexPo
 
     if (tessellation < 3)
         throw std::out_of_range("tesselation parameter out of range");
+
+	if (!SphereVertexCache[tessellation].empty() && !SphereIndexCache[tessellation].empty())
+	{
+		vertices = SphereVertexCache[tessellation];
+		indices = SphereIndexCache[tessellation];
+
+		return;
+	}
 
     size_t verticalSegments = tessellation;
     size_t horizontalSegments = tessellation * 2;
@@ -64,4 +77,7 @@ void Utils::CreateSphere(float radius, size_t tessellation, std::vector<VertexPo
             indices.push_back((uint16_t)(i * stride + nextJ));
         }
     }
+
+	SphereVertexCache[tessellation] = vertices;
+	SphereIndexCache[tessellation] = indices;
 }

@@ -36,5 +36,7 @@ namespace Galactic
             virtual bool IsGenerated() const = 0;
             
             static bool Wireframe;
+
+			virtual ~IBody() {}
     };
 }

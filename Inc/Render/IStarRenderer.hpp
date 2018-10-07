@@ -8,6 +8,6 @@ namespace Galactic
 {
     class IStarRenderer : public IRenderable {
         public:
-            
+			virtual ~IStarRenderer() {}
     };
 }

@@ -6,6 +6,12 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+#ifdef _DEBUG
+	size_t SphericalQuadTreeTerrain::GridSize = 9;
+#else
+	size_t SphericalQuadTreeTerrain::GridSize = 33;
+#endif
+
 size_t SphericalQuadTreeTerrain::FrameSplits = 0;
 
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
@@ -17,7 +23,6 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     m_deviceContext->GetDevice(&m_device);
 
     m_states = std::make_unique<DirectX::CommonStates>(m_device.Get());
-    m_noise.SetSeed(rand() % RAND_MAX);
 
     CreateEffect();
 }
@@ -35,7 +40,7 @@ void SphericalQuadTreeTerrain::CreateEffect()
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
-    m_effect = std::make_shared<Effect>(m_device.Get(), L"Shaders/PlanetVS.fx", L"Shaders/PlanetPS.fx", els, num, false);
+    m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), L"Shaders/PlanetVS.fx", L"Shaders/PlanetPS.fx", els, num, false);
 
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_NONE, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
@@ -48,20 +53,30 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
 
-	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
-	D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
+	// TODO: Cache resources as this is very slow
+	//D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
+	//D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
 
 	m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
 
-void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain, int octaves)
+void SphericalQuadTreeTerrain::Generate()
 {
     m_noise.SetInterp(FastNoise::Quintic);
     m_noise.SetNoiseType(FastNoise::SimplexFractal);
-    m_noise.SetFractalOctaves(octaves);
-    m_noise.SetFractalGain(gain);
-    m_noise.SetFractalLacunarity(lacunarity);
-    m_noise.SetFrequency(freq);
+    m_noise.SetFractalOctaves((int)m_planet->GetParam("Octaves"));
+    m_noise.SetFractalGain(m_planet->GetParam("Gain"));
+    m_noise.SetFractalLacunarity(m_planet->GetParam("Lacunarity"));
+    m_noise.SetFrequency(m_planet->GetParam("Frequency"));
+	m_noise.SetSeed(m_planet->GetSeed());
+
+	m_bnoise = m_noise;
+	m_bnoise.SetSeed(m_planet->GetSeed() + 1);
+
+	m_biomes[EBiomes::Grass] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Grass]);
+	m_biomes[EBiomes::Mountains] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Mountains]);
+	m_biomes[EBiomes::Desert] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Desert]);
+	m_biomes[EBiomes::Ocean] = std::make_unique<OceanBiome>(m_noise, Biomes[EBiomes::Ocean]);
 
     std::array<Matrix, 6> orientations = 
     {
@@ -75,7 +90,7 @@ void SphericalQuadTreeTerrain::Generate(float freq, float lacunarity, float gain
 
     for (int i = 0; i < 6; ++i)
     {
-        m_faces[i] = std::make_shared<TerrainNode>(shared_from_this(), std::weak_ptr<TerrainNode>(), m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
+        m_faces[i] = std::make_unique<TerrainNode>(this, nullptr, m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
         m_faces[i]->SetMatrix(orientations[i]);
         
 #ifdef _DEBUG
@@ -106,8 +121,8 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-	m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
-	m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
+	//m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
+	//m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
 
 	ScatterBuffer buffer = GetScatterBuffer(m_planet);
 	m_buffer->SetData(m_deviceContext.Get(), buffer);
@@ -141,12 +156,27 @@ void SphericalQuadTreeTerrain::Reset()
         face->Release();
 }
 
-float Galactic::SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p)
+void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, DirectX::SimpleMath::Color &col)
 {
-    float scale = m_planet->GetNoiseScale();
-    float minvalue = m_planet->GetMinValue();
+	float scale = m_planet->GetParam("NoiseScale");
+    //float minvalue = m_planet->GetParam("MinValue");
 
-    float v = m_planet->GetHeight() * m_noise.GetNoise(p.x * 40.0f * scale, p.y * 40.0f * scale, p.z * 40.0f * scale);
+	float x = p.x * 40.0f * scale;
+	float y = p.y * 40.0f * scale;
+	float z = p.z * 40.0f * scale;
+
+	//float h = (m_bnoise.GetNoise(x, y, z) + 1.0f) / 2.0f;
+
+	/*EBiomes biome;
+
+	if (h < 0.55f) biome = EBiomes::Ocean;
+	else if (h < 0.7f) biome = EBiomes::Grass;
+	else if (h < 0.85f) biome = EBiomes::Mountains;
+	else biome = EBiomes::Desert;
+	*/
+	float v = m_bnoise.GetNoise(x, y, z) * m_planet->GetParam("Height");
+    //float v = m_biomes[biome]->GetHeight(x, y, z);
     
-    return fmaxf(0.0f, v - minvalue);
+    height = std::fmaxf(0.0f, v);
+	//col = m_biomes[biome]->GetColour(height);
 }

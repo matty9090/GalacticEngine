@@ -6,7 +6,9 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, IPlanet *planet, Square bounds, int quad)
+float TerrainNode::SplitDistance = 35.0f;
+
+TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
       m_terrain(terrain),
       m_parent(parent),
@@ -20,7 +22,7 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
     m_context->GetDevice(&device);
 
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
-    m_world = IsRoot() ? Matrix::Identity : m_parent.lock()->GetMatrix();
+    m_world = IsRoot() ? Matrix::Identity : m_parent->GetMatrix();
     m_depth = -(int)log2f(m_scale);
     m_diameter = m_scale * m_terrain->GetRadius() * 2;
 
@@ -43,7 +45,7 @@ TerrainNode::TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_p
 
 void TerrainNode::Generate()
 {
-    uint16_t gridsize = (uint16_t)m_terrain->GetGridSize();
+    uint16_t gridsize = (uint16_t)SphericalQuadTreeTerrain::GridSize;
 
     float step = m_bounds.size / (gridsize - 1);
     bool hasParent = !IsRoot();
@@ -60,7 +62,7 @@ void TerrainNode::Generate()
         case SW: sx = 0, sy = gh; break;
     }
 
-    auto parent = m_parent.lock();
+    auto parent = m_parent;
 
     for (int y = 0; y < gridsize; ++y)
     {
@@ -87,10 +89,12 @@ void TerrainNode::Generate()
                 pos.Normalize();
                 pos = Vector3::Transform(pos, m_world);
 
-                float height = m_terrain->GetHeight(pos);
-                auto col = m_planet->GetPalette().getColorAt(height / m_planet->GetHeight());
+				float height;
+				DirectX::SimpleMath::Color col;
 
-                v.color = Color(col.r, col.g, col.b, col.a);
+                m_terrain->GetHeight(pos, height, col);
+
+                v.color = col;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
 				v.sphere = pos;
@@ -107,8 +111,6 @@ void TerrainNode::Generate()
     }
 
     m_originalVertices = m_vertices;
-
-    parent.reset();
 
     for (uint16_t y = 0; y < gridsize - 1; ++y)
     {
@@ -162,7 +164,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 
 void TerrainNode::Update(float dt)
 {
-    int gridsize = m_terrain->GetGridSize();
+    int gridsize = SphericalQuadTreeTerrain::GridSize;
 
     Vector3 cam = m_planet->GetCameraPos();
     Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
@@ -176,7 +178,7 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = m_depth < 3 || distance < m_scale * 40.0f;
+        bool divide = m_depth < 3 || distance < m_scale * SplitDistance;
 
         if (!divide)
             Merge();
@@ -187,15 +189,14 @@ void TerrainNode::Update(float dt)
         }
         else if (!IsLeaf())
         {
-            for (auto &child : m_children)
-                child->Update(dt);
+			for (auto &child : m_children)
+				child->Update(dt);
         }
     }
 }
 
 void TerrainNode::Reset()
 {
-    m_terrain.reset();
     m_buffer.reset();
     
 #ifdef _DEBUG
@@ -220,10 +221,10 @@ void TerrainNode::Split()
         float x = m_bounds.x, y = m_bounds.y;
         float d = m_bounds.size / 2;
 
-        m_children[NW] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x    , y    , d }, NW);
-        m_children[NE] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x + d, y    , d }, NE);
-        m_children[SE] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x + d, y + d, d }, SE);
-        m_children[SW] = std::make_shared<TerrainNode>(m_terrain, weak_from_this(), m_planet, Square{ x    , y + d, d }, SW);
+        m_children[NW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y    , d }, NW);
+        m_children[NE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y    , d }, NE);
+        m_children[SE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y + d, d }, SE);
+        m_children[SW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y + d, d }, SW);
 
 #ifdef _DEBUG
         m_children[NW]->SetDebugName(m_dbgName + "_" + std::to_string(NW));
@@ -300,7 +301,7 @@ void TerrainNode::FixEdges()
 
 void Galactic::TerrainNode::NotifyNeighbours()
 {
-    std::vector<std::shared_ptr<TerrainNode>> neighbours;
+    std::vector<TerrainNode*> neighbours;
 
     auto n1 = GetGreaterThanOrEqualNeighbour(North);
     auto n2 = GetGreaterThanOrEqualNeighbour(East);
@@ -321,10 +322,10 @@ void Galactic::TerrainNode::NotifyNeighbours()
         n->FixEdges();
 }
 
-void TerrainNode::FixEdge(EDir dir, std::shared_ptr<TerrainNode> neighbour, std::vector<uint16_t> nEdge, int depth)
+void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth)
 {
     int diff = m_depth - depth;
-    int grid = m_terrain->GetGridSize();
+    int grid = SphericalQuadTreeTerrain::GridSize;
 
     if (diff == 0)
     {
@@ -348,13 +349,13 @@ Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
 {
     std::array<float, 9> s;
     Vector3 n;
-    uint32_t i = 0;
+    //uint32_t i = 0;
 
     for (int yy = -1; yy <= 1; yy++) {
         for (int xx = -1; xx <= 1; xx++) {
             Vector3 v = Vector3(x + (float)xx * step, 0.5f, y + (float)yy * step);
             v.Normalize();
-            s[i++] = m_terrain->GetHeight(Vector3::Transform(v, m_world));
+            //s[i++] = m_terrain->GetHeight(Vector3::Transform(v, m_world));
         }
     }
 
@@ -378,9 +379,9 @@ Vector3 TerrainNode::PointToSphere(DirectX::SimpleMath::Vector3 p)
                    p.z * sqrtf(1.0f - x2 * 0.5f - y2 * 0.5f + (x2 * y2) * 0.33333333f));
 }
 
-std::vector<std::shared_ptr<TerrainNode>> TerrainNode::GetSmallerNeighbours(std::shared_ptr<TerrainNode> neighbour, int dir) const {
-    std::vector<std::shared_ptr<TerrainNode>> neighbours;
-    std::queue<std::shared_ptr<TerrainNode>> nodes;
+std::vector<TerrainNode*> TerrainNode::GetSmallerNeighbours(TerrainNode *neighbour, int dir) const {
+    std::vector<TerrainNode*> neighbours;
+    std::queue<TerrainNode*> nodes;
 
     if (neighbour)
         nodes.push(neighbour);
@@ -450,9 +451,9 @@ std::vector<std::shared_ptr<TerrainNode>> TerrainNode::GetSmallerNeighbours(std:
     return neighbours;
 }
 
-std::shared_ptr<TerrainNode> TerrainNode::GetGreaterThanOrEqualNeighbour(int dir) const {
-    auto parent = m_parent.lock();
-    auto self = shared_from_this();
+TerrainNode *TerrainNode::GetGreaterThanOrEqualNeighbour(int dir) const {
+    auto parent = m_parent;
+    auto self = this;
     
     switch (dir) {
         case North: {

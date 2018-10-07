@@ -5,6 +5,10 @@
 #include "pch.h"
 #include "Game.h"
 
+#define _CRTDBG_MAP_ALLOC  
+#include <stdlib.h>  
+#include <crtdbg.h>  
+
 using namespace DirectX;
 
 namespace
@@ -26,6 +30,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     if (!XMVerifyCPUSupport())
         return 1;
@@ -104,6 +110,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     g_game.reset();
 
     CoUninitialize();
+
+	_CrtDumpMemoryLeaks();
 
     return (int) msg.wParam;
 }

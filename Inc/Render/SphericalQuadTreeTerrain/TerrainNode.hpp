@@ -30,13 +30,13 @@ namespace Galactic
         float size;
     };
     
-    class TerrainNode : public IRenderable, public Drawable<PlanetVertex>, public std::enable_shared_from_this<TerrainNode>
+    class TerrainNode : public IRenderable, public Drawable<PlanetVertex>
     {
         public:
             enum EDir { North, East, South, West };
             enum EQuad { NE, NW, SE, SW };
 
-            TerrainNode(std::shared_ptr<ISphericalTerrain> terrain, std::weak_ptr<TerrainNode> parent, IPlanet *planet, Square bounds, int quad);
+            TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad);
 
             void SetMatrix(DirectX::SimpleMath::Matrix m) { m_world = m; }
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
@@ -52,15 +52,16 @@ namespace Galactic
             void Merge();
             void Release();
 
-            bool IsRoot() const { return !m_parent.lock(); }
+            bool IsRoot() const { return m_parent == nullptr; }
             void SetDebugName(std::string name) { m_dbgName = name; }
             void SetDebugColour(DirectX::SimpleMath::Color col) { m_dbgCol = col; }
             void FixEdges();
 
             int GetDepth() const { return m_depth; }
             std::vector<uint16_t> GetEdge(EDir edge) const { return m_edges[edge]; }
+            TerrainNode *GetChild(int dir) const { return m_children[dir].get(); }
 
-            std::shared_ptr<TerrainNode> GetChild(int dir) const { return m_children[dir]; }
+			static float SplitDistance;
 
         private:
             int m_depth;
@@ -71,8 +72,8 @@ namespace Galactic
             Square m_bounds;
 
             IPlanet *m_planet;
-            std::weak_ptr<TerrainNode> m_parent;
-            std::shared_ptr<ISphericalTerrain> m_terrain;
+            TerrainNode *m_parent;
+            ISphericalTerrain *m_terrain;
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
 
             // Debug
@@ -85,7 +86,7 @@ namespace Galactic
 
             std::vector<PlanetVertex> m_originalVertices;
             std::array<std::vector<uint16_t>, 4> m_edges;
-            std::array<std::shared_ptr<TerrainNode>, 4> m_children;
+            std::array<std::unique_ptr<TerrainNode>, 4> m_children;
 
             DirectX::SimpleMath::Matrix m_world;
 
@@ -93,9 +94,9 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
             void NotifyNeighbours();
-            void FixEdge(EDir dir, std::shared_ptr<TerrainNode> neighbour, std::vector<uint16_t> nEdge, int depth);
+            void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             
-            std::shared_ptr<TerrainNode> GetGreaterThanOrEqualNeighbour(int dir) const;
-            std::vector<std::shared_ptr<TerrainNode>> GetSmallerNeighbours(std::shared_ptr<TerrainNode> neighbour, int dir) const;
+            TerrainNode *GetGreaterThanOrEqualNeighbour(int dir) const;
+            std::vector<TerrainNode*> GetSmallerNeighbours(TerrainNode *neighbour, int dir) const;
     };
 }

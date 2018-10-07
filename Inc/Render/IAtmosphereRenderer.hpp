@@ -8,6 +8,6 @@ namespace Galactic {
     class IAtmosphereRenderer : public IRenderable
     {
         public:
-            
+			virtual ~IAtmosphereRenderer() {}
     };
 }

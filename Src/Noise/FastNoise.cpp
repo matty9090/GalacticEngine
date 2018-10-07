@@ -27,7 +27,7 @@
 //
 
 #include "pch.h"
-#include "FastNoise/FastNoise.h"
+#include "Noise/FastNoise.h"
 
 #include <math.h>
 #include <assert.h>

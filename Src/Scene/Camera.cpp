@@ -36,7 +36,7 @@ void Camera::Events(DirectX::Mouse *mouse, DirectX::Mouse::State &ms, float dt)
 {
 	if (ms.positionMode == Mouse::MODE_RELATIVE)
 	{
-		Vector3 delta = Vector3(float(ms.x), float(ms.y), 0.f) * dt * 0.18f;
+		Vector3 delta = Vector3(float(ms.x), float(ms.y), 0.f) * dt * 0.5f;
 
 		m_pitch -= delta.y;
 		m_yaw -= delta.x;

@@ -4,49 +4,47 @@
 #include "TerrainNode.hpp"
 #include "ISphericalTerrain.hpp"
 
-#include "FastNoise/FastNoise.h"
+#include "Noise/Biome.hpp"
+#include "Noise/FastNoise.h"
 #include "Render/Scatter.hpp"
-#include "Render/DirectX/Effect.hpp"
+#include "Render/DirectX/EffectManager.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
 namespace Galactic
 {
-    class SphericalQuadTreeTerrain : public ISphericalTerrain, public std::enable_shared_from_this<SphericalQuadTreeTerrain>
+    class SphericalQuadTreeTerrain : public ISphericalTerrain
     {
         public:
             SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
             
-            void Generate(float freq, float lacunarity, float gain, int octaves);
+            void Generate();
             void CreateEffect();
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
             void Reset();
 
-#ifdef _DEBUG
-            int GetGridSize() const { return 9; }
-#else
-            int GetGridSize() const { return 33; }
-#endif
-
             float GetRadius() const { return m_radius; }
-            float GetHeight(DirectX::SimpleMath::Vector3 p);
+			void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Color &col);
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
-            std::shared_ptr<Effect> GetEffect() const { return m_effect; };
+            Effect *GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
 
+			static size_t GridSize;
 			static const size_t MaxSplitsPerFrame = 2;
 			static size_t FrameSplits;
 
         private:
-            FastNoise m_noise;
+			std::map<EBiomes, std::unique_ptr<Biome>> m_biomes;
+            FastNoise m_noise, m_bnoise;
             DirectX::SimpleMath::Matrix m_world;
 
             IPlanet *m_planet;
-            std::shared_ptr<Effect> m_effect;
+            Effect *m_effect;
+
             std::unique_ptr<DirectX::CommonStates> m_states;
-            std::array<std::shared_ptr<TerrainNode>, 6> m_faces;
+            std::array<std::unique_ptr<TerrainNode>, 6> m_faces;
 			std::unique_ptr<ConstantBuffer<ScatterBuffer>> m_buffer;
 
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;

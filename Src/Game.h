@@ -15,10 +15,13 @@ class Game
 {
 public:
 
-    Game() noexcept;
+	Game() noexcept;
+	~Game() { Cleanup(); }
 
     // Initialization and management
     void Initialize(HWND window, int width, int height);
+
+	void Cleanup();
 
     // Basic game loop
     void Tick();

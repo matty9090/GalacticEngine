@@ -13,10 +13,12 @@ ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *
 {
     std::vector<VertexPositionTexture> vertices;
 
-    Utils::CreateSphere(1.0f, 120U, vertices, m_indices);
+    Utils::CreateSphere(1.0f, 100U, vertices, m_indices);
 
     for (auto &v : vertices)
         m_vertices.push_back(ScatteredAtmosphereVertex{ v.position });
+
+	vertices.clear();
 
     ID3D11Device *device;
     context->GetDevice(&device);
@@ -28,7 +30,7 @@ ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
-    m_effect = std::make_unique<Effect>(device, L"Shaders/ScatteredAtmosphereVS.fx", L"Shaders/ScatteredAtmospherePS.fx", els, num, false);
+    m_effect = EffectManager::getInstance().GetEffect(device, L"Shaders/ScatteredAtmosphereVS.fx", L"Shaders/ScatteredAtmospherePS.fx", els, num, false);
 
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_BACK, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
@@ -92,7 +94,14 @@ void ScatteredAtmosphere::Update(float dt)
 void ScatteredAtmosphere::Reset()
 {
     m_buffer.reset();
-    m_effect.reset();
+	m_buffer2.reset();
     m_states.reset();
     m_raster.Reset();
+
+	Cleanup();
+}
+
+ScatteredAtmosphere::~ScatteredAtmosphere()
+{
+	
 }
