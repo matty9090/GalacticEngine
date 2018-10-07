@@ -159,7 +159,7 @@ void SphericalQuadTreeTerrain::Reset()
 void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, DirectX::SimpleMath::Color &col)
 {
 	float scale = m_planet->GetParam("NoiseScale");
-    float minvalue = m_planet->GetParam("MinValue");
+    //float minvalue = m_planet->GetParam("MinValue");
 
 	float x = p.x * 40.0f * scale;
 	float y = p.y * 40.0f * scale;

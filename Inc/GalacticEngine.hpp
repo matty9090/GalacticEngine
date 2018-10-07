@@ -44,11 +44,11 @@ namespace Galactic {
 
 	void InitEngine();
 
-	void SetSplitDistance(float d) { TerrainNode::SplitDistance = d; }
-	float GetSplitDistance() { return TerrainNode::SplitDistance; }
+	void SetSplitDistance(float d);
+	float GetSplitDistance();
 
-	void SetGridSize(size_t gs) { SphericalQuadTreeTerrain::GridSize = gs; }
-	float GetGridSize() { return SphericalQuadTreeTerrain::GridSize; }
+	void SetGridSize(size_t gs);
+	size_t GetGridSize();
 
 	std::unique_ptr<Galactic::IStarSystem> CreateStarSystem(std::string name, EStarSystem type);
 	std::unique_ptr<Galactic::IStar> CreateStar(ID3D11DeviceContext *deviceContext, std::string name);

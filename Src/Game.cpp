@@ -150,19 +150,7 @@ void Game::Render()
 	auto view = m_camera->GetViewMatrix();
 	auto proj = m_camera->GetProjectionMatrix();
 
-    auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Moon"));
-
-    float height = (m_camera->GetPosition() - planet->GetPosition()).Length() - (float)(planet->GetRadius() / Galactic::Constants::Scale);
-
     m_system->Render(view, proj);
-
-    if (m_showUI)
-    {
-        m_spriteBatch->Begin();
-
-        
-        m_spriteBatch->End();
-    }
 
     Present();
 }

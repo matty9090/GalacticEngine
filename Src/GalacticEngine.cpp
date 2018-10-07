@@ -17,6 +17,12 @@ namespace Galactic {
 		Biomes[EBiomes::Ocean].colour = Color(0.0f, 0.0f, 1.0f);
 	}
 
+	void SetSplitDistance(float d) { TerrainNode::SplitDistance = d; }
+	float GetSplitDistance() { return TerrainNode::SplitDistance; }
+
+	void SetGridSize(size_t gs) { SphericalQuadTreeTerrain::GridSize = gs; }
+	size_t GetGridSize() { return SphericalQuadTreeTerrain::GridSize; }
+
     std::unique_ptr<IStarSystem> CreateStarSystem(std::string name, EStarSystem type)
     {
         type;

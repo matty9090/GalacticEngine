@@ -34,5 +34,7 @@ DirectX::SimpleMath::Color Biome::GetColour(float h)
 
 float OceanBiome::GetHeight(float x, float y, float z)
 {
+	x; y; z;
+
 	return 0;
 }

@@ -350,7 +350,7 @@ Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
 {
     std::array<float, 9> s;
     Vector3 n;
-    uint32_t i = 0;
+    //uint32_t i = 0;
 
     for (int yy = -1; yy <= 1; yy++) {
         for (int xx = -1; xx <= 1; xx++) {
