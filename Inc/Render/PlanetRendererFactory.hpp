@@ -35,19 +35,19 @@ namespace Galactic {
     std::unique_ptr<IAtmosphereRenderer> CreateAtmosphereRenderer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet, EDetail detail)
     {
 
-		std::unique_ptr<IAtmosphereRenderer> renderer;
+        std::unique_ptr<IAtmosphereRenderer> renderer;
 
-		switch (detail) {
-			case EDetail::Low:
-				renderer = std::make_unique<SimpleAtmosphere>(deviceContext.Get(), planet);
-				break;
+        switch (detail) {
+            case EDetail::Low:
+                renderer = std::make_unique<SimpleAtmosphere>(deviceContext.Get(), planet);
+                break;
 
-			case EDetail::Medium:
-			case EDetail::High:
-				renderer = std::make_unique<ScatteredAtmosphere>(deviceContext.Get(), planet);
-				break;
-		}
+            case EDetail::Medium:
+            case EDetail::High:
+                renderer = std::make_unique<ScatteredAtmosphere>(deviceContext.Get(), planet);
+                break;
+        }
 
-		return renderer;
+        return renderer;
     }
 }

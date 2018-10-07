@@ -37,6 +37,6 @@ namespace Galactic
             
             static bool Wireframe;
 
-			virtual ~IBody() {}
+            virtual ~IBody() {}
     };
 }

@@ -5,14 +5,28 @@
 
 namespace Galactic
 {
+    enum class EParams
+    {
+        Gain,
+        Height,
+        Biomes,
+        Octaves,
+        GridSize,
+        MinValue,
+        Frequency,
+        AtmHeight,
+        NoiseScale,
+        Lacunarity,
+    };
+
     class IPlanet : public IBody
     {
         public:
-			virtual void SetParam(std::string name, float value) = 0;
-			virtual float GetParam(std::string name) = 0;
+            virtual void SetParam(EParams, float value) = 0;
+            virtual float GetParam(EParams name) = 0;
 
-			virtual void SetSeed(int seed) = 0;
-			virtual int GetSeed() = 0;
+            virtual void SetSeed(int seed) = 0;
+            virtual int GetSeed() = 0;
 
             virtual void SetRadius(double r) = 0;
             virtual double GetRadius() const = 0;
@@ -23,6 +37,6 @@ namespace Galactic
             virtual float GetAtmosphereHeight() const = 0;
             virtual DirectX::SimpleMath::Color GetAtmosphereColour() const = 0;
 
-			virtual ~IPlanet() {}
+            virtual ~IPlanet() {}
     };
 }

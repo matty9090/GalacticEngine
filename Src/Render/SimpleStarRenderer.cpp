@@ -22,9 +22,9 @@ SimpleStarRenderer::SimpleStarRenderer(ID3D11DeviceContext *context, IStar *plan
     context->GetDevice(&device);
 
     D3D11_INPUT_ELEMENT_DESC els[] = {
-        // Semantic   Index  Format							 Slot   Offset	Slot Class					 Instance Step
-        { "POSITION", 0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		0,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",    0,	 DXGI_FORMAT_R32G32B32A32_FLOAT, 0,		12,		D3D11_INPUT_PER_VERTEX_DATA, 0 }
+        // Semantic   Index  Format                             Slot   Offset    Slot Class                     Instance Step
+        { "POSITION", 0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",    0,     DXGI_FORMAT_R32G32B32A32_FLOAT, 0,        12,        D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
     
     unsigned int num = sizeof(els) / sizeof(els[0]);

@@ -33,7 +33,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_outputWidth = std::max(width, 1);
     m_outputHeight = std::max(height, 1);
 
-	Galactic::InitEngine();
+    Galactic::InitEngine();
 
     CreateDevice();
     CreateResources();
@@ -42,7 +42,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_mouse = std::make_unique<Mouse>();
     m_mouse->SetWindow(window);
 
-	//m_camera->Attach(m_system->FindBody("Moon"));
+    //m_camera->Attach(m_system->FindBody("Moon"));
 
     // TODO: Change the timer settings if you want something other than the default variable timestep mode.
     // e.g. for 60 FPS fixed timestep update logic, call:
@@ -108,7 +108,7 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
     if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
 
-	m_camera->Events(m_mouse.get(), mouse, dt);
+    m_camera->Events(m_mouse.get(), mouse, dt);
 
     Vector3 move = Vector3::Zero;
 
@@ -129,9 +129,9 @@ void Game::Update(DX::StepTimer const& timer)
 
     move = move * factor * dt;
     m_speed = factor;
-	m_camera->Move(move);
+    m_camera->Move(move);
 
-	m_camera->Update(dt);
+    m_camera->Update(dt);
     m_system->SetCameraPos(m_camera->GetPosition());
     m_system->Update(dt * 0.000f);
 }
@@ -147,8 +147,8 @@ void Game::Render()
 
     Clear();
 
-	auto view = m_camera->GetViewMatrix();
-	auto proj = m_camera->GetProjectionMatrix();
+    auto view = m_camera->GetViewMatrix();
+    auto proj = m_camera->GetProjectionMatrix();
 
     m_system->Render(view, proj);
 
@@ -295,7 +295,7 @@ void Game::CreateDevice()
     // TODO: Initialize device dependent objects here (independent of window size).
     m_font = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"Resources/Fonts/Courier.font");
     m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
-	
+    
     m_system = Galactic::CreateStarSystem("System", Galactic::EStarSystem::Simple);
 
     auto star = Galactic::CreateStar(m_d3dContext.Get(), "Star");
@@ -324,7 +324,7 @@ void Game::CreateDevice()
     moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
     moon->SetVelocity(Vector3(-1.0e5, 0.0f, 1.3e6));
-	moon->SetAtmosphereHeight(200.0f);
+    moon->SetAtmosphereHeight(200.0f);
     moon->Generate(Galactic::EDetail::High);
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
@@ -427,25 +427,25 @@ void Game::CreateResources()
     DX::ThrowIfFailed(m_d3dDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, m_depthStencilView.ReleaseAndGetAddressOf()));
 
     // TODO: Initialize windows-size dependent objects here.
-	m_camera = std::make_unique<Galactic::Camera>(backBufferWidth, backBufferHeight);
+    m_camera = std::make_unique<Galactic::Camera>(backBufferWidth, backBufferHeight);
 }
 
 void Game::Cleanup()
 {
-	m_depthStencilView.Reset();
-	m_renderTargetView.Reset();
-	m_swapChain.Reset();
-	m_d3dContext.Reset();
-	m_d3dDevice.Reset();
-	m_font.reset();
-	m_spriteBatch.reset();
+    m_depthStencilView.Reset();
+    m_renderTargetView.Reset();
+    m_swapChain.Reset();
+    m_d3dContext.Reset();
+    m_d3dDevice.Reset();
+    m_font.reset();
+    m_spriteBatch.reset();
 
-	m_system->Reset();
+    m_system->Reset();
 }
 
 void Game::OnDeviceLost()
 {
-	Cleanup();
+    Cleanup();
     
     CreateDevice();
     CreateResources();

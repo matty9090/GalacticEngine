@@ -37,8 +37,8 @@ Effect::Effect(ID3D11Device *device, std::wstring vs, std::wstring ps, D3D11_INP
         DX::ThrowIfFailed(res);
     }
 
-	DX::ThrowIfFailed(device->CreateVertexShader(v_buffer->GetBufferPointer(), v_buffer->GetBufferSize(), nullptr, m_vertexShader.ReleaseAndGetAddressOf()));
-	DX::ThrowIfFailed(device->CreatePixelShader(p_buffer->GetBufferPointer(), p_buffer->GetBufferSize(), nullptr, m_pixelShader.ReleaseAndGetAddressOf()));
+    DX::ThrowIfFailed(device->CreateVertexShader(v_buffer->GetBufferPointer(), v_buffer->GetBufferSize(), nullptr, m_vertexShader.ReleaseAndGetAddressOf()));
+    DX::ThrowIfFailed(device->CreatePixelShader(p_buffer->GetBufferPointer(), p_buffer->GetBufferSize(), nullptr, m_pixelShader.ReleaseAndGetAddressOf()));
     DX::ThrowIfFailed(device->CreateInputLayout(layout, num, v_buffer->GetBufferPointer(), v_buffer->GetBufferSize(), m_layout.ReleaseAndGetAddressOf()));
 
     v_buffer->Release();

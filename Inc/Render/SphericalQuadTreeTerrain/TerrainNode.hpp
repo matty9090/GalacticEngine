@@ -61,7 +61,7 @@ namespace Galactic
             std::vector<uint16_t> GetEdge(EDir edge) const { return m_edges[edge]; }
             TerrainNode *GetChild(int dir) const { return m_children[dir].get(); }
 
-			static float SplitDistance;
+            static float SplitDistance;
 
         private:
             int m_depth;

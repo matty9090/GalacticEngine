@@ -41,17 +41,20 @@
 #include "Physics/Constants.hpp"
 
 namespace Galactic {
-	enum class EStarSystem { Simple, NBody };
+    enum class EStarSystem { Simple, NBody };
 
-	void InitEngine();
+    void InitEngine();
 
-	void SetSplitDistance(float d);
-	float GetSplitDistance();
+    void SetSplitDistance(float d);
+    float GetSplitDistance();
 
-	void SetGridSize(size_t gs);
-	size_t GetGridSize();
+    void SetGridSize(size_t gs);
+    size_t GetGridSize();
 
-	std::unique_ptr<Galactic::IStarSystem> CreateStarSystem(std::string name, EStarSystem type);
-	std::unique_ptr<Galactic::IStar> CreateStar(ID3D11DeviceContext *deviceContext, std::string name);
-	std::unique_ptr<Galactic::IPlanet> CreatePlanet(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius);
+    void SetSplitsPerFrame(size_t splits);
+    size_t GetSplitsPerFrame();
+
+    std::unique_ptr<Galactic::IStarSystem> CreateStarSystem(std::string name, EStarSystem type);
+    std::unique_ptr<Galactic::IStar> CreateStar(ID3D11DeviceContext *deviceContext, std::string name);
+    std::unique_ptr<Galactic::IPlanet> CreatePlanet(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius);
 }

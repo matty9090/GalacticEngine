@@ -18,14 +18,14 @@ ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *
     for (auto &v : vertices)
         m_vertices.push_back(ScatteredAtmosphereVertex{ v.position });
 
-	vertices.clear();
+    vertices.clear();
 
     ID3D11Device *device;
     context->GetDevice(&device);
 
     D3D11_INPUT_ELEMENT_DESC els[] = {
-        // Semantic   Index  Format							 Slot   Offset	Slot Class					 Instance Step
-        { "POSITION", 0,	 DXGI_FORMAT_R32G32B32_FLOAT,	 0,		0,		D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        // Semantic   Index  Format                             Slot   Offset    Slot Class                     Instance Step
+        { "POSITION", 0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -61,19 +61,19 @@ void ScatteredAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::Simp
     m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-	float radius = (float)(m_planet->GetRadius() / Constants::Scale);
-	float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
-	float atmradius = atmheight + radius;
+    float radius = (float)(m_planet->GetRadius() / Constants::Scale);
+    float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
+    float atmradius = atmheight + radius;
 
     m_world = Matrix::CreateScale(atmradius) * Matrix::CreateTranslation(m_planet->GetPosition());
 
     Matrix worldViewProj =  m_world * view * proj;
 
-	ScatteredAtmosphereBuffer buffer = {
-		worldViewProj.Transpose()
+    ScatteredAtmosphereBuffer buffer = {
+        worldViewProj.Transpose()
     };
 
-	ScatterBuffer buffer2 = GetScatterBuffer(m_planet);
+    ScatterBuffer buffer2 = GetScatterBuffer(m_planet);
 
     m_buffer->SetData(m_context, buffer);
     m_buffer2->SetData(m_context, buffer2);
@@ -94,14 +94,14 @@ void ScatteredAtmosphere::Update(float dt)
 void ScatteredAtmosphere::Reset()
 {
     m_buffer.reset();
-	m_buffer2.reset();
+    m_buffer2.reset();
     m_states.reset();
     m_raster.Reset();
 
-	Cleanup();
+    Cleanup();
 }
 
 ScatteredAtmosphere::~ScatteredAtmosphere()
 {
-	
+    
 }

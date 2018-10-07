@@ -35,13 +35,13 @@ PlanetGenerator::PlanetGenerator(ID3D11DeviceContext *context) : m_context(conte
 std::unique_ptr<IPlanet> PlanetGenerator::CreateRocky(std::string name, double mass, double radius)
 {
     auto planet = CreatePlanet(m_context, name, mass, radius);
-    planet->SetParam("Octaves", 10.0f);
-    planet->SetParam("Height", Utils::Rand(0.2f, 0.8f) / 10.0f);
-    planet->SetParam("Frequency", Utils::Rand(0.1f, 0.5f) / 10.0f);
-    planet->SetParam("Lacunarity", Utils::Rand(1.6f, 2.5f));
-    planet->SetParam("Gain", Utils::Rand(0.0f, 2.0f) / 10.0f + 0.45f);
-    planet->SetParam("NoiseScale", Utils::Rand(0.4f, 1.8f));
-    planet->SetParam("MinValue", Utils::Rand(0.0f, 2.0f) / 100.0f - 0.0011f);
+    planet->SetParam(EParams::Octaves, 10.0f);
+    planet->SetParam(EParams::Height, Utils::Rand(0.2f, 0.4f) / 10.0f);
+    planet->SetParam(EParams::Frequency, Utils::Rand(0.1f, 0.5f) / 10.0f);
+    planet->SetParam(EParams::Lacunarity, Utils::Rand(1.6f, 2.5f));
+    planet->SetParam(EParams::Gain, Utils::Rand(0.0f, 2.0f) / 10.0f + 0.45f);
+    planet->SetParam(EParams::NoiseScale, Utils::Rand(0.4f, 1.8f));
+    planet->SetParam(EParams::MinValue, Utils::Rand(0.0f, 2.0f) / 100.0f - 0.0011f);
 
     return planet;
 }
@@ -53,8 +53,8 @@ std::unique_ptr<IPlanet> PlanetGenerator::CreateGasGiant(std::string name, doubl
     palette.addColorStop(0.0f, col);
 
     auto planet = CreatePlanet(m_context, name, mass, radius);
-    planet->SetParam("Height", 0.0f);
-    planet->SetParam("Octaves", 0.0f);
+    planet->SetParam(EParams::Height, 0.0f);
+    planet->SetParam(EParams::Octaves, 0.0f);
     planet->SetAtmosphereColour(DirectX::SimpleMath::Color(col.r, col.g, col.b));
 
     return planet;

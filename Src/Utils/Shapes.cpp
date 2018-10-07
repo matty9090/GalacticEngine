@@ -17,13 +17,13 @@ void Utils::CreateSphere(float radius, size_t tessellation, std::vector<VertexPo
     if (tessellation < 3)
         throw std::out_of_range("tesselation parameter out of range");
 
-	if (!SphereVertexCache[tessellation].empty() && !SphereIndexCache[tessellation].empty())
-	{
-		vertices = SphereVertexCache[tessellation];
-		indices = SphereIndexCache[tessellation];
+    if (!SphereVertexCache[tessellation].empty() && !SphereIndexCache[tessellation].empty())
+    {
+        vertices = SphereVertexCache[tessellation];
+        indices = SphereIndexCache[tessellation];
 
-		return;
-	}
+        return;
+    }
 
     size_t verticalSegments = tessellation;
     size_t horizontalSegments = tessellation * 2;
@@ -78,6 +78,6 @@ void Utils::CreateSphere(float radius, size_t tessellation, std::vector<VertexPo
         }
     }
 
-	SphereVertexCache[tessellation] = vertices;
-	SphereIndexCache[tessellation] = indices;
+    SphereVertexCache[tessellation] = vertices;
+    SphereIndexCache[tessellation] = indices;
 }
