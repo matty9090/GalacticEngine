@@ -5,7 +5,7 @@
 #include "Render/Scatter.hpp"
 #include "Render/Drawable.hpp"
 #include "Render/IAtmosphereRenderer.hpp"
-#include "Render/DirectX/Effect.hpp"
+#include "Render/DirectX/EffectManager.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
 namespace Galactic
@@ -37,7 +37,8 @@ namespace Galactic
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
 
             IPlanet *m_planet;
-            std::unique_ptr<Effect> m_effect;
+            Effect *m_effect;
+
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::unique_ptr<ConstantBuffer<ScatteredAtmosphereBuffer>> m_buffer;
             std::unique_ptr<ConstantBuffer<ScatterBuffer>> m_buffer2;

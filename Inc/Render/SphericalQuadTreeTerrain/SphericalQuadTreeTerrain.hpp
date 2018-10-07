@@ -7,7 +7,7 @@
 #include "Noise/Biome.hpp"
 #include "Noise/FastNoise.h"
 #include "Render/Scatter.hpp"
-#include "Render/DirectX/Effect.hpp"
+#include "Render/DirectX/EffectManager.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
 namespace Galactic
@@ -28,7 +28,7 @@ namespace Galactic
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
-            std::shared_ptr<Effect> GetEffect() const { return m_effect; };
+            Effect *GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
 
 			static size_t GridSize;
@@ -41,7 +41,7 @@ namespace Galactic
             DirectX::SimpleMath::Matrix m_world;
 
             IPlanet *m_planet;
-            std::shared_ptr<Effect> m_effect;
+            Effect *m_effect;
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::array<std::shared_ptr<TerrainNode>, 6> m_faces;
 			std::unique_ptr<ConstantBuffer<ScatterBuffer>> m_buffer;

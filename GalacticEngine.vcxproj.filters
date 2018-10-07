@@ -173,6 +173,9 @@
     <ClInclude Include="Inc\Noise\Biome.hpp">
       <Filter>Noise</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\DirectX\EffectManager.hpp">
+      <Filter>Render\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -248,6 +251,9 @@
     </ClCompile>
     <ClCompile Include="Src\Noise\FastNoise.cpp">
       <Filter>Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\DirectX\EffectManager.cpp">
+      <Filter>Render\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

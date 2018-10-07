@@ -28,7 +28,7 @@ ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
-    m_effect = std::make_unique<Effect>(device, L"Shaders/ScatteredAtmosphereVS.fx", L"Shaders/ScatteredAtmospherePS.fx", els, num, false);
+    m_effect = EffectManager::getInstance().GetEffect(device, L"Shaders/ScatteredAtmosphereVS.fx", L"Shaders/ScatteredAtmospherePS.fx", els, num, false);
 
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_BACK, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
@@ -92,7 +92,6 @@ void ScatteredAtmosphere::Update(float dt)
 void ScatteredAtmosphere::Reset()
 {
     m_buffer.reset();
-    m_effect.reset();
     m_states.reset();
     m_raster.Reset();
 }

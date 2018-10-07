@@ -45,7 +45,7 @@ void Planet::Generate(EDetail detail)
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
 
-    //m_isGenerated = true;
+	m_isGenerated = true;
 }
 
 void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)

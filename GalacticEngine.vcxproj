@@ -26,7 +26,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
@@ -40,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
@@ -186,6 +186,7 @@
     <ClInclude Include="Inc\Render\Cube.hpp" />
     <ClInclude Include="Inc\Render\DirectX\ConstantBuffer.hpp" />
     <ClInclude Include="Inc\Render\DirectX\Effect.hpp" />
+    <ClInclude Include="Inc\Render\DirectX\EffectManager.hpp" />
     <ClInclude Include="Inc\Render\Drawable.hpp" />
     <ClInclude Include="Inc\Render\Gradient.hpp" />
     <ClInclude Include="Inc\Render\IAtmosphereRenderer.hpp" />
@@ -237,6 +238,7 @@
     <ClCompile Include="Src\Render\Billboard.cpp" />
     <ClCompile Include="Src\Render\Cube.cpp" />
     <ClCompile Include="Src\Render\DirectX\Effect.cpp" />
+    <ClCompile Include="Src\Render\DirectX\EffectManager.cpp" />
     <ClCompile Include="Src\Render\Gradient.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererHigh.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererLow.cpp" />
