@@ -31,6 +31,7 @@ namespace Galactic
             Effect *GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
 
+            static bool   CancelGeneration;
             static size_t GridSize;
             static size_t FrameSplits;
             static size_t MaxSplitsPerFrame;

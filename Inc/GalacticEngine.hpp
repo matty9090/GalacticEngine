@@ -45,6 +45,8 @@ namespace Galactic {
 
     void InitEngine();
 
+    void CancelCurrentGeneration();
+
     void SetSplitDistance(float d);
     float GetSplitDistance();
 

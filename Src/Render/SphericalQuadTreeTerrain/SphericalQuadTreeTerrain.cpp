@@ -12,6 +12,7 @@ using namespace DirectX::SimpleMath;
     size_t SphericalQuadTreeTerrain::GridSize = 33;
 #endif
 
+bool   SphericalQuadTreeTerrain::CancelGeneration = false;
 size_t SphericalQuadTreeTerrain::FrameSplits = 0;
 size_t SphericalQuadTreeTerrain::MaxSplitsPerFrame = 2;
 
@@ -68,6 +69,8 @@ void SphericalQuadTreeTerrain::CreateEffect()
 
 void SphericalQuadTreeTerrain::Generate()
 {
+    CancelGeneration = false;
+
     m_noise.SetInterp(FastNoise::Quintic);
     m_noise.SetNoiseType(FastNoise::SimplexFractal);
     m_noise.SetFractalOctaves((int)m_planet->GetParam(EParams::Octaves));
@@ -147,10 +150,14 @@ void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX:
 
 void SphericalQuadTreeTerrain::Update(float dt)
 {
+    FrameSplits = 0;
     m_world = m_planet->GetMatrix();
 
-    for (auto &face : m_faces)
-        face->Update(dt);
+    if (!CancelGeneration)
+    {
+        for (auto &face : m_faces)
+            face->Update(dt);
+    }
 }
 
 void SphericalQuadTreeTerrain::Reset()
