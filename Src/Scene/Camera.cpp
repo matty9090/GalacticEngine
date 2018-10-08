@@ -10,7 +10,7 @@ Camera::Camera(size_t width, size_t height)
       m_height(height),
       m_body(nullptr),
       m_cameraPos(0.0f, 0.0f, 0.0f),
-      m_relPos(0.0f, 0.0f, -150.0f),
+      //m_relPos(0.0f, 0.0f, -150.0f),
       m_yaw(0.0f),
       m_pitch(0.0f)
 {
@@ -26,7 +26,7 @@ void Camera::Update(float dt)
     float z = r * cosf(m_yaw);
     float x = r * sinf(m_yaw);
 
-    m_cameraPos = m_relPos + ((m_body != nullptr) ? m_body->GetPosition() : Vector3::Zero);
+    //m_cameraPos = m_relPos + ((m_body != nullptr) ? m_body->GetPosition() : Vector3::Zero);
     Vector3 look = m_cameraPos + Vector3(x, y, z);
 
     m_view = Matrix::CreateLookAt(m_cameraPos, look, Vector3::Up);
@@ -61,4 +61,11 @@ void Camera::Events(DirectX::Mouse *mouse, DirectX::Mouse::State &ms, float dt)
 DirectX::SimpleMath::Quaternion Camera::GetQuaternion() const
 {
     return Quaternion::CreateFromYawPitchRoll(m_yaw, -m_pitch, 0.f);
+}
+
+std::string Galactic::Camera::to_string()
+{
+    std::ostringstream ss;
+    ss << "(" << m_cameraPos.x << ", " << m_cameraPos.y << ", " << m_cameraPos.z << ")";
+    return ss.str();
 }

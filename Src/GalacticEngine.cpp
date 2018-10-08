@@ -17,6 +17,11 @@ namespace Galactic {
         Biomes[EBiomes::Ocean].colour = Color(0.0f, 0.0f, 1.0f);
     }
 
+    void CancelCurrentGeneration()
+    {
+        SphericalQuadTreeTerrain::CancelGeneration = true;
+    }
+
     void SetSplitDistance(float d) { TerrainNode::SplitDistance = d; }
     float GetSplitDistance() { return TerrainNode::SplitDistance; }
 
