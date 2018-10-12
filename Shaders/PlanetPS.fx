@@ -5,7 +5,7 @@ struct VS_OUTPUT {
 	float3 WorldPos : POSITION;
 	float3 Normal : NORMAL0;
 	float3 Sphere : NORMAL1;
-	float4 Color : COLOR0;
+	float2 Biome : COLOR0;
 	float3 Colour1 : COLOR1;
 	float3 Colour2 : COLOR2;
 	float2 UV : TEXCOORD0;
@@ -38,10 +38,11 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	float3 sColour = v.Colour1 + 0.25f * v.Colour2;
 	sColour = 1.0 - exp(sColour * -0.8f);
 	
-	v.Color *= sColour.b;
+	float4 col = Tex.Sample(Sampler, v.Biome);
+	col *= sColour.b;
 	
 	float4 colour;
-	colour.rgb = DiffuseLight * v.Color + sColour;
+	colour.rgb = DiffuseLight * col + sColour;
 	colour.a = 1.0f;
 
 	return colour;

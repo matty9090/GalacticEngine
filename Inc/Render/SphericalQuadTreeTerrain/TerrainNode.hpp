@@ -14,7 +14,7 @@ namespace Galactic
         DirectX::SimpleMath::Vector3 position;
         DirectX::SimpleMath::Vector3 normal;
         DirectX::SimpleMath::Vector3 sphere;
-        DirectX::SimpleMath::Vector4 color;
+        DirectX::SimpleMath::Vector2 biome;
         DirectX::SimpleMath::Vector2 uv;
     };
 

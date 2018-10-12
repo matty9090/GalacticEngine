@@ -90,11 +90,11 @@ void TerrainNode::Generate()
                 pos = Vector3::Transform(pos, m_world);
 
                 float height;
-                DirectX::SimpleMath::Color col;
+                Vector2 biome;
 
-                m_terrain->GetHeight(pos, height, col);
+                m_terrain->GetHeight(pos, height, biome);
 
-                v.color = col;
+                v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
@@ -213,7 +213,7 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (m_depth >= 9 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
+    if (m_depth >= 11 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
         return;
 
     if (IsLeaf())

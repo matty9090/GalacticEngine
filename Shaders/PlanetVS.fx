@@ -11,7 +11,7 @@ struct VS_OUTPUT {
 	float3 WorldPos : POSITION;
 	float3 Normal : NORMAL0;
 	float3 Sphere : NORMAL1;
-	float4 Color : COLOR0;
+	float2 Biome : COLOR0;
 	float3 Colour1 : COLOR1;
 	float3 Colour2 : COLOR2;
 	float2 UV : TEXCOORD0;
@@ -21,7 +21,7 @@ struct VS_INPUT {
 	float4 vPosition : POSITION;
 	float3 vNormal : NORMAL;
 	float3 vSphere : TANGENT;
-	float4 vColor : COLOR;
+	float2 vBiome : COLOR;
 	float2 vUV : TEXCOORD;
 };
 
@@ -36,7 +36,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	Output.WorldPos = mul(v_in.vPosition, mWorld);
 	Output.Normal   = mul(v_in.vNormal, mWorld);
 	Output.Sphere   = v_in.vSphere;
-	Output.Color 	= v_in.vColor;
+	Output.Biome 	= v_in.vBiome;
 	Output.Colour1	= PrimaryColour;
 	Output.Colour2	= SecondaryColour;
 	Output.UV 		= v_in.vUV;

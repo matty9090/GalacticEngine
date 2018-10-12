@@ -32,6 +32,6 @@ namespace Galactic
             IBody *m_body;
 
             DirectX::SimpleMath::Matrix m_view, m_proj;
-            DirectX::SimpleMath::Vector3 m_cameraPos;//, m_relPos;
+            DirectX::SimpleMath::Vector3 m_cameraPos/* , m_relPos*/;
     };
 }
