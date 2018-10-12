@@ -24,7 +24,7 @@ namespace Galactic
             void Reset();
 
             float GetRadius() const { return m_radius; }
-            void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Color &col);
+            void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup);
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
@@ -49,6 +49,8 @@ namespace Galactic
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::array<std::unique_ptr<TerrainNode>, 6> m_faces;
             std::unique_ptr<ConstantBuffer<ScatterBuffer>> m_buffer;
+
+            ID3D11ShaderResourceView *m_texBiomes;
 
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;

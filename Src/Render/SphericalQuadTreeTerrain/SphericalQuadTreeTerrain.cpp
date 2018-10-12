@@ -61,8 +61,11 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
 
     // TODO: Cache resources as this is very slow
-    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
+    D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/biomes.png", NULL, NULL, &m_texBiomes, NULL);
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
+
+    D3D11_RECT rect;
+    
 
     m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
@@ -130,7 +133,7 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-    //m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
+    m_deviceContext->PSSetShaderResources(0, 1, &m_texBiomes);
     //m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
 
     ScatterBuffer buffer = GetScatterBuffer(m_planet);
@@ -162,6 +165,7 @@ void SphericalQuadTreeTerrain::Update(float dt)
 
 void SphericalQuadTreeTerrain::Reset()
 {
+    m_texBiomes->Release();
     m_states.reset();
     m_effect->Reset();
 
@@ -169,9 +173,9 @@ void SphericalQuadTreeTerrain::Reset()
         face->Release();
 }
 
-void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, DirectX::SimpleMath::Color &col)
+void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, Vector2 &biomeLookup)
 {
-    bool biomes_enabled = (bool)m_planet->GetParam(EParams::Biomes);
+   // bool biomes_enabled = (bool)m_planet->GetParam(EParams::Biomes);
     float scale = m_planet->GetParam(EParams::NoiseScale);
     float minvalue = m_planet->GetParam(EParams::MinValue);
 
@@ -179,23 +183,20 @@ void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &
     float y = p.y * 40.0f * scale;
     float z = p.z * 40.0f * scale;
 
-    //float h = (m_bnoise.GetNoise(x, y, z) + 1.0f) / 2.0f;
+    float e = m_noise.GetNoise(x, y, z);
+    float m = (m_bnoise.GetNoise(x * 2.0f, y * 2.0f, z * 2.0f) + 1.0f) / 2.0f;
+    float h = e * m_planet->GetParam(EParams::Height);
 
-    /*EBiomes biome;
+    EBiomes biome = EBiomes::Grass;
 
-    if (h < 0.55f) biome = EBiomes::Ocean;
-    else if (h < 0.7f) biome = EBiomes::Grass;
-    else if (h < 0.85f) biome = EBiomes::Mountains;
-    else biome = EBiomes::Desert;
-    */
-
-    float noise = m_noise.GetNoise(x, y, z);
-    float v = noise * m_planet->GetParam(EParams::Height);
-    //float v = m_biomes[biome]->GetHeight(x, y, z);
+    if (e < 0.2f) biome = EBiomes::Ocean;
+    else if (e < 0.22f) biome = EBiomes::Beach;
     
-    auto colour = m_gradient.getColorAt(noise);
+    if (e > 0.8f)
+    {
+        if (m < 0.1f) biome = EBiomes::Desert;
+    }
 
-    height = std::fmaxf(0.0f, v - minvalue);
-    col = Color(colour.r, colour.g, colour.b, 1.0f);
-    //col = m_biomes[biome]->GetColour(height);
+    height = h;
+    biomeLookup = Vector2(e, 1.0f - m);
 }

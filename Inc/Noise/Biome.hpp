@@ -8,7 +8,7 @@
 
 namespace Galactic
 {
-    enum class EBiomes { Grass, Mountains, Desert, Ocean };
+    enum class EBiomes { Grass, Mountains, Desert, Ocean, Beach };
 
     struct NoiseParameters
     {

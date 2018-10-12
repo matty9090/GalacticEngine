@@ -14,7 +14,8 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_atmosphere(nullptr),
       m_isGenerated(false),
       m_atmosphereHeight(200.0f),
-      m_atmColour(Color(0.0f, 0.7f, 1.0f))
+      m_atmColour(Color(0.0f, 0.7f, 1.0f)),
+      m_vertexCount(0)
 {
     m_params.resize(20);
     SetParam(EParams::Biomes, 0.0f);
@@ -27,6 +28,8 @@ Planet::~Planet()
 
 void Planet::Generate(EDetail detail)
 {
+    m_vertexCount = 0;
+
     Matrix matrix;
 
     if (m_isGenerated)

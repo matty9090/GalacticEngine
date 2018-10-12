@@ -90,11 +90,11 @@ void TerrainNode::Generate()
                 pos = Vector3::Transform(pos, m_world);
 
                 float height;
-                DirectX::SimpleMath::Color col;
+                Vector2 biome;
 
-                m_terrain->GetHeight(pos, height, col);
+                m_terrain->GetHeight(pos, height, biome);
 
-                v.color = col;
+                v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
@@ -137,6 +137,8 @@ void TerrainNode::Generate()
         m_vertices[m_indices[i + 1]].normal += n;
         m_vertices[m_indices[i + 2]].normal += n;
     }
+
+    m_planet->IncrementVertices(gridsize * gridsize * 4);
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -211,7 +213,7 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (m_depth >= 9 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
+    if (m_depth >= 11 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
         return;
 
     if (IsLeaf())
@@ -263,6 +265,9 @@ void TerrainNode::Merge()
         m_children[1].reset();
         m_children[2].reset();
         m_children[3].reset();
+
+        int gridsize = SphericalQuadTreeTerrain::GridSize;
+        m_planet->IncrementVertices(-(gridsize * gridsize * 4));
 
         NotifyNeighbours();
     }
