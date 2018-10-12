@@ -137,6 +137,8 @@ void TerrainNode::Generate()
         m_vertices[m_indices[i + 1]].normal += n;
         m_vertices[m_indices[i + 2]].normal += n;
     }
+
+    m_planet->IncrementVertices(gridsize * gridsize * 4);
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -263,6 +265,9 @@ void TerrainNode::Merge()
         m_children[1].reset();
         m_children[2].reset();
         m_children[3].reset();
+
+        int gridsize = SphericalQuadTreeTerrain::GridSize;
+        m_planet->IncrementVertices(-(gridsize * gridsize * 4));
 
         NotifyNeighbours();
     }

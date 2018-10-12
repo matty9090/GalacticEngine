@@ -37,6 +37,9 @@ namespace Galactic
             virtual float GetAtmosphereHeight() const = 0;
             virtual DirectX::SimpleMath::Color GetAtmosphereColour() const = 0;
 
+            virtual void IncrementVertices(size_t num) = 0;
+            virtual size_t GetVertexCount() = 0;
+
             virtual ~IPlanet() {}
     };
 }

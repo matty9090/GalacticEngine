@@ -313,11 +313,18 @@ void Game::CreateDevice()
 
     Galactic::PlanetGenerator gen(m_d3dContext.Get());
 
-    auto planet = gen.CreateGasGiant("Planet", 5.683e26, 58232.0);
+    auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.971e24, 6371.0);
     planet->SetInfluence(star.get());
     planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     planet->SetAtmosphereHeight(800.0f);
+
+    planet->SetParam(Galactic::EParams::Gain, 0.5f);
+    planet->SetParam(Galactic::EParams::Frequency, 0.018f);
+    planet->SetParam(Galactic::EParams::Lacunarity, 2.3f);
+    planet->SetParam(Galactic::EParams::Height, 0.01f);
+    planet->SetParam(Galactic::EParams::NoiseScale, 1.818f);
+
     planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 962e24, 6371.0);

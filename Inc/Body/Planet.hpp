@@ -55,6 +55,9 @@ namespace Galactic
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             void SetInfluence(IBody *body) { m_influence = body; }
 
+            void IncrementVertices(size_t num) { m_vertexCount += num; }
+            size_t GetVertexCount() { return m_vertexCount; }
+
         private:
             std::string m_name;
 
@@ -63,6 +66,8 @@ namespace Galactic
             double m_radius;
             long double m_mass;
             float m_atmosphereHeight;
+
+            size_t m_vertexCount;
 
             std::vector<float> m_params;
 
