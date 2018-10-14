@@ -14,6 +14,7 @@ namespace Galactic {
             void Reset();
 
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
+            DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal) { return normal; }
 
         private:
             DirectX::SimpleMath::Matrix m_world;

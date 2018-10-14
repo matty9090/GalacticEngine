@@ -39,10 +39,10 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	sColour = 1.0 - exp(sColour * -0.8f);
 	
 	float4 col = Tex.Sample(Sampler, v.Biome);
-	col *= sColour.b;
+	//col *= sColour.b;
 	
 	float4 colour;
-	colour.rgb = DiffuseLight * col + sColour;
+	colour.rgb = DiffuseLight * col/* + sColour*/;
 	colour.a = 1.0f;
 
 	return colour;

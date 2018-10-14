@@ -45,6 +45,7 @@ namespace Galactic
 
             PlanetVertex &GetVertex(int i) { return m_originalVertices[i]; }
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
+            DirectX::SimpleMath::Vector3 GetHighestPoint() const { return m_highestPoint; }
 
             void Generate();
             bool IsLeaf() { return m_children[0] == nullptr; }
@@ -67,6 +68,7 @@ namespace Galactic
             int m_depth;
             bool m_visible;
             float m_scale, m_diameter;
+            DirectX::SimpleMath::Vector3 m_highestPoint;
 
             int m_quad;
             Square m_bounds;

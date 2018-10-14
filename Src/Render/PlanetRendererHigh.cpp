@@ -32,3 +32,15 @@ void Galactic::HighDetailPlanetRenderer::Reset()
     m_terrain->Reset();
     m_terrain.reset();
 }
+
+Vector3 Galactic::HighDetailPlanetRenderer::GetPoint(Vector3 normal)
+{
+    normal.Normalize();
+
+    Vector2 lookup;
+    float height;
+
+    m_terrain->GetHeight(normal, height, lookup);
+
+    return Vector3::Transform(normal + normal * height, m_terrain->GetMatrix());
+}

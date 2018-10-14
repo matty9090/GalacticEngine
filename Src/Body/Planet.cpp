@@ -3,6 +3,8 @@
 #include "Render/PlanetRendererFactory.hpp"
 #include "Physics/Constants.hpp"
 
+#include <fstream>
+
 using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -91,4 +93,25 @@ void Planet::Reset()
 
     m_renderer.reset();
     m_atmosphere.reset();
+}
+
+void Galactic::Planet::ReadSettings(std::string file)
+{
+    std::ifstream f(file.c_str());
+
+    while (!f.eof())
+    {
+        int param;
+        float value;
+
+        f >> param >> value;
+
+        SetParam((EParams)param, value);
+    }
+
+    f.close();
+}
+
+Vector3 Galactic::Planet::GetPoint(Vector3 normal) {
+    return m_renderer->GetPoint(normal);
 }
