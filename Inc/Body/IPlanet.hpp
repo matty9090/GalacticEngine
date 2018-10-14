@@ -17,11 +17,17 @@ namespace Galactic
         AtmHeight,
         NoiseScale,
         Lacunarity,
+        BiomeGain,
+        BiomeFrequency,
+        BiomeScale,
+        BiomeLacunarity,
     };
 
     class IPlanet : public IBody
     {
         public:
+            virtual void ReadSettings(std::string file) = 0;
+
             virtual void SetParam(EParams, float value) = 0;
             virtual float GetParam(EParams name) = 0;
 
@@ -36,6 +42,10 @@ namespace Galactic
 
             virtual float GetAtmosphereHeight() const = 0;
             virtual DirectX::SimpleMath::Color GetAtmosphereColour() const = 0;
+
+            virtual void IncrementVertices(size_t num) = 0;
+            virtual size_t GetVertexCount() = 0;
+            virtual DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal) = 0;
 
             virtual ~IPlanet() {}
     };

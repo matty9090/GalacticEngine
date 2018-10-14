@@ -3,6 +3,8 @@
 #include "Render/PlanetRendererFactory.hpp"
 #include "Physics/Constants.hpp"
 
+#include <fstream>
+
 using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -14,7 +16,8 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_atmosphere(nullptr),
       m_isGenerated(false),
       m_atmosphereHeight(200.0f),
-      m_atmColour(Color(0.0f, 0.7f, 1.0f))
+      m_atmColour(Color(0.0f, 0.7f, 1.0f)),
+      m_vertexCount(0)
 {
     m_params.resize(20);
     SetParam(EParams::Biomes, 0.0f);
@@ -27,6 +30,8 @@ Planet::~Planet()
 
 void Planet::Generate(EDetail detail)
 {
+    m_vertexCount = 0;
+
     Matrix matrix;
 
     if (m_isGenerated)
@@ -88,4 +93,25 @@ void Planet::Reset()
 
     m_renderer.reset();
     m_atmosphere.reset();
+}
+
+void Galactic::Planet::ReadSettings(std::string file)
+{
+    std::ifstream f(file.c_str());
+
+    while (!f.eof())
+    {
+        int param;
+        float value;
+
+        f >> param >> value;
+
+        SetParam((EParams)param, value);
+    }
+
+    f.close();
+}
+
+Vector3 Galactic::Planet::GetPoint(Vector3 normal) {
+    return m_renderer->GetPoint(normal);
 }

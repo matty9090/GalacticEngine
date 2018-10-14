@@ -6,7 +6,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 35.0f;
+float TerrainNode::SplitDistance = 30.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -64,6 +64,8 @@ void TerrainNode::Generate()
 
     auto parent = m_parent;
 
+    float highest = std::numeric_limits<float>::lowest();
+
     for (int y = 0; y < gridsize; ++y)
     {
         float yy = m_bounds.y + y * step;
@@ -87,18 +89,24 @@ void TerrainNode::Generate()
                 Vector3 pos = Vector3(xx, 0.5f, yy);
 
                 pos.Normalize();
-                pos = Vector3::Transform(pos, m_world);
+                pos = Vector3::TransformNormal(pos, m_world);
 
                 float height;
-                DirectX::SimpleMath::Color col;
+                Vector2 biome;
 
-                m_terrain->GetHeight(pos, height, col);
+                m_terrain->GetHeight(pos, height, biome);
 
-                v.color = col;
+                v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
                 v.uv = Vector2(xx * 80.0f, yy * 80.0f);
+
+                if (height > highest)
+                {
+                    m_highestPoint = pos;
+                    highest = height;
+                }
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -137,6 +145,8 @@ void TerrainNode::Generate()
         m_vertices[m_indices[i + 1]].normal += n;
         m_vertices[m_indices[i + 2]].normal += n;
     }
+
+    m_planet->IncrementVertices(gridsize * gridsize * 4);
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -211,7 +221,7 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (m_depth >= 9 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
+    if (m_depth >= 12 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
         return;
 
     if (IsLeaf())
@@ -263,6 +273,9 @@ void TerrainNode::Merge()
         m_children[1].reset();
         m_children[2].reset();
         m_children[3].reset();
+
+        int gridsize = SphericalQuadTreeTerrain::GridSize;
+        m_planet->IncrementVertices(-(gridsize * gridsize * 4));
 
         NotifyNeighbours();
     }

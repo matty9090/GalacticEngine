@@ -121,11 +121,12 @@ void Game::Update(DX::StepTimer const& timer)
     move *= 0.05f;
 
     auto closestBody = static_cast<Galactic::IPlanet*>(m_system->GetClosestBody(m_camera->GetPosition()));
-    
-    float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
-    float factor = ((Vector3::Distance(m_camera->GetPosition(), closestBody->GetPosition()) - radius)) * 30.0f;
+    auto dir = m_camera->GetPosition() - closestBody->GetPosition();
 
-    factor = std::fminf(std::fmaxf(factor, 1.0f), 100000.0f);
+    float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
+    float factor = ((Vector3::Distance(m_camera->GetPosition(), closestBody->GetPoint(dir)))) * 30.0f;
+
+    factor = std::fminf(std::fmaxf(factor, 0.1f), 100000.0f);
 
     move = move * factor * dt;
     m_speed = factor;
@@ -313,18 +314,21 @@ void Game::CreateDevice()
 
     Galactic::PlanetGenerator gen(m_d3dContext.Get());
 
-    auto planet = gen.CreateGasGiant("Planet", 5.683e26, 58232.0);
+    auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.683e26, 58232.0);
     planet->SetInfluence(star.get());
     planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     planet->SetAtmosphereHeight(800.0f);
+    planet->ReadSettings("settings.txt");
+
     planet->Generate(Galactic::EDetail::High);
 
-    auto moon = gen.CreateRocky("Moon", 962e24, 6371.0);
+    auto moon = gen.CreateRocky("Moon", 5.971e24, 6371.0);
     moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
     moon->SetVelocity(Vector3(-1.0e5, 0.0f, 1.3e6));
     moon->SetAtmosphereHeight(200.0f);
+    moon->ReadSettings("settings.txt");
     moon->Generate(Galactic::EDetail::High);
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));

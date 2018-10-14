@@ -9,12 +9,12 @@ Camera::Camera(size_t width, size_t height)
     : m_width(width),
       m_height(height),
       m_body(nullptr),
-      m_cameraPos(0.0f, 0.0f, 0.0f),
+      m_cameraPos(0.0f, 0.0f, -150.0f),
       //m_relPos(0.0f, 0.0f, -150.0f),
       m_yaw(0.0f),
       m_pitch(0.0f)
 {
-    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(width) / float(height), 0.01f, 500000.f);
+    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(width) / float(height), 0.0001f, 500000.f);
 }
 
 void Camera::Update(float dt)

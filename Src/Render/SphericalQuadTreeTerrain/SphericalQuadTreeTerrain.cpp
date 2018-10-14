@@ -14,7 +14,7 @@ using namespace DirectX::SimpleMath;
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
 size_t SphericalQuadTreeTerrain::FrameSplits = 0;
-size_t SphericalQuadTreeTerrain::MaxSplitsPerFrame = 2;
+size_t SphericalQuadTreeTerrain::MaxSplitsPerFrame = 6;
 
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
     : m_deviceContext(deviceContext),
@@ -61,7 +61,7 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
 
     // TODO: Cache resources as this is very slow
-    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/planet_tex.jpg", NULL, NULL, m_texture.ReleaseAndGetAddressOf(), NULL);
+    D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/biomes.png", NULL, NULL, &m_texBiomes, NULL);
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/rock.jpg", NULL, NULL, m_surface.ReleaseAndGetAddressOf(), NULL);
 
     m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
@@ -81,6 +81,9 @@ void SphericalQuadTreeTerrain::Generate()
 
     m_bnoise = m_noise;
     m_bnoise.SetSeed(m_planet->GetSeed() + 1);
+    m_bnoise.SetFrequency(m_planet->GetParam(EParams::BiomeFrequency));
+    m_bnoise.SetFractalGain(m_planet->GetParam(EParams::BiomeGain));
+    m_bnoise.SetFractalLacunarity(m_planet->GetParam(EParams::BiomeLacunarity));
     
     m_biomes[EBiomes::Grass] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Grass]);
     m_biomes[EBiomes::Mountains] = std::make_unique<Biome>(m_noise, Biomes[EBiomes::Mountains]);
@@ -130,7 +133,7 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
     m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-    //m_deviceContext->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
+    m_deviceContext->PSSetShaderResources(0, 1, &m_texBiomes);
     //m_deviceContext->PSSetShaderResources(1, 1, m_surface.GetAddressOf());
 
     ScatterBuffer buffer = GetScatterBuffer(m_planet);
@@ -162,6 +165,7 @@ void SphericalQuadTreeTerrain::Update(float dt)
 
 void SphericalQuadTreeTerrain::Reset()
 {
+    m_texBiomes->Release();
     m_states.reset();
     m_effect->Reset();
 
@@ -169,33 +173,20 @@ void SphericalQuadTreeTerrain::Reset()
         face->Release();
 }
 
-void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, DirectX::SimpleMath::Color &col)
+void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, Vector2 &biomeLookup)
 {
-    bool biomes_enabled = (bool)m_planet->GetParam(EParams::Biomes);
     float scale = m_planet->GetParam(EParams::NoiseScale);
     float minvalue = m_planet->GetParam(EParams::MinValue);
+    float bscale = m_planet->GetParam(EParams::BiomeScale);
 
-    float x = p.x * 40.0f * scale;
-    float y = p.y * 40.0f * scale;
-    float z = p.z * 40.0f * scale;
+    float x = p.x * 40.0f;
+    float y = p.y * 40.0f;
+    float z = p.z * 40.0f;
 
-    //float h = (m_bnoise.GetNoise(x, y, z) + 1.0f) / 2.0f;
+    float e = m_noise.GetNoise(x * scale, y * scale, z * scale);
+    float m = m_bnoise.GetNoise(x * bscale, y * bscale, z * bscale);
+    float h = e * m_planet->GetParam(EParams::Height);
 
-    /*EBiomes biome;
-
-    if (h < 0.55f) biome = EBiomes::Ocean;
-    else if (h < 0.7f) biome = EBiomes::Grass;
-    else if (h < 0.85f) biome = EBiomes::Mountains;
-    else biome = EBiomes::Desert;
-    */
-
-    float noise = m_noise.GetNoise(x, y, z);
-    float v = noise * m_planet->GetParam(EParams::Height);
-    //float v = m_biomes[biome]->GetHeight(x, y, z);
-    
-    auto colour = m_gradient.getColorAt(noise);
-
-    height = std::fmaxf(0.0f, v - minvalue);
-    col = Color(colour.r, colour.g, colour.b, 1.0f);
-    //col = m_biomes[biome]->GetColour(height);
+    height = h;
+    biomeLookup = Vector2((m + 1.0f) / 2.0f, 1.0f - ((e + 1.0f) / 2.0f));
 }

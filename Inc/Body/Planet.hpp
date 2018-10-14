@@ -18,6 +18,7 @@ namespace Galactic
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
             void Reset();
+            void ReadSettings(std::string file);
 
             void SetParam(EParams name, float value) { m_params[(int)name] = value; }
             float GetParam(EParams name) { return m_params[(int)name]; }
@@ -55,6 +56,11 @@ namespace Galactic
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             void SetInfluence(IBody *body) { m_influence = body; }
 
+            void IncrementVertices(size_t num) { m_vertexCount += num; }
+            size_t GetVertexCount() { return m_vertexCount; }
+
+            DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal);
+
         private:
             std::string m_name;
 
@@ -63,6 +69,8 @@ namespace Galactic
             double m_radius;
             long double m_mass;
             float m_atmosphereHeight;
+
+            size_t m_vertexCount;
 
             std::vector<float> m_params;
 
