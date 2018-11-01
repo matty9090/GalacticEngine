@@ -10,13 +10,15 @@
 #include "Render/DirectX/EffectManager.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
+#include "Physics/Constants.hpp"
+
 namespace Galactic
 {
     class SphericalQuadTreeTerrain : public ISphericalTerrain
     {
         public:
             SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
-            
+
             void Generate();
             void CreateEffect();
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
@@ -24,12 +26,13 @@ namespace Galactic
             void Reset();
 
             float GetRadius() const { return m_radius; }
-            void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup);
+            void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, int &texIndex);
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             Effect *GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
+            ID3D11ShaderResourceView *GetTexture(int tex) const { return m_textures[tex]; }
 
             static bool   CancelGeneration;
             static size_t GridSize;
@@ -55,7 +58,8 @@ namespace Galactic
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
-            Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture, m_surface;
+            
+            std::vector<ID3D11ShaderResourceView*> m_textures;
 
             float m_radius;
     };

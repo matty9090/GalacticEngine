@@ -64,8 +64,6 @@ void TerrainNode::Generate()
 
     auto parent = m_parent;
 
-    float highest = std::numeric_limits<float>::lowest();
-
     for (int y = 0; y < gridsize; ++y)
     {
         float yy = m_bounds.y + y * step;
@@ -91,22 +89,18 @@ void TerrainNode::Generate()
                 pos.Normalize();
                 pos = Vector3::TransformNormal(pos, m_world);
 
+                int tex;
                 float height;
-                Vector2 biome;
+                Vector2 biome; 
 
-                m_terrain->GetHeight(pos, height, biome);
+                m_terrain->GetHeight(pos, height, biome, tex);
 
                 v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
-                v.uv = Vector2(xx * 80.0f, yy * 80.0f);
-
-                if (height > highest)
-                {
-                    m_highestPoint = pos;
-                    highest = height;
-                }
+                v.uv = Vector2(xx * 4000.0f, yy * 4000.0f);
+                v.weights = tex;
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -139,11 +133,28 @@ void TerrainNode::Generate()
         Vector3 p2 = m_vertices[m_indices[i + 1]].position;
         Vector3 p3 = m_vertices[m_indices[i + 2]].position;
 
-        Vector3 n = (p3 - p1).Cross(p2 - p1);
+        Vector3 t1 = m_vertices[m_indices[i + 0]].uv;
+        Vector3 t2 = m_vertices[m_indices[i + 1]].uv;
+        Vector3 t3 = m_vertices[m_indices[i + 2]].uv;
 
-        m_vertices[m_indices[i + 0]].normal += n;
-        m_vertices[m_indices[i + 1]].normal += n;
-        m_vertices[m_indices[i + 2]].normal += n;
+        Vector3 vector1 = p2 - p1, vector2 = p3 - p1;
+        Vector2 tuVector = t2 - t1, tvVector = t3 - t1;
+        Vector3 n = vector2.Cross(vector1);
+        Vector3 tangent;
+
+        float den = 1.0f / (tuVector.x * tvVector.y - tuVector.y * tvVector.x);
+
+        tangent.x = (tvVector.y * vector1.x - tvVector.x * vector2.x) * den;
+        tangent.y = (tvVector.y * vector1.y - tvVector.x * vector2.y) * den;
+        tangent.z = (tvVector.y * vector1.z - tvVector.x * vector2.z) * den;
+
+        m_vertices[m_indices[i + 0]].normal = n;
+        m_vertices[m_indices[i + 1]].normal = n;
+        m_vertices[m_indices[i + 2]].normal = n;
+
+        m_vertices[m_indices[i + 0]].tangent = tangent;
+        m_vertices[m_indices[i + 1]].tangent = tangent;
+        m_vertices[m_indices[i + 2]].tangent = tangent;
     }
 
     m_planet->IncrementVertices(gridsize * gridsize * 4);

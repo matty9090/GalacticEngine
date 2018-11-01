@@ -28,6 +28,10 @@ Effect::Effect(ID3D11Device *device, std::wstring vs, std::wstring ps, D3D11_INP
         
         HRESULT res;
 
+        std::ofstream file("errors.txt");
+        file << "";
+        file.close();
+
         res = D3DCompileFromFile(vs.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_5_0", flags, 0, &v_buffer, &v_error);
         LogErrors(v_error);
         DX::ThrowIfFailed(res);

@@ -13,9 +13,11 @@ namespace Galactic
     {
         DirectX::SimpleMath::Vector3 position;
         DirectX::SimpleMath::Vector3 normal;
+        DirectX::SimpleMath::Vector3 tangent;
         DirectX::SimpleMath::Vector3 sphere;
         DirectX::SimpleMath::Vector2 biome;
         DirectX::SimpleMath::Vector2 uv;
+        float weights;
     };
 
     struct MatrixBuffer
@@ -45,7 +47,6 @@ namespace Galactic
 
             PlanetVertex &GetVertex(int i) { return m_originalVertices[i]; }
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
-            DirectX::SimpleMath::Vector3 GetHighestPoint() const { return m_highestPoint; }
 
             void Generate();
             bool IsLeaf() { return m_children[0] == nullptr; }
@@ -68,7 +69,6 @@ namespace Galactic
             int m_depth;
             bool m_visible;
             float m_scale, m_diameter;
-            DirectX::SimpleMath::Vector3 m_highestPoint;
 
             int m_quad;
             Square m_bounds;
@@ -87,6 +87,7 @@ namespace Galactic
             Microsoft::WRL::ComPtr<ID3D11InputLayout> m_dbgInputLayout;
 
             std::vector<PlanetVertex> m_originalVertices;
+            std::vector<int> m_texIndex;
             std::array<std::vector<uint16_t>, 4> m_edges;
             std::array<std::unique_ptr<TerrainNode>, 4> m_children;
 

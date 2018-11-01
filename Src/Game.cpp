@@ -24,6 +24,12 @@ Game::Game() noexcept :
     m_showUI(false),
     m_paused(false)
 {
+//#ifdef _DEBUG
+    AllocConsole();
+    freopen("conin$", "r", stdin);
+    freopen("conout$", "w", stdout);
+    freopen("conout$", "w", stderr);
+//#endif
 }
 
 // Initialize the Direct3D resources required to run.
@@ -319,7 +325,6 @@ void Game::CreateDevice()
     planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     planet->SetAtmosphereHeight(800.0f);
-    planet->ReadSettings("settings.txt");
 
     planet->Generate(Galactic::EDetail::High);
 

@@ -10,6 +10,10 @@ namespace Galactic
 {
     enum class EBiomes { Grass, Mountains, Desert, Ocean, Beach };
 
+    /*
+        TODO: Remove
+    */
+
     struct NoiseParameters
     {
         int octaves;

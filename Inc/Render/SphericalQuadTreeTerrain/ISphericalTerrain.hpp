@@ -15,7 +15,8 @@ namespace Galactic
             virtual Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const = 0;
 
             virtual void SetRenderContext() = 0;
-            virtual void GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Vector2 &biome) = 0;
+            virtual void GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Vector2 &biome, int &texIndex) = 0;
+            virtual ID3D11ShaderResourceView *GetTexture(int tex) const = 0;
 
             virtual ~ISphericalTerrain() {}
     };

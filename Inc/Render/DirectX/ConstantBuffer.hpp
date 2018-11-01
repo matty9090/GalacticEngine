@@ -43,6 +43,4 @@ namespace Galactic
 
         deviceContext->Unmap(m_buffer.Get(), 0);
     }
-
-
 }
