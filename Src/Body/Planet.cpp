@@ -43,10 +43,14 @@ void Planet::Generate(EDetail detail)
         
         m_atmosphere->Reset();
         m_atmosphere.reset();
+
+        m_clouds->Reset();
+        m_clouds.reset();
     }
 
     m_renderer = CreatePlanetRenderer(m_deviceContext, this, detail);
     m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this, detail);
+    m_clouds = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);
 
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
@@ -61,11 +65,14 @@ void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matri
 
     if (m_atmosphere)
         m_atmosphere->Render(view, proj);
+
+    if (m_clouds)
+        m_clouds->Render(view, proj);
 }
 
 void Planet::Update(float dt)
 {
-    m_position += m_velocity * dt;
+    //m_position += m_velocity * dt;
 
     Matrix rotX = Matrix::CreateRotationX(m_rotation.x);
     Matrix rotY = Matrix::CreateRotationY(m_rotation.y);
@@ -81,6 +88,9 @@ void Planet::Update(float dt)
 
     if (m_atmosphere)
         m_atmosphere->Update(dt);
+
+    if (m_clouds)
+        m_clouds->Update(dt);
 }
 
 void Planet::Reset()
@@ -88,11 +98,15 @@ void Planet::Reset()
     if (m_renderer)
         m_renderer->Reset();
     
-    if(m_atmosphere)
+    if (m_atmosphere)
         m_atmosphere->Reset();
+
+    if (m_clouds)
+        m_clouds->Reset();
 
     m_renderer.reset();
     m_atmosphere.reset();
+    m_clouds.reset();
 }
 
 void Galactic::Planet::ReadSettings(std::string file)

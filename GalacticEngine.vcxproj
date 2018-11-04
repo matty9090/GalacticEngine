@@ -193,6 +193,7 @@
     <ClInclude Include="Inc\Render\IPlanetRenderer.hpp" />
     <ClInclude Include="Inc\Render\IRenderable.hpp" />
     <ClInclude Include="Inc\Render\IStarRenderer.hpp" />
+    <ClInclude Include="Inc\Render\NoiseCloudRenderer.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererFactory.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererHigh.hpp" />
     <ClInclude Include="Inc\Render\PlanetRendererLow.hpp" />
@@ -240,6 +241,7 @@
     <ClCompile Include="Src\Render\DirectX\Effect.cpp" />
     <ClCompile Include="Src\Render\DirectX\EffectManager.cpp" />
     <ClCompile Include="Src\Render\Gradient.cpp" />
+    <ClCompile Include="Src\Render\NoiseCloudRenderer.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererHigh.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererLow.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererMed.cpp" />

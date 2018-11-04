@@ -4,6 +4,7 @@
 
 #include "Render/IPlanetRenderer.hpp"
 #include "Render/IAtmosphereRenderer.hpp"
+#include "Render/NoiseCloudRenderer.hpp"
 
 namespace Galactic
 {
@@ -81,6 +82,7 @@ namespace Galactic
             IBody *m_influence;
             std::unique_ptr<IPlanetRenderer> m_renderer;
             std::unique_ptr<IAtmosphereRenderer> m_atmosphere;
+            std::unique_ptr<NoiseCloudRenderer> m_clouds;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
     };
 }

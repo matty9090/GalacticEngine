@@ -176,6 +176,9 @@
     <ClInclude Include="Inc\Render\DirectX\EffectManager.hpp">
       <Filter>Render\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\NoiseCloudRenderer.hpp">
+      <Filter>Render\Body</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -254,6 +257,9 @@
     </ClCompile>
     <ClCompile Include="Src\Render\DirectX\EffectManager.cpp">
       <Filter>Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\NoiseCloudRenderer.cpp">
+      <Filter>Render\Body</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

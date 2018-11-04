@@ -140,7 +140,7 @@ void Game::Update(DX::StepTimer const& timer)
 
     m_camera->Update(dt);
     m_system->SetCameraPos(m_camera->GetPosition());
-    m_system->Update(dt * 0.000f);
+    m_system->Update(dt * 0.01f);
 }
 
 // Draws the scene.
