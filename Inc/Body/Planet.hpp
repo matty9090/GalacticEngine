@@ -5,6 +5,7 @@
 #include "Render/IPlanetRenderer.hpp"
 #include "Render/IAtmosphereRenderer.hpp"
 #include "Render/NoiseCloudRenderer.hpp"
+#include "Render/GrassRenderer.hpp"
 
 namespace Galactic
 {
@@ -61,6 +62,7 @@ namespace Galactic
             size_t GetVertexCount() { return m_vertexCount; }
 
             DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal);
+            GrassDistributor &GetGrassDistributor() { return m_grass->GetDistributor(); }
 
         private:
             std::string m_name;
@@ -83,6 +85,7 @@ namespace Galactic
             std::unique_ptr<IPlanetRenderer> m_renderer;
             std::unique_ptr<IAtmosphereRenderer> m_atmosphere;
             std::unique_ptr<NoiseCloudRenderer> m_clouds;
+            std::unique_ptr<GrassRenderer> m_grass;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
     };
 }

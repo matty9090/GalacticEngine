@@ -112,9 +112,9 @@ void SphericalQuadTreeTerrain::Generate()
         m_faces[i] = std::make_unique<TerrainNode>(this, nullptr, m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
         m_faces[i]->SetMatrix(orientations[i]);
         
-#ifdef _DEBUG
+//#ifdef _DEBUG
         m_faces[i]->SetDebugName(std::to_string(i));
-#endif
+//#endif
     }
     
     for (int i = 0; i < 6; ++i) {

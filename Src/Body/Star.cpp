@@ -12,13 +12,13 @@ Star::Star(std::string name, ID3D11DeviceContext *context) : m_name(name), m_inf
 {
     m_world = Matrix::Identity;
     m_renderer = CreateStarRenderer(context, this);
-    m_billboard = std::make_unique<Billboard>(context, this, "Resources/StarGlow.png");
+    m_billboard = std::make_unique<Billboard>(context, this, Vector3::Zero, "Resources/StarGlow.png", Billboard::Additive);
 }
 
 void Star::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
     //m_renderer->Render(view, proj);
-    m_billboard->Render(view, proj);
+    //m_billboard->Render(view, proj);
 }
 
 void Star::Update(float dt)

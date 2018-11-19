@@ -2,6 +2,7 @@
 
 #include "IBody.hpp"
 #include "Render/Gradient.hpp"
+#include "Render/GrassDistributor.hpp"
 
 namespace Galactic
 {
@@ -46,6 +47,7 @@ namespace Galactic
             virtual void IncrementVertices(size_t num) = 0;
             virtual size_t GetVertexCount() = 0;
             virtual DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal) = 0;
+            virtual GrassDistributor &GetGrassDistributor() = 0;
 
             virtual ~IPlanet() {}
     };

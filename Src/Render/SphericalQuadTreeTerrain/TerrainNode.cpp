@@ -21,10 +21,15 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
     ID3D11Device *device;
     m_context->GetDevice(&device);
 
-    m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
     m_world = IsRoot() ? Matrix::Identity : m_parent->GetMatrix();
     m_depth = -(int)log2f(m_scale);
     m_diameter = m_scale * m_terrain->GetRadius() * 2;
+    m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
+
+    //Vector3 mid = Vector3::Transform(Vector3(0, m_terrain->GetRadius(), 0), m_world);
+
+    //m_grass = std::make_unique<Billboard>(m_context, m_planet, mid, "Resources/grass.png", Billboard::Alpha);
+    //m_grass->SetScale(0.1f);
 
 #ifdef _DEBUG
     m_dbgCol    = Color(0.0f, 0.0f, 1.0f, 0.15f);
@@ -158,6 +163,12 @@ void TerrainNode::Generate()
     }
 
     m_planet->IncrementVertices(gridsize * gridsize * 4);
+
+    Vector3 center = m_vertices[(gridsize * gridsize) / 2].position;
+    Vector3 normal = center;
+    normal.Normalize();
+    
+    m_planet->GetGrassDistributor().AddPatch(m_dbgName, Vector3::Transform(center, m_terrain->GetMatrix()), normal);
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -166,6 +177,8 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         if (IsLeaf())
         {
+            m_terrain->SetRenderContext();
+
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
             MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
 
@@ -247,12 +260,14 @@ void TerrainNode::Split()
         m_children[SE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y + d, d }, SE);
         m_children[SW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y + d, d }, SW);
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
         m_children[NW]->SetDebugName(m_dbgName + "_" + std::to_string(NW));
         m_children[NE]->SetDebugName(m_dbgName + "_" + std::to_string(NE));
         m_children[SE]->SetDebugName(m_dbgName + "_" + std::to_string(SE));
         m_children[SW]->SetDebugName(m_dbgName + "_" + std::to_string(SW));
-#endif
+//#endif
+
+        m_planet->GetGrassDistributor().RemovePatch(m_dbgName);
 
         for (auto &child : m_children)
             child->Generate();

@@ -2,6 +2,8 @@
 
 #include "Body/IPlanet.hpp"
 #include "ISphericalTerrain.hpp"
+
+#include "Render/Billboard.hpp"
 #include "Render/Drawable.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
@@ -76,6 +78,7 @@ namespace Galactic
             IPlanet *m_planet;
             TerrainNode *m_parent;
             ISphericalTerrain *m_terrain;
+
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
 
             // Debug
