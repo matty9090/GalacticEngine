@@ -10,7 +10,7 @@ GrassRenderer::GrassRenderer(ID3D11DeviceContext *context, IPlanet *planet)
       m_distributor()
 {
     m_grass = std::make_unique<Billboard>(context, planet, Vector3::Zero, "Resources/grass.png", Billboard::Alpha);
-    m_grass->SetScale(0.1f);
+    m_grass->SetScale(0.001f);
 }
 
 GrassRenderer::~GrassRenderer()

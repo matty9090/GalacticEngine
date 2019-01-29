@@ -3,6 +3,10 @@
 #include <d3d11.h>
 #include <wrl/client.h>
 
+#include <mutex>
+
+//std::mutex d_mutex;
+
 namespace Galactic
 {
     template <class VertexType, class IndexType = uint16_t>
@@ -24,6 +28,8 @@ namespace Galactic
             ID3D11Device *m_device;
 
             bool m_generated;
+
+            std::mutex mutex;
 
         protected:
             std::vector<VertexType> m_vertices;
@@ -62,6 +68,8 @@ namespace Galactic
     template<class VertexType, class IndexType>
     inline void Drawable<VertexType, IndexType>::Init()
     {
+        std::lock_guard<std::mutex> lock(mutex);
+
         Cleanup();
 
         m_vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertices.size();

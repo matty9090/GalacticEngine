@@ -35,7 +35,7 @@ NoiseCloudRenderer::NoiseCloudRenderer(ID3D11DeviceContext *context, IPlanet *pl
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
 
-    DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
+    DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()), "Creating raster");
 
     m_buffer  = std::make_unique<ConstantBuffer<CloudBuffer>>(device);
     m_buffer2 = std::make_unique<ConstantBuffer<ScatterBuffer>>(device);

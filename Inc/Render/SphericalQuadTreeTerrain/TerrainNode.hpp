@@ -79,6 +79,8 @@ namespace Galactic
             TerrainNode *m_parent;
             ISphericalTerrain *m_terrain;
 
+            std::mutex mutex;
+
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
 
             // Debug
@@ -88,7 +90,7 @@ namespace Galactic
             std::unique_ptr<DirectX::BasicEffect> m_dbgEffect;
             std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_dbgBatch;
             Microsoft::WRL::ComPtr<ID3D11InputLayout> m_dbgInputLayout;
-
+                
             std::vector<PlanetVertex> m_originalVertices;
             std::vector<int> m_texIndex;
             std::array<std::vector<uint16_t>, 4> m_edges;

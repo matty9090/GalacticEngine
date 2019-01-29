@@ -41,7 +41,7 @@ namespace Galactic
 
         private:
             std::map<EBiomes, std::unique_ptr<Biome>> m_biomes;
-            FastNoise m_noise, m_bnoise;
+            FastNoise m_noise, m_snoise, m_bnoise;
             DirectX::SimpleMath::Matrix m_world;
 
             IPlanet *m_planet;

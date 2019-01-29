@@ -68,12 +68,30 @@
 #include <iostream>
 #include <queue>
 
+#include <comdef.h>
+
 namespace DX
 {
-    inline void ThrowIfFailed(HRESULT hr)
+    inline void ThrowIfFailed(HRESULT hr, std::string reason = "")
     {
         if (FAILED(hr))
         {
+            /*_com_error err(hr);
+            LPCTSTR errMsg = err.ErrorMessage();
+
+            MessageBoxW(NULL, errMsg, L"Error", MB_OK);
+            throw std::exception();*/
+
+            TCHAR szBuffer[200];
+
+            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
+                NULL, hr,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+                (LPTSTR)szBuffer,
+                200,
+                NULL);
+
+            MessageBoxW(NULL, szBuffer, L"Error", MB_OK);
             throw std::exception();
         }
     }

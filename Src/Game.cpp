@@ -20,7 +20,7 @@ Game::Game() noexcept :
     m_window(nullptr),
     m_outputWidth(1280),
     m_outputHeight(960),
-    m_featureLevel(D3D_FEATURE_LEVEL_11_1),
+    m_featureLevel(D3D_FEATURE_LEVEL_11_0),
     m_showUI(false),
     m_paused(false)
 {
@@ -113,6 +113,14 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::F2)) planet->Generate(Galactic::EDetail::Medium);
     if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
     if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
+    
+    float detailHeightMod = planet->GetParam(Galactic::EParams::DetailHeightMod);
+    float detailFrequency = planet->GetParam(Galactic::EParams::DetailFrequency);
+
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad7)) { planet->SetParam(Galactic::EParams::DetailHeightMod, detailHeightMod + 0.02f); planet->Generate(Galactic::EDetail::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad8)) { planet->SetParam(Galactic::EParams::DetailHeightMod, detailHeightMod - 0.02f); planet->Generate(Galactic::EDetail::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad4)) { planet->SetParam(Galactic::EParams::DetailFrequency, detailFrequency + 0.02f); planet->Generate(Galactic::EDetail::High); }
+    if (m_tracker.IsKeyReleased(Keyboard::NumPad5)) { planet->SetParam(Galactic::EParams::DetailFrequency, detailFrequency - 0.02f); planet->Generate(Galactic::EDetail::High); }
 
     m_camera->Events(m_mouse.get(), mouse, dt);
 
@@ -132,7 +140,7 @@ void Game::Update(DX::StepTimer const& timer)
     float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_camera->GetPosition(), closestBody->GetPoint(dir)))) * 30.0f;
 
-    factor = std::fminf(std::fmaxf(factor, 0.1f), 100000.0f);
+    factor = std::fminf(std::fmaxf(factor, 0.02f), 100000.0f);
 
     move = move * factor * dt;
     m_speed = factor;
@@ -191,7 +199,7 @@ void Game::Present()
     }
     else
     {
-        DX::ThrowIfFailed(hr);
+        DX::ThrowIfFailed(hr, "Device reset");
     }
 }
 
@@ -270,7 +278,7 @@ void Game::CreateDevice()
         device.ReleaseAndGetAddressOf(),    // returns the Direct3D device created
         &m_featureLevel,                    // returns feature level of device created
         context.ReleaseAndGetAddressOf()    // returns the device immediate context
-        ));
+        ), "Creating device");
 
 #ifndef NDEBUG
     ComPtr<ID3D11Debug> d3dDebug;
@@ -374,7 +382,7 @@ void Game::CreateResources()
         }
         else
         {
-            DX::ThrowIfFailed(hr);
+            DX::ThrowIfFailed(hr, "Device error");
         }
     }
     else
@@ -412,7 +420,7 @@ void Game::CreateResources()
             &fsSwapChainDesc,
             nullptr,
             m_swapChain.ReleaseAndGetAddressOf()
-            ));
+            ), "Creating swapchain");
 
         // This template does not support exclusive fullscreen mode and prevents DXGI from responding to the ALT+ENTER shortcut.
         DX::ThrowIfFailed(dxgiFactory->MakeWindowAssociation(m_window, DXGI_MWA_NO_ALT_ENTER));

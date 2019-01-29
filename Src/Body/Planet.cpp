@@ -47,11 +47,11 @@ void Planet::Generate(EDetail detail)
         m_clouds->Reset();
         m_clouds.reset();
 
-        m_grass->Reset();
-        m_grass.reset();
+        //m_grass->Reset();
+        //m_grass.reset();
     }
 
-    m_grass = std::make_unique<GrassRenderer>(m_deviceContext.Get(), this);
+    //m_grass = std::make_unique<GrassRenderer>(m_deviceContext.Get(), this);
     m_renderer = CreatePlanetRenderer(m_deviceContext, this, detail);
     m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this, detail);
     m_clouds = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);
@@ -73,8 +73,8 @@ void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matri
     if (m_clouds)
         m_clouds->Render(view, proj);
 
-    if (m_grass)
-        m_grass->Render(view, proj);
+    //if (m_grass)
+    //    m_grass->Render(view, proj);
 }
 
 void Planet::Update(float dt)
@@ -93,7 +93,7 @@ void Planet::Update(float dt)
     if (m_renderer) m_renderer->Update(dt);
     if (m_atmosphere) m_atmosphere->Update(dt);
     if (m_clouds) m_clouds->Update(dt);
-    if (m_grass) m_grass->Update(dt);
+    //if (m_grass) m_grass->Update(dt);
 }
 
 void Planet::Reset()
@@ -101,12 +101,12 @@ void Planet::Reset()
     if (m_renderer) m_renderer->Reset();
     if (m_atmosphere) m_atmosphere->Reset();
     if (m_clouds) m_clouds->Reset();
-    if (m_grass) m_grass->Reset();
+    //if (m_grass) m_grass->Reset();
 
     m_renderer.reset();
     m_atmosphere.reset();
     m_clouds.reset();
-    m_grass.reset();
+    //m_grass.reset();
 }
 
 void Galactic::Planet::ReadSettings(std::string file)

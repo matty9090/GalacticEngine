@@ -22,6 +22,8 @@ namespace Galactic
         BiomeFrequency,
         BiomeScale,
         BiomeLacunarity,
+        DetailFrequency,
+        DetailHeightMod
     };
 
     class IPlanet : public IBody

@@ -9,7 +9,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 15;
+    size_t SphericalQuadTreeTerrain::GridSize = 51;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -59,8 +59,8 @@ void SphericalQuadTreeTerrain::CreateEffect()
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
 
-    DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
-    DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()));
+    DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()), "Creating raster");
+    DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()), "Creating raster");
 
     m_textures.resize(2);
 
@@ -85,6 +85,9 @@ void SphericalQuadTreeTerrain::Generate()
     m_noise.SetFractalLacunarity(m_planet->GetParam(EParams::Lacunarity));
     m_noise.SetFrequency(m_planet->GetParam(EParams::Frequency));
     m_noise.SetSeed(m_planet->GetSeed());
+
+    m_snoise = m_noise;
+    m_snoise.SetFrequency(m_planet->GetParam(EParams::Frequency) * m_planet->GetParam(EParams::DetailFrequency));
 
     m_bnoise = m_noise;
     m_bnoise.SetSeed(m_planet->GetSeed() + 1);
@@ -194,8 +197,9 @@ void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &
     float z = p.z * 40.0f;
 
     float e = (m_noise.GetNoise(x * scale, y * scale, z * scale) + 1.0f) / 2.0f;
+    float s = (m_snoise.GetNoise(x * scale, y * scale, z * scale) + 1.0f) / 2.0f;
     float m = (m_bnoise.GetNoise(x * bscale, y * bscale, z * bscale) + 1.0f) / 2.0f;
-    float h = e * m_planet->GetParam(EParams::Height);
+    float h = (e + s * m_planet->GetParam(EParams::DetailHeightMod)) * m_planet->GetParam(EParams::Height);
 
     if (e < 0.53f) texIndex = 0;
     else if (e < 0.51f) texIndex = 1;
@@ -205,7 +209,7 @@ void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &
 
     /*if (e > 0.8f)
     {
-
+        
     }
 
     if (e > 0.8f)
@@ -215,6 +219,6 @@ void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &
         else if (m < 0.5f) texIndex = (int)EBiomes::Mountains;
     }*/
 
-    height = 0;
+    height = h;
     biomeLookup = Vector2(m, 1.0f - e);
 }

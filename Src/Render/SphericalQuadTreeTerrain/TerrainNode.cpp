@@ -2,11 +2,14 @@
 #include "Render/SphericalQuadTreeTerrain/TerrainNode.hpp"
 #include "Render/SphericalQuadTreeTerrain/SphericalQuadTreeTerrain.hpp"
 
+#include <thread>
+#include <mutex>
+
 using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 30.0f;
+float TerrainNode::SplitDistance = 20.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -96,7 +99,7 @@ void TerrainNode::Generate()
 
                 int tex;
                 float height;
-                Vector2 biome; 
+                Vector2 biome;
 
                 m_terrain->GetHeight(pos, height, biome, tex);
 
@@ -163,12 +166,6 @@ void TerrainNode::Generate()
     }
 
     m_planet->IncrementVertices(gridsize * gridsize * 4);
-
-    Vector3 center = m_vertices[(gridsize * gridsize) / 2].position;
-    Vector3 normal = center;
-    normal.Normalize();
-    
-    m_planet->GetGrassDistributor().AddPatch(m_dbgName, Vector3::Transform(center, m_terrain->GetMatrix()), normal);
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -177,7 +174,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         if (IsLeaf())
         {
-            m_terrain->SetRenderContext();
+            //m_terrain->SetRenderContext();
 
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
             MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
@@ -260,20 +257,30 @@ void TerrainNode::Split()
         m_children[SE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y + d, d }, SE);
         m_children[SW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y + d, d }, SW);
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
         m_children[NW]->SetDebugName(m_dbgName + "_" + std::to_string(NW));
         m_children[NE]->SetDebugName(m_dbgName + "_" + std::to_string(NE));
         m_children[SE]->SetDebugName(m_dbgName + "_" + std::to_string(SE));
         m_children[SW]->SetDebugName(m_dbgName + "_" + std::to_string(SW));
-//#endif
+#endif
 
-        m_planet->GetGrassDistributor().RemovePatch(m_dbgName);
+        //m_planet->GetGrassDistributor().RemovePatch(m_dbgName);
+
+        std::vector<std::thread> threads;
 
         for (auto &child : m_children)
-            child->Generate();
+            threads.push_back(std::thread([&]() { child->Generate(); }));
+
+        for (auto &t : threads)
+            t.join();
+
+        threads.clear();
 
         for (auto &child : m_children)
-            child->FixEdges();
+            threads.push_back(std::thread([&]() { child->FixEdges(); }));
+
+        for (auto &t : threads)
+            t.join();
 
         NotifyNeighbours();
     }

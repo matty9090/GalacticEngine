@@ -48,6 +48,9 @@ std::unique_ptr<IPlanet> PlanetGenerator::CreateRocky(std::string name, double m
     planet->SetParam(EParams::BiomeGain, planet->GetParam(EParams::Gain));
     planet->SetParam(EParams::BiomeScale, planet->GetParam(EParams::NoiseScale));
 
+    planet->SetParam(EParams::DetailFrequency, planet->GetParam(EParams::Frequency) * 0.1f);
+    planet->SetParam(EParams::DetailHeightMod, planet->GetParam(EParams::Height) * 0.1f);
+
     return planet;
 }
 

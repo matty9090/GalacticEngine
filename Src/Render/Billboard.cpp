@@ -42,7 +42,7 @@ Billboard::Billboard(ID3D11DeviceContext *context, IBody *parent, DirectX::Simpl
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
 
-    DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
+    DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()), "Creating raster");
 
     m_buffer = std::make_unique<ConstantBuffer<BillboardBuffer>>(device);
     m_states = std::make_unique<CommonStates>(device);
@@ -57,7 +57,6 @@ void Billboard::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Ma
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
     auto sampler = m_states->AnisotropicWrap();
-
     auto blendmethod = m_states->NonPremultiplied();
 
     if (m_blend == Additive)
@@ -65,7 +64,7 @@ void Billboard::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Ma
 
     m_context->PSSetSamplers(0, 1, &sampler);
     m_context->RSSetState(m_raster.Get());
-    m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+    m_context->OMSetDepthStencilState(m_states->DepthNone(), 0);
     m_context->OMSetBlendState(blendmethod, factor, 0xFFFFFFFF);
 
     m_context->IASetInputLayout(m_effect->GetInputLayout());
@@ -74,6 +73,7 @@ void Billboard::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Ma
     m_context->PSSetShaderResources(0, 1, m_texture.GetAddressOf());
 
     m_world = Matrix::CreateScale(m_scale);
+    //m_world *= Matrix::CreateTranslation(m_parent->GetPosition() + m_offset);
     m_world *= Matrix::CreateBillboard(m_parent->GetPosition() + m_offset, m_parent->GetCameraPos(), Vector3::Up, &Vector3::Forward);
 
     Matrix worldViewProj = m_world * view * proj;
