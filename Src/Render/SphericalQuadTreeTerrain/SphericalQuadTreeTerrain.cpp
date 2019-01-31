@@ -106,8 +106,12 @@ void SphericalQuadTreeTerrain::Generate()
     auto row2 = BiomeConfig::Row().AddBiome(0.6f, { 0.0f, 1.0f, 0.0f })
                                   .AddBiome(1.0f, { 0.0f, 0.0f, 1.0f });
 
-    m_biomeConf.AddBiomeRow(row1, 0.5f);
-    m_biomeConf.AddBiomeRow(row2, 1.0f);
+    auto row3 = BiomeConfig::Row().AddBiome(0.8f, { 1.0f, 0.0f, 0.0f })
+                                  .AddBiome(1.0f, { 0.0f, 1.0f, 1.0f });
+
+    m_biomeConf.AddBiomeRow(row1, 0.33f);
+    m_biomeConf.AddBiomeRow(row2, 0.67f);
+    m_biomeConf.AddBiomeRow(row3, 1.00f);
 
     ID3D11Texture2D *tex = NULL;
 
