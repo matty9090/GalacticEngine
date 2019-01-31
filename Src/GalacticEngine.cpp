@@ -11,10 +11,7 @@ using DirectX::SimpleMath::Color;
 namespace Galactic {
     void InitEngine()
     {
-        Biomes[EBiomes::Grass] = { 10, 0.45f, 1.9f, 0.04f, 0.04f, 1.0f, Color(0.0f, 1.0f, 0.0f) };
-        Biomes[EBiomes::Desert] = { 10, 0.45f, 1.9f, 0.04f, 0.04f, 1.0f, Color(1.0f, 1.0f, 0.0f) };
-        Biomes[EBiomes::Mountains] = { 10, 0.6f, 1.9f, 0.04f, 0.04f, 1.0f, Color(0.6f, 0.6f, 0.6f) };
-        Biomes[EBiomes::Ocean].colour = Color(0.0f, 0.0f, 1.0f);
+        
     }
 
     void CancelCurrentGeneration()
@@ -53,5 +50,14 @@ namespace Galactic {
         planet->SetRadius(radius);
 
         return planet;
+    }
+
+    std::unique_ptr<Galactic::FlatEarth> CreateFlatEarth(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius)
+    {
+        std::unique_ptr<Galactic::FlatEarth> fe = std::make_unique<Galactic::FlatEarth>(deviceContext, name);
+        fe->SetMass(mass);
+        fe->SetRadius(radius);
+
+        return fe;
     }
 }

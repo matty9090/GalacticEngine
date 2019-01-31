@@ -8,46 +8,33 @@
 
 namespace Galactic
 {
-    enum class EBiomes { Grass, Mountains, Desert, Ocean, Beach };
-
-    /*
-        TODO: Remove
-    */
-
-    struct NoiseParameters
-    {
-        int octaves;
-        float gain;
-        float lacunarity;
-        float frequency;
-        float height;
-        float scale;
-
-        DirectX::SimpleMath::Color colour;
-    };
-
-    extern std::map<EBiomes, NoiseParameters> Biomes;
-
-    class Biome
+    class BiomeConfig
     {
         public:
-            Biome(FastNoise &noise, NoiseParameters params) : m_noise(noise), m_params(params) {}
+            struct Row
+            {
+                friend class BiomeConfig;
 
-            virtual float GetHeight(float x, float y, float z);
-            virtual DirectX::SimpleMath::Color GetColour(float h);
+                public:
+                    Row &AddBiome(float moisture, DirectX::SimpleMath::Color colour)
+                    {
+                        moisture = (moisture > 1.0f) ? 1.0f : moisture;
+                        biomes[moisture] = colour;
+                        return *this;
+                    }
 
-        protected:
-            FastNoise &m_noise;
-            NoiseParameters m_params;
+                    size_t GetCount() { return biomes.size(); }
 
-            void SetNoiseParams();
-    };
+                private:
+                    std::map<float, DirectX::SimpleMath::Color> biomes;
+            };
 
-    class OceanBiome : public Biome
-    {
-        public:
-            OceanBiome(FastNoise &noise, NoiseParameters params) : Biome(noise, params) {}
+            BiomeConfig() {}
 
-            float GetHeight(float x, float y, float z);
+            void Generate(ID3D11Device *device, ID3D11Texture2D **tex, ID3D11ShaderResourceView **srv, size_t width, size_t height);
+            void AddBiomeRow(Row row, float elevation);
+
+        private:
+            std::map<float, Row> biomes;
     };
 }

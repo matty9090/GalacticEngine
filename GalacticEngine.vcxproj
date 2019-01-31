@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\Body\IBody.hpp" />
+    <ClInclude Include="Inc\Body\FlatEarth.hpp" />
     <ClInclude Include="Inc\Body\IPlanet.hpp" />
     <ClInclude Include="Inc\Body\IStar.hpp" />
     <ClInclude Include="Inc\Body\Planet.hpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="Src\StepTimer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Body\FlatEarth.cpp" />
     <ClCompile Include="Src\Body\Planet.cpp" />
     <ClCompile Include="Src\Body\Star.cpp" />
     <ClCompile Include="Src\GalacticEngine.cpp" />

@@ -40,7 +40,7 @@ namespace Galactic
             static size_t MaxSplitsPerFrame;
 
         private:
-            std::map<EBiomes, std::unique_ptr<Biome>> m_biomes;
+            BiomeConfig m_biomeConf;
             FastNoise m_noise, m_snoise, m_bnoise;
             DirectX::SimpleMath::Matrix m_world;
 
@@ -62,5 +62,7 @@ namespace Galactic
             std::vector<ID3D11ShaderResourceView*> m_textures;
 
             float m_radius;
+
+            void GetBiomeTexture();
     };
 }

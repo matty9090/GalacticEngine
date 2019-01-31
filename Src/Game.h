@@ -80,4 +80,5 @@ private:
 
     std::unique_ptr<Galactic::Camera>				m_camera;
     std::unique_ptr<Galactic::IStarSystem>          m_system;
+    std::unique_ptr<Galactic::FlatEarth>            m_fe;
 };

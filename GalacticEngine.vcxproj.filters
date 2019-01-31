@@ -188,6 +188,9 @@
     <ClInclude Include="Inc\Render\GrassDistributor.hpp">
       <Filter>Render\Body</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Body\FlatEarth.hpp">
+      <Filter>Body</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -278,6 +281,9 @@
     </ClCompile>
     <ClCompile Include="Src\Render\GrassDistributor.cpp">
       <Filter>Render\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Body\FlatEarth.cpp">
+      <Filter>Body</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
