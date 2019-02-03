@@ -3,8 +3,6 @@
 #include "Render/SphericalQuadTreeTerrain/SphericalQuadTreeTerrain.hpp"
 #include "WICTextureLoader.h"
 
-#include <wincodecsdk.h>
-
 using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -72,9 +70,9 @@ void SphericalQuadTreeTerrain::CreateEffect()
     // TODO: Cache resources as this is very slow
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/biomes.png", NULL, NULL, &m_texBiomes, NULL);
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/grass01d.jpg", NULL, NULL, &m_textures[0], NULL);
-    D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/grass01n.png", NULL, NULL, &m_textures[0], NULL);
+    D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Biomes/grass01n.png", NULL, NULL, &m_textures[0], NULL);
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/snow01d.png", NULL, NULL, &m_textures[2], NULL);
-    D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/snow01n.png", NULL, NULL, &m_textures[1], NULL);
+    D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Biomes/snow01n.png", NULL, NULL, &m_textures[1], NULL);
 
     m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
@@ -100,27 +98,27 @@ void SphericalQuadTreeTerrain::Generate()
     m_bnoise.SetFractalGain(m_planet->GetParam(EParams::BiomeGain));
     m_bnoise.SetFractalLacunarity(m_planet->GetParam(EParams::BiomeLacunarity));
 
-    auto row1 = BiomeConfig::Row().AddBiome(0.1f, Biomes::Scorched)
-                                  .AddBiome(0.2f, Biomes::Bare)
-                                  .AddBiome(0.5f, Biomes::Tundra)
-                                  .AddBiome(1.0f, Biomes::Snowy);
+    auto row1 = BiomeConfig::Row().AddBiome(0.1f, "Scorched")
+                                  .AddBiome(0.2f, "Bare")
+                                  .AddBiome(0.5f, "Tundra")
+                                  .AddBiome(1.0f, "Snowy");
 
-    auto row2 = BiomeConfig::Row().AddBiome(0.3f, Biomes::Desert)
-                                  .AddBiome(0.6f, Biomes::ShrubLand)
-                                  .AddBiome(1.0f, Biomes::Taiga);
+    auto row2 = BiomeConfig::Row().AddBiome(0.3f, "Desert")
+                                  .AddBiome(0.6f, "ShrubLand")
+                                  .AddBiome(1.0f, "Taiga");
 
-    auto row3 = BiomeConfig::Row().AddBiome(0.2f, Biomes::Desert)
-                                  .AddBiome(0.5f, Biomes::GrassLand)
-                                  .AddBiome(0.8f, Biomes::Forest)
-                                  .AddBiome(1.0f, Biomes::TempRainForest);
+    auto row3 = BiomeConfig::Row().AddBiome(0.2f, "Desert")
+                                  .AddBiome(0.5f, "GrassLand")
+                                  .AddBiome(0.8f, "Forest")
+                                  .AddBiome(1.0f, "TempRainForest");
 
-    auto row4 = BiomeConfig::Row().AddBiome(0.2f, Biomes::DryDesert)
-                                  .AddBiome(0.3f, Biomes::GrassLand)
-                                  .AddBiome(0.7f, Biomes::TropForest)
-                                  .AddBiome(1.0f, Biomes::TropRainForest);
+    auto row4 = BiomeConfig::Row().AddBiome(0.2f, "DryDesert")
+                                  .AddBiome(0.3f, "GrassLand")
+                                  .AddBiome(0.7f, "TropForest")
+                                  .AddBiome(1.0f, "TropRainForest");
 
-    auto row5 = BiomeConfig::Row().AddBiome(1.0f, Biomes::Beach);
-    auto row6 = BiomeConfig::Row().AddBiome(1.0f, Biomes::Ocean);
+    auto row5 = BiomeConfig::Row().AddBiome(1.0f, "Beach");
+    auto row6 = BiomeConfig::Row().AddBiome(1.0f, "Ocean");
 
     m_biomeConf.AddBiomeRow(row1, 0.10f);
     m_biomeConf.AddBiomeRow(row2, 0.20f);
@@ -129,11 +127,7 @@ void SphericalQuadTreeTerrain::Generate()
     m_biomeConf.AddBiomeRow(row5, 0.62f);
     m_biomeConf.AddBiomeRow(row6, 1.00f);
 
-    ID3D11Texture2D *tex = NULL;
-
-    m_biomeConf.Generate(m_device.Get(), &tex, &m_texBiomes, 200, 200);
-
-    DX::ThrowIfFailed(DirectX::SaveWICTextureToFile(m_deviceContext.Get(), (ID3D11Resource*)tex, GUID_ContainerFormatPng, L"Resources/b.png"));
+    m_biomeConf.Generate(m_device.Get(), &m_texBiomes, 1024, 1024);
 
     std::array<Matrix, 6> orientations = 
     {
@@ -245,19 +239,7 @@ void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &
     else if (e < 0.51f) texIndex = 1;
     else texIndex = 1;
 
-    /* TODO: Automatic biome resolution */
-
-    /*if (e > 0.8f)
-    {
-        
-    }
-
-    if (e > 0.8f)
-    {
-        if (m < 0.1f) texIndex = (int)EBiomes::Desert;
-        else if (m < 0.2f) texIndex = (int)EBiomes::Mountains;
-        else if (m < 0.5f) texIndex = (int)EBiomes::Mountains;
-    }*/
+    auto biome = m_biomeConf.Sample(m, e);
 
     height = h;
     biomeLookup = Vector2(m, 1.0f - e);

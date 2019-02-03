@@ -1,48 +1,61 @@
 #include "pch.h"
 #include "Noise/Biome.hpp"
+
 #include <fstream>
+#include <wincodecsdk.h>
 
 using namespace Galactic;
 
-void Galactic::BiomeConfig::Generate(ID3D11Device *device, ID3D11Texture2D **tex, ID3D11ShaderResourceView **srv, size_t width, size_t height)
+std::map<std::string, Biome> BiomeConfig::Biomes;
+
+BiomeConfig::~BiomeConfig()
 {
-    float **pixels = new float*[height];
+    Clear();
+}
 
-    for (size_t y = 0; y < height; ++y)
-        pixels[y] = new float[width * 4];
+void BiomeConfig::Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv, size_t w, size_t h)
+{
+    Clear();
 
-    for (size_t y = 0; y < height; ++y)
+    m_width = w;
+    m_height = h;
+
+    m_pixels = new float*[m_height];
+
+    for (size_t y = 0; y < m_height; ++y)
+        m_pixels[y] = new float[m_width * 4];
+
+    for (size_t y = 0; y < m_height; ++y)
     {
-        for (size_t x = 0; x < width * 4; x += 4)
+        for (size_t x = 0; x < m_width * 4; x += 4)
         {
-            pixels[y][x + 0] = 0.0f;
-            pixels[y][x + 1] = 0.0f;
-            pixels[y][x + 2] = 0.0f;
-            pixels[y][x + 3] = 1.0f;
+            m_pixels[y][x + 0] = 0.0f;
+            m_pixels[y][x + 1] = 0.0f;
+            m_pixels[y][x + 2] = 0.0f;
+            m_pixels[y][x + 3] = 1.0f;
         }
     }
-
     
     size_t minY = 0;
 
-    for (auto row : biomes)
+    for (auto row : m_biomes)
     {
         float elevation = row.first;
-        size_t maxY = (int)((float)height * elevation);
+        size_t maxY = (int)((float)m_height * elevation);
         size_t minX = 0;
 
         for (auto col : row.second.biomes)
         {
             float  moisture = col.first;
-            auto   colour = col.second;
-            size_t maxX = (int)((float)width * moisture);
+            auto   colour = Biomes[col.second].Colour;
+            size_t maxX = (int)((float)m_width * moisture);
 
             for (size_t y = minY; y < maxY; ++y) {
                 for (size_t x = minX * 4; x < maxX * 4; x += 4) {
-                    pixels[y][x + 0] = colour.R() - 0.2f;
-                    pixels[y][x + 1] = colour.G() - 0.2f;
-                    pixels[y][x + 2] = colour.B() - 0.2f;
-                    pixels[y][x + 3] = 1.0f;
+                    m_pixels[y][x + 0] = colour.R() - 0.2f;
+                    m_pixels[y][x + 1] = colour.G() - 0.2f;
+                    m_pixels[y][x + 2] = colour.B() - 0.2f;
+                    m_pixels[y][x + 3] = 1.0f;
                 }
             }
 
@@ -53,8 +66,8 @@ void Galactic::BiomeConfig::Generate(ID3D11Device *device, ID3D11Texture2D **tex
     }
 
     D3D11_TEXTURE2D_DESC desc = {};
-    desc.Width = width;
-    desc.Height = height;
+    desc.Width = m_width;
+    desc.Height = m_height;
     desc.MipLevels = 1;
     desc.ArraySize = 1;
     desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -68,35 +81,76 @@ void Galactic::BiomeConfig::Generate(ID3D11Device *device, ID3D11Texture2D **tex
     srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     srv_desc.Texture2D.MipLevels = 1;
 
-    DX::ThrowIfFailed(device->CreateTexture2D(&desc, NULL, tex));
+    DX::ThrowIfFailed(device->CreateTexture2D(&desc, NULL, &m_tex));
 
     ID3D11DeviceContext *context;
     device->GetImmediateContext(&context);
 
     D3D11_MAPPED_SUBRESOURCE mapped;
-    DX::ThrowIfFailed(context->Map((ID3D11Resource*)(*tex), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
+    DX::ThrowIfFailed(context->Map((ID3D11Resource*)m_tex, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
 
     BYTE *textureRow = reinterpret_cast<BYTE*>(mapped.pData);
     int rowLength = desc.Width * sizeof(float) * 4;
 
-    for (unsigned int h = 0; h < desc.Height; ++h)
+    for (unsigned int height = 0; height < desc.Height; ++height)
     {
-        memcpy(textureRow, pixels[h], rowLength);
+        memcpy(textureRow, m_pixels[height], rowLength);
         textureRow += mapped.RowPitch;
     }
 
-    context->Unmap((ID3D11Resource*)(*tex), 0);
+    context->Unmap((ID3D11Resource*)m_tex, 0);
 
-    DX::ThrowIfFailed(device->CreateShaderResourceView((ID3D11Resource*)(*tex), &srv_desc, srv));
-
-    for (size_t y = 0; y < height; ++y)
-        delete[] pixels[y];
-
-    delete[] pixels;
+    DX::ThrowIfFailed(device->CreateShaderResourceView((ID3D11Resource*)m_tex, &srv_desc, srv));
+    DX::ThrowIfFailed(DirectX::SaveWICTextureToFile(context, (ID3D11Resource*)m_tex, GUID_ContainerFormatPng, L"Resources/b.png"));
 }
 
-void Galactic::BiomeConfig::AddBiomeRow(Row row, float elevation)
+void BiomeConfig::AddBiomeRow(Row row, float elevation)
 {
     elevation = (elevation > 1.0f) ? 1.0f : elevation;
-    biomes[elevation] = row;
+    m_biomes[elevation] = row;
+}
+
+void BiomeConfig::Clear()
+{
+    if (m_pixels)
+    {
+        for (size_t y = 0; y < m_height; ++y)
+            delete[] m_pixels[y];
+
+        delete[] m_pixels;
+    }
+
+    m_pixels = NULL;
+}
+
+std::string Galactic::BiomeConfig::Sample(float m, float e)
+{
+    // TODO: Create lookup table
+
+    m *= m_width;
+    e *= m_height;
+
+    size_t minY = 0;
+
+    for (auto row : m_biomes)
+    {
+        float elevation = row.first;
+        size_t maxY = (int)((float)m_height * elevation);
+        size_t minX = 0;
+
+        for (auto col : row.second.biomes)
+        {
+            float  moisture = col.first;
+            size_t maxX = (int)((float)m_width * moisture);
+
+            if (e >= minY && e < maxY && m >= minX && m < maxX)
+                return col.second;
+
+            minX = maxX;
+        }
+
+        minY = maxY;
+    }
+
+    return "BiomeNotFound";
 }

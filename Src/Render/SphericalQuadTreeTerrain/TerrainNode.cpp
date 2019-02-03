@@ -100,7 +100,7 @@ void TerrainNode::Generate()
                 int tex;
                 float height;
                 Vector2 biome;
-
+                
                 m_terrain->GetHeight(pos, height, biome, tex);
 
                 v.biome = biome;

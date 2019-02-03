@@ -8,6 +8,12 @@
 
 namespace Galactic
 {
+    struct Biome
+    {
+        std::string Texture, NormalMap;
+        DirectX::SimpleMath::Color Colour;
+    };
+
     class BiomeConfig
     {
         public:
@@ -16,47 +22,36 @@ namespace Galactic
                 friend class BiomeConfig;
 
                 public:
-                    Row &AddBiome(float moisture, DirectX::SimpleMath::Color colour)
+                    Row &AddBiome(float moisture, std::string name)
                     {
                         moisture = (moisture > 1.0f) ? 1.0f : moisture;
-                        biomes[moisture] = colour;
+                        biomes[moisture] = name;
                         return *this;
                     }
 
                     size_t GetCount() { return biomes.size(); }
 
                 private:
-                    std::map<float, DirectX::SimpleMath::Color> biomes;
+                    std::map<float, std::string> biomes;
             };
 
-            BiomeConfig() {}
+            BiomeConfig() : m_pixels(NULL) {}
+            ~BiomeConfig();
 
-            void Generate(ID3D11Device *device, ID3D11Texture2D **tex, ID3D11ShaderResourceView **srv, size_t width, size_t height);
+            void Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv, size_t width, size_t height);
             void AddBiomeRow(Row row, float elevation);
+            void Clear();
+
+            std::string Sample(float moisture, float elevation);
+
+            static std::map<std::string, Biome> Biomes;
 
         private:
-            std::map<float, Row> biomes;
-    };
+            std::map<float, Row> m_biomes;
 
-    namespace Biomes
-    {
-        namespace
-        {
-            DirectX::SimpleMath::Color Scorched         = { 0.33f, 0.33f, 0.33f };
-            DirectX::SimpleMath::Color Bare             = { 0.53f, 0.53f, 0.53f };
-            DirectX::SimpleMath::Color Tundra           = { 0.73f, 0.73f, 0.67f };
-            DirectX::SimpleMath::Color Snowy            = { 0.86f, 0.86f, 0.89f };
-            DirectX::SimpleMath::Color Desert           = { 0.79f, 0.82f, 0.61f };
-            DirectX::SimpleMath::Color ShrubLand        = { 0.53f, 0.67f, 0.46f };
-            DirectX::SimpleMath::Color Taiga            = { 0.60f, 0.67f, 0.46f };
-            DirectX::SimpleMath::Color GrassLand        = { 0.53f, 0.67f, 0.33f };
-            DirectX::SimpleMath::Color Forest           = { 0.40f, 0.59f, 0.35f };
-            DirectX::SimpleMath::Color TempRainForest   = { 0.26f, 0.53f, 0.33f };
-            DirectX::SimpleMath::Color DryDesert        = { 0.82f, 0.72f, 0.54f };
-            DirectX::SimpleMath::Color TropForest       = { 0.33f, 0.60f, 0.26f };
-            DirectX::SimpleMath::Color TropRainForest   = { 0.20f, 0.46f, 0.33f };
-            DirectX::SimpleMath::Color Beach            = { 0.63f, 0.56f, 0.46f };
-            DirectX::SimpleMath::Color Ocean            = { 0.26f, 0.26f, 0.48f };
-        }
-    }
+            ID3D11Texture2D *m_tex;
+            float **m_pixels;
+
+            size_t m_width, m_height;
+    };
 }
