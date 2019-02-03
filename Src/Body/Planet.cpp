@@ -17,7 +17,8 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_isGenerated(false),
       m_atmosphereHeight(200.0f),
       m_atmColour(Color(0.0f, 0.7f, 1.0f)),
-      m_vertexCount(0)
+      m_vertexCount(0),
+      m_cloudsEnabled(true)
 {
     m_params.resize(20);
     SetParam(EParams::Biomes, 0.0f);
@@ -70,7 +71,7 @@ void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matri
     if (m_atmosphere)
         m_atmosphere->Render(view, proj);
 
-    if (m_clouds)
+    if (m_cloudsEnabled && m_clouds)
         m_clouds->Render(view, proj);
 
     //if (m_grass)
@@ -92,7 +93,7 @@ void Planet::Update(float dt)
 
     if (m_renderer) m_renderer->Update(dt);
     if (m_atmosphere) m_atmosphere->Update(dt);
-    if (m_clouds) m_clouds->Update(dt);
+    if (m_cloudsEnabled && m_clouds) m_clouds->Update(dt);
     //if (m_grass) m_grass->Update(dt);
 }
 

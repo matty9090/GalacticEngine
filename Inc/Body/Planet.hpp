@@ -21,6 +21,7 @@ namespace Galactic
             void Update(float dt);
             void Reset();
             void ReadSettings(std::string file);
+            void EnableClouds(bool enabled) { m_cloudsEnabled = enabled; }
 
             void SetParam(EParams name, float value) { m_params[(int)name] = value; }
             float GetParam(EParams name) { return m_params[(int)name]; }
@@ -68,7 +69,7 @@ namespace Galactic
             std::string m_name;
 
             int m_seed;
-            bool m_isGenerated;
+            bool m_isGenerated, m_cloudsEnabled;
             double m_radius;
             long double m_mass;
             float m_atmosphereHeight;
