@@ -108,7 +108,7 @@ void TerrainNode::Generate()
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
                 v.uv = Vector2(xx * 4000.0f, yy * 4000.0f);
-                v.weights = tex;
+                //v.weights = tex;
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -370,6 +370,8 @@ void TerrainNode::NotifyNeighbours()
 
 void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth)
 {
+    neighbour;
+
     int diff = m_depth - depth;
     int grid = SphericalQuadTreeTerrain::GridSize;
 

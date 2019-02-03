@@ -39,7 +39,7 @@ namespace Galactic
             std::string m_name;
 
             bool m_isGenerated;
-            double m_mass, m_radius;
+            long double m_mass, m_radius;
             IBody *m_influence;
 
             ID3D11DeviceContext *m_context;

@@ -17,6 +17,8 @@ Star::Star(std::string name, ID3D11DeviceContext *context) : m_name(name), m_inf
 
 void Star::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
+    view;
+    proj;
     //m_renderer->Render(view, proj);
     //m_billboard->Render(view, proj);
 }

@@ -137,9 +137,7 @@ void Game::Update(DX::StepTimer const& timer)
     auto closestBody = static_cast<Galactic::IPlanet*>(m_system->GetClosestBody(m_camera->GetPosition()));
     auto dir = m_camera->GetPosition() - closestBody->GetPosition();
 
-    float radius = (float)(closestBody->GetRadius() / Galactic::Constants::Scale) - 0.005f;
     float factor = ((Vector3::Distance(m_camera->GetPosition(), closestBody->GetPoint(dir)))) * 30.0f;
-
     factor = std::fminf(std::fmaxf(factor, 0.02f), 100000.0f);
 
     move = move * factor * dt;

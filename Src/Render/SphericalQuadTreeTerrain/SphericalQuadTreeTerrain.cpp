@@ -100,18 +100,34 @@ void SphericalQuadTreeTerrain::Generate()
     m_bnoise.SetFractalGain(m_planet->GetParam(EParams::BiomeGain));
     m_bnoise.SetFractalLacunarity(m_planet->GetParam(EParams::BiomeLacunarity));
 
-    auto row1 = BiomeConfig::Row().AddBiome(0.2f, { 0.0f, 1.0f, 1.0f })
-                                  .AddBiome(1.0f, { 1.0f, 0.0f, 0.0f });
+    auto row1 = BiomeConfig::Row().AddBiome(0.1f, Biomes::Scorched)
+                                  .AddBiome(0.2f, Biomes::Bare)
+                                  .AddBiome(0.5f, Biomes::Tundra)
+                                  .AddBiome(1.0f, Biomes::Snowy);
 
-    auto row2 = BiomeConfig::Row().AddBiome(0.6f, { 0.0f, 1.0f, 0.0f })
-                                  .AddBiome(1.0f, { 0.0f, 0.0f, 1.0f });
+    auto row2 = BiomeConfig::Row().AddBiome(0.3f, Biomes::Desert)
+                                  .AddBiome(0.6f, Biomes::ShrubLand)
+                                  .AddBiome(1.0f, Biomes::Taiga);
 
-    auto row3 = BiomeConfig::Row().AddBiome(0.8f, { 1.0f, 0.0f, 0.0f })
-                                  .AddBiome(1.0f, { 0.0f, 1.0f, 1.0f });
+    auto row3 = BiomeConfig::Row().AddBiome(0.2f, Biomes::Desert)
+                                  .AddBiome(0.5f, Biomes::GrassLand)
+                                  .AddBiome(0.8f, Biomes::Forest)
+                                  .AddBiome(1.0f, Biomes::TempRainForest);
 
-    m_biomeConf.AddBiomeRow(row1, 0.33f);
-    m_biomeConf.AddBiomeRow(row2, 0.67f);
-    m_biomeConf.AddBiomeRow(row3, 1.00f);
+    auto row4 = BiomeConfig::Row().AddBiome(0.2f, Biomes::DryDesert)
+                                  .AddBiome(0.3f, Biomes::GrassLand)
+                                  .AddBiome(0.7f, Biomes::TropForest)
+                                  .AddBiome(1.0f, Biomes::TropRainForest);
+
+    auto row5 = BiomeConfig::Row().AddBiome(1.0f, Biomes::Beach);
+    auto row6 = BiomeConfig::Row().AddBiome(1.0f, Biomes::Ocean);
+
+    m_biomeConf.AddBiomeRow(row1, 0.10f);
+    m_biomeConf.AddBiomeRow(row2, 0.20f);
+    m_biomeConf.AddBiomeRow(row3, 0.48f);
+    m_biomeConf.AddBiomeRow(row4, 0.60f);
+    m_biomeConf.AddBiomeRow(row5, 0.62f);
+    m_biomeConf.AddBiomeRow(row6, 1.00f);
 
     ID3D11Texture2D *tex = NULL;
 
@@ -213,7 +229,7 @@ void SphericalQuadTreeTerrain::Reset()
 void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, Vector2 &biomeLookup, int &texIndex)
 {
     float scale = m_planet->GetParam(EParams::NoiseScale);
-    float minvalue = m_planet->GetParam(EParams::MinValue);
+    //float minvalue = m_planet->GetParam(EParams::MinValue);
     float bscale = m_planet->GetParam(EParams::BiomeScale);
 
     float x = p.x * 40.0f;

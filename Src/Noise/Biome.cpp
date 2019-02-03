@@ -8,12 +8,12 @@ void Galactic::BiomeConfig::Generate(ID3D11Device *device, ID3D11Texture2D **tex
 {
     float **pixels = new float*[height];
 
-    for (int y = 0; y < height; ++y)
+    for (size_t y = 0; y < height; ++y)
         pixels[y] = new float[width * 4];
 
-    for (int y = 0; y < height; ++y)
+    for (size_t y = 0; y < height; ++y)
     {
-        for (int x = 0; x < width * 4; x += 4)
+        for (size_t x = 0; x < width * 4; x += 4)
         {
             pixels[y][x + 0] = 0.0f;
             pixels[y][x + 1] = 0.0f;
@@ -27,28 +27,28 @@ void Galactic::BiomeConfig::Generate(ID3D11Device *device, ID3D11Texture2D **tex
 
     for (auto row : biomes)
     {
-        size_t minX = 0;
         float elevation = row.first;
-        int maxY = (int)((float)height * elevation);
+        size_t maxY = (int)((float)height * elevation);
+        size_t minX = 0;
 
         for (auto col : row.second.biomes)
         {
-            float moisture = col.first;
-            int   maxX = (int)((float)width * moisture);
-            auto  colour = col.second;
+            float  moisture = col.first;
+            auto   colour = col.second;
+            size_t maxX = (int)((float)width * moisture);
 
             for (size_t y = minY; y < maxY; ++y) {
                 for (size_t x = minX * 4; x < maxX * 4; x += 4) {
-                    pixels[y][x + 0] = colour.R();
-                    pixels[y][x + 1] = colour.G();
-                    pixels[y][x + 2] = colour.B();
+                    pixels[y][x + 0] = colour.R() - 0.2f;
+                    pixels[y][x + 1] = colour.G() - 0.2f;
+                    pixels[y][x + 2] = colour.B() - 0.2f;
                     pixels[y][x + 3] = 1.0f;
                 }
             }
 
             minX = maxX;
         }
-
+        
         minY = maxY;
     }
 
@@ -89,7 +89,7 @@ void Galactic::BiomeConfig::Generate(ID3D11Device *device, ID3D11Texture2D **tex
 
     DX::ThrowIfFailed(device->CreateShaderResourceView((ID3D11Resource*)(*tex), &srv_desc, srv));
 
-    for (int y = 0; y < height; ++y)
+    for (size_t y = 0; y < height; ++y)
         delete[] pixels[y];
 
     delete[] pixels;

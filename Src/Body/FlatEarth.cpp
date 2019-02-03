@@ -50,5 +50,6 @@ void FlatEarth::Reset()
 
 void FlatEarth::Generate(EDetail detail)
 {
+    detail;
     m_geometry = GeometricPrimitive::CreateCylinder(m_context, 1.4f, 40.0f);
 }
