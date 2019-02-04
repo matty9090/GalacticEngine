@@ -19,13 +19,13 @@ namespace Galactic
         DirectX::SimpleMath::Vector3 sphere;
         DirectX::SimpleMath::Vector2 biome;
         DirectX::SimpleMath::Vector2 uv;
-        float weights;
+        size_t texIndex;
     };
 
     struct MatrixBuffer
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
-        DirectX::SimpleMath::Matrix world; // 64 bytes
+        DirectX::SimpleMath::Matrix world;         // 64 bytes
     };
 
     struct Square
@@ -79,8 +79,9 @@ namespace Galactic
             TerrainNode *m_parent;
             ISphericalTerrain *m_terrain;
 
-            std::mutex mutex;
+            ID3D11Device *m_device;
 
+            std::mutex mutex;
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
 
             // Debug
@@ -90,7 +91,8 @@ namespace Galactic
             std::unique_ptr<DirectX::BasicEffect> m_dbgEffect;
             std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_dbgBatch;
             Microsoft::WRL::ComPtr<ID3D11InputLayout> m_dbgInputLayout;
-                
+            
+            std::vector<ID3D11ShaderResourceView*> m_textures;
             std::vector<PlanetVertex> m_originalVertices;
             std::vector<int> m_texIndex;
             std::array<std::vector<uint16_t>, 4> m_edges;
@@ -101,6 +103,7 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
+            size_t GetTextureIndex(std::string biome);
             void NotifyNeighbours();
             void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             

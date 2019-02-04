@@ -10,13 +10,13 @@ struct VS_OUTPUT {
 	float3 Colour1 : COLOR1;
 	float3 Colour2 : COLOR2;
 	float2 UV : TEXCOORD0;
-	float  Weights : BLENDWEIGHT;
+	uint   TexIndex : TEXCOORD1;
 };
 
 static const float PI = 3.14159265f;
 
 Texture2D BiomeTex : register(t0);
-Texture2D Tex[4] : register(t1);
+Texture2D Tex[8] : register(t1);
 
 SamplerState Sampler : register(s0);
 	
@@ -47,24 +47,27 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	float4 col = BiomeTex.Sample(Sampler, v.Biome);
 	//col *= sColour.b;
 	
-	// Material 0
-	float4 bumpMap = Tex[0].Sample(Sampler, v.UV);
-	bumpMap = (bumpMap * 2.0f) - 1.0f;
-	float3 bumpNormal = (bumpMap.x * tangent) + (bumpMap.y * binormal) + (bumpMap.z * normal);
+	// Sample texture/normal map colour
+	float4 diffuse;
+	float4 normalMap;
+	
+	if(v.TexIndex == 0)      { diffuse = Tex[0].Sample(Sampler, v.UV); normalMap = Tex[1].Sample(Sampler, v.UV); }
+	else if(v.TexIndex == 2) { diffuse = Tex[2].Sample(Sampler, v.UV); normalMap = Tex[3].Sample(Sampler, v.UV); }
+	else if(v.TexIndex == 4) { diffuse = Tex[4].Sample(Sampler, v.UV); normalMap = Tex[5].Sample(Sampler, v.UV); }
+	else if(v.TexIndex == 6) { diffuse = Tex[6].Sample(Sampler, v.UV); normalMap = Tex[7].Sample(Sampler, v.UV); }
+	else					 { diffuse = Tex[0].Sample(Sampler, v.UV); normalMap = Tex[1].Sample(Sampler, v.UV); }
+	
+	normalMap = (normalMap * 2.0f) - 1.0f;
+	float3 bumpNormal = (normalMap.x * tangent) + (normalMap.y * binormal) + (normalMap.z * normal);
 	bumpNormal = normalize(bumpNormal);
 	float lightIntensity = saturate(dot(bumpNormal, lightDir));
-	float4 diffuse0 = saturate(col * lightIntensity);
-
-	// Material 1
-	bumpMap = Tex[1].Sample(Sampler, v.UV);
-	bumpMap = (bumpMap * 2.0f) - 1.0f;
-	bumpNormal = (bumpMap.x * tangent) + (bumpMap.y * binormal) + (bumpMap.z * normal);
-	bumpNormal = normalize(bumpNormal);
-	lightIntensity = saturate(dot(bumpNormal, lightDir));
-	float4 diffuse1 = saturate(col * lightIntensity);
+	
+	float3 finalCol = col * diffuse;
+	//finalCol = saturate(finalCol * lightIntensity);
 
 	float4 colour;
-	colour.rgb = lerp(diffuse0, diffuse1, v.Weights);
+	colour.rgb = finalCol;
+	//colour.rgb = col;
 	colour.a = 1.0f;
 
 	return colour;

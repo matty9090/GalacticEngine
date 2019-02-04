@@ -16,7 +16,7 @@ struct VS_OUTPUT {
 	float3 Colour1 : COLOR1;
 	float3 Colour2 : COLOR2;
 	float2 UV : TEXCOORD0;
-	float  Weights : BLENDWEIGHT;
+	uint   TexIndex : TEXCOORD1;
 };
 
 struct VS_INPUT {
@@ -26,7 +26,7 @@ struct VS_INPUT {
 	float3 vSphere : NORMAL1;
 	float2 vBiome : TEXCOORD0;
 	float2 vUV : TEXCOORD1;
-	float  vWeights : BLENDWEIGHT;
+	uint   vTexIndex : TEXCOORD2;
 };
 
 VS_OUTPUT main(VS_INPUT v_in) {
@@ -45,7 +45,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	Output.Colour1	= PrimaryColour;
 	Output.Colour2	= SecondaryColour;
 	Output.UV 		= v_in.vUV;
-	Output.Weights	= v_in.vWeights;
+	Output.TexIndex	= v_in.vTexIndex;
 	
 	//Output.Position.z = LogDepthBuffer(Output.Position.w);
 

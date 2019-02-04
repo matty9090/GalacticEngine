@@ -26,12 +26,12 @@ namespace Galactic
             void Reset();
 
             float GetRadius() const { return m_radius; }
-            void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, int &texIndex);
+            void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             Effect *GetEffect() const { return m_effect; };
-            Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_deviceContext; };
+            Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_context; };
             ID3D11ShaderResourceView *GetTexture(int tex) const { return m_textures[tex]; }
 
             static bool   CancelGeneration;
@@ -57,7 +57,7 @@ namespace Galactic
 
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;
-            Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
+            Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context;
             
             std::vector<ID3D11ShaderResourceView*> m_textures;
 

@@ -21,9 +21,13 @@ void BiomeConfig::Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv,
     m_height = h;
 
     m_pixels = new float*[m_height];
+    m_pixelBiomes = new std::string*[m_height];
 
     for (size_t y = 0; y < m_height; ++y)
         m_pixels[y] = new float[m_width * 4];
+
+    for (size_t y = 0; y < m_height; ++y)
+        m_pixelBiomes[y] = new std::string[m_width];
 
     for (size_t y = 0; y < m_height; ++y)
     {
@@ -52,11 +56,14 @@ void BiomeConfig::Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv,
 
             for (size_t y = minY; y < maxY; ++y) {
                 for (size_t x = minX * 4; x < maxX * 4; x += 4) {
-                    m_pixels[y][x + 0] = colour.R() - 0.2f;
-                    m_pixels[y][x + 1] = colour.G() - 0.2f;
-                    m_pixels[y][x + 2] = colour.B() - 0.2f;
-                    m_pixels[y][x + 3] = 1.0f;
+                    m_pixels[y][x + 0]  = colour.R() - 0.2f;
+                    m_pixels[y][x + 1]  = colour.G() - 0.2f;
+                    m_pixels[y][x + 2]  = colour.B() - 0.2f;
+                    m_pixels[y][x + 3]  = 1.0f;
                 }
+
+                for (size_t x = minX; x < maxX; ++x)
+                    m_pixelBiomes[y][x] = col.second;
             }
 
             minX = maxX;
@@ -120,37 +127,22 @@ void BiomeConfig::Clear()
         delete[] m_pixels;
     }
 
+    if (m_pixelBiomes)
+    {
+        for (size_t y = 0; y < m_height; ++y)
+            delete[] m_pixelBiomes[y];
+
+        delete[] m_pixelBiomes;
+    }
+
     m_pixels = NULL;
+    m_pixelBiomes = NULL;
 }
 
 std::string Galactic::BiomeConfig::Sample(float m, float e)
 {
-    // TODO: Create lookup table
+    size_t ee = (int)(e * m_height);
+    size_t mm = (int)(m * m_width);
 
-    m *= m_width;
-    e *= m_height;
-
-    size_t minY = 0;
-
-    for (auto row : m_biomes)
-    {
-        float elevation = row.first;
-        size_t maxY = (int)((float)m_height * elevation);
-        size_t minX = 0;
-
-        for (auto col : row.second.biomes)
-        {
-            float  moisture = col.first;
-            size_t maxX = (int)((float)m_width * moisture);
-
-            if (e >= minY && e < maxY && m >= minX && m < maxX)
-                return col.second;
-
-            minX = maxX;
-        }
-
-        minY = maxY;
-    }
-
-    return "BiomeNotFound";
+    return m_pixelBiomes[ee > m_height ? m_height : ee][mm > m_width ? m_width : mm];
 }

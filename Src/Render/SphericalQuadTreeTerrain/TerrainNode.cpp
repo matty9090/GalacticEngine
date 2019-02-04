@@ -24,11 +24,12 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
     ID3D11Device *device;
     m_context->GetDevice(&device);
 
+    m_device = device;
     m_world = IsRoot() ? Matrix::Identity : m_parent->GetMatrix();
     m_depth = -(int)log2f(m_scale);
     m_diameter = m_scale * m_terrain->GetRadius() * 2;
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
-
+        
     //Vector3 mid = Vector3::Transform(Vector3(0, m_terrain->GetRadius(), 0), m_world);
 
     //m_grass = std::make_unique<Billboard>(m_context, m_planet, mid, "Resources/grass.png", Billboard::Alpha);
@@ -80,7 +81,8 @@ void TerrainNode::Generate()
         {
             PlanetVertex v;
 
-            if (hasParent && (x % 2 == 0) && (y % 2 == 0))
+            // TODO: GetTextureIndex
+            /*if (hasParent && (x % 2 == 0) && (y % 2 == 0))
             {
                 int xh = sx + x / 2;
                 int yh = sy + y / 2;
@@ -88,7 +90,7 @@ void TerrainNode::Generate()
                 v = parent->GetVertex(xh + yh * gridsize);
                 v.normal = Vector3::Zero;
             }
-            else
+            else*/
             {
                 float xx = m_bounds.x + x * step;
 
@@ -97,18 +99,20 @@ void TerrainNode::Generate()
                 pos.Normalize();
                 pos = Vector3::TransformNormal(pos, m_world);
 
-                int tex;
+                std::string tex;
                 float height;
                 Vector2 biome;
+                size_t texIndex;
                 
                 m_terrain->GetHeight(pos, height, biome, tex);
+                texIndex = GetTextureIndex(tex);
 
                 v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
                 v.uv = Vector2(xx * 4000.0f, yy * 4000.0f);
-                //v.weights = tex;
+                v.texIndex = texIndex;
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -181,6 +185,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 
             m_buffer->SetData(m_context, buffer);
 
+            m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
             Draw();
@@ -263,6 +268,15 @@ void TerrainNode::Split()
         m_children[SE]->SetDebugName(m_dbgName + "_" + std::to_string(SE));
         m_children[SW]->SetDebugName(m_dbgName + "_" + std::to_string(SW));
 #endif
+        /*m_children[0]->Generate();
+        m_children[1]->Generate();
+        m_children[2]->Generate();
+        m_children[3]->Generate();
+
+        m_children[0]->FixEdges();
+        m_children[1]->FixEdges();
+        m_children[2]->FixEdges();
+        m_children[3]->FixEdges();*/
 
         //m_planet->GetGrassDistributor().RemovePatch(m_dbgName);
 
@@ -343,6 +357,38 @@ void TerrainNode::FixEdges()
     if (n4) FixEdge(West, n4, n4->GetEdge(East), n4->GetDepth());
     
     Init();
+}
+
+size_t TerrainNode::GetTextureIndex(std::string biome)
+{
+    assert(m_textures.size() <= 8);
+
+    auto texStr = "Resources/Biomes/" + BiomeConfig::Biomes[biome].Texture;
+    auto normalStr = "Resources/Biomes/" + BiomeConfig::Biomes[biome].NormalMap;
+
+    ID3D11ShaderResourceView *tex, *norm;
+
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+
+        tex = TextureManager::getInstance().GetTexture(m_device, texStr);
+        norm = TextureManager::getInstance().GetTexture(m_device, normalStr);
+
+        assert(tex);
+        assert(norm);
+        assert(tex != norm);
+    }
+
+    for (size_t n = 0; n < m_textures.size(); ++n)
+    {
+        if (m_textures[n] == tex)
+            return n;
+    }
+
+    m_textures.push_back(tex);
+    m_textures.push_back(norm);
+
+    return m_textures.size() - 2;
 }
 
 void TerrainNode::NotifyNeighbours()

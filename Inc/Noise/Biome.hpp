@@ -35,7 +35,7 @@ namespace Galactic
                     std::map<float, std::string> biomes;
             };
 
-            BiomeConfig() : m_pixels(NULL) {}
+            BiomeConfig() : m_pixels(NULL), m_pixelBiomes(NULL) {}
             ~BiomeConfig();
 
             void Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv, size_t width, size_t height);
@@ -51,6 +51,7 @@ namespace Galactic
 
             ID3D11Texture2D *m_tex;
             float **m_pixels;
+            std::string **m_pixelBiomes;
 
             size_t m_width, m_height;
     };

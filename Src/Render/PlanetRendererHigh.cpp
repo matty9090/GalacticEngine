@@ -39,7 +39,7 @@ Vector3 Galactic::HighDetailPlanetRenderer::GetPoint(Vector3 normal)
 
     Vector2 lookup;
     float height;
-    int tex;
+    std::string tex;
 
     m_terrain->GetHeight(normal, height, lookup, tex);
 

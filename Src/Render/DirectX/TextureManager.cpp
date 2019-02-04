@@ -15,7 +15,7 @@ ID3D11ShaderResourceView *TextureManager::GetTexture(ID3D11Device *device, std::
     }
     else
     {
-        D3DX11CreateShaderResourceViewFromFileA(device, tex.c_str(), NULL, NULL, &texture, NULL);
+        DX::ThrowIfFailed(D3DX11CreateShaderResourceViewFromFileA(device, tex.c_str(), NULL, NULL, &texture, NULL));
 
         m_textures[tex] = texture;
     }

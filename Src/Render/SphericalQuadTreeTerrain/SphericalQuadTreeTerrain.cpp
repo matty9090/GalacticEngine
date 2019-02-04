@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 47;
+    size_t SphericalQuadTreeTerrain::GridSize = 51;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -18,12 +18,12 @@ size_t SphericalQuadTreeTerrain::FrameSplits = 0;
 size_t SphericalQuadTreeTerrain::MaxSplitsPerFrame = 6;
 
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
-    : m_deviceContext(deviceContext),
+    : m_context(deviceContext),
       m_planet(planet),
       m_world(planet->GetMatrix()),
       m_radius((float)(planet->GetRadius() / Constants::Scale))
 {
-    m_deviceContext->GetDevice(&m_device);
+    m_context->GetDevice(&m_device);
 
     m_states = std::make_unique<DirectX::CommonStates>(m_device.Get());
 
@@ -40,14 +40,14 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
 void SphericalQuadTreeTerrain::CreateEffect()
 {
     D3D11_INPUT_ELEMENT_DESC els[] = {
-        // Semantic   Index  Format                           Slot      Offset     Slot Class                   Instance Step
+        // Semantic      Index  Format                           Slot      Offset     Slot Class                   Instance Step
         { "POSITION",    0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,         D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL",      0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        12,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TANGENT",     0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL",      1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        36,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        48,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD",    1,     DXGI_FORMAT_R32G32_FLOAT,        0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "BLENDWEIGHT", 0,     DXGI_FORMAT_R32_FLOAT,           0,        64,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    2,     DXGI_FORMAT_R32_UINT,            0,        64,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -127,7 +127,7 @@ void SphericalQuadTreeTerrain::Generate()
     m_biomeConf.AddBiomeRow(row5, 0.62f);
     m_biomeConf.AddBiomeRow(row6, 1.00f);
 
-    m_biomeConf.Generate(m_device.Get(), &m_texBiomes, 1024, 1024);
+    m_biomeConf.Generate(m_device.Get(), &m_texBiomes, 100, 100);
 
     std::array<Matrix, 6> orientations = 
     {
@@ -163,23 +163,23 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     auto sampler = m_states->AnisotropicWrap();
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    m_deviceContext->PSSetSamplers(0, 1, &sampler);
-    m_deviceContext->RSSetState(IBody::Wireframe ? m_rasterWire.Get() : m_raster.Get());
-    m_deviceContext->OMSetBlendState(m_states->Opaque(), factor, 0xFFFFFFFF);
-    m_deviceContext->OMSetDepthStencilState(m_states->DepthDefault(), 1);
+    m_context->PSSetSamplers(0, 1, &sampler);
+    m_context->RSSetState(IBody::Wireframe ? m_rasterWire.Get() : m_raster.Get());
+    m_context->OMSetBlendState(m_states->Opaque(), factor, 0xFFFFFFFF);
+    m_context->OMSetDepthStencilState(m_states->DepthDefault(), 1);
 
-    m_deviceContext->IASetInputLayout(m_effect->GetInputLayout());
-    m_deviceContext->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
-    m_deviceContext->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
+    m_context->IASetInputLayout(m_effect->GetInputLayout());
+    m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
+    m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
-    m_deviceContext->PSSetShaderResources(0, 1, &m_texBiomes);
-    m_deviceContext->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
+    m_context->PSSetShaderResources(0, 1, &m_texBiomes);
+    //m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
 
     ScatterBuffer buffer = GetScatterBuffer(m_planet);
-    m_buffer->SetData(m_deviceContext.Get(), buffer);
+    m_buffer->SetData(m_context.Get(), buffer);
 
-    m_deviceContext->VSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
-    m_deviceContext->PSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
+    m_context->VSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
+    m_context->PSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
 }
 
 void SphericalQuadTreeTerrain::GetBiomeTexture()
@@ -220,11 +220,11 @@ void SphericalQuadTreeTerrain::Reset()
         tex->Release();
 }
 
-void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, Vector2 &biomeLookup, int &texIndex)
+void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, Vector2 &biomeLookup, std::string &texIndex)
 {
     float scale = m_planet->GetParam(EParams::NoiseScale);
-    //float minvalue = m_planet->GetParam(EParams::MinValue);
     float bscale = m_planet->GetParam(EParams::BiomeScale);
+    //float minvalue = m_planet->GetParam(EParams::MinValue);
 
     float x = p.x * 40.0f;
     float y = p.y * 40.0f;
@@ -235,12 +235,7 @@ void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &
     float m = (m_bnoise.GetNoise(x * bscale, y * bscale, z * bscale) + 1.0f) / 2.0f;
     float h = (e + s * m_planet->GetParam(EParams::DetailHeightMod)) * m_planet->GetParam(EParams::Height);
 
-    if (e < 0.53f) texIndex = 0;
-    else if (e < 0.51f) texIndex = 1;
-    else texIndex = 1;
-
-    auto biome = m_biomeConf.Sample(m, e);
-
+    texIndex = m_biomeConf.Sample(m, 1.0f - e);
     height = h;
     biomeLookup = Vector2(m, 1.0f - e);
 }
