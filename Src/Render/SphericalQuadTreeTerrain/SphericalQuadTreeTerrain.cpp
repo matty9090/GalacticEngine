@@ -233,7 +233,12 @@ void SphericalQuadTreeTerrain::Reset()
         face->Release();
 }
 
-void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, Vector2 &biomeLookup, std::string &texIndex)
+std::string Galactic::SphericalQuadTreeTerrain::GetBiome(const DirectX::SimpleMath::Vector2 &lookup)
+{
+    return m_biomeConf.Sample(lookup.x, lookup.y);
+}
+
+void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, float &height, Vector2 &biomeLookup, std::string &texIndex)
 {
     float scale = m_planet->GetParam(EParams::NoiseScale);
     float bscale = m_planet->GetParam(EParams::BiomeScale);

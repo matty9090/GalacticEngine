@@ -45,6 +45,7 @@ namespace Galactic
             ID3D11DeviceContext *m_context;
             ID3D11ShaderResourceView *m_texture;
 
+            std::unique_ptr<DirectX::CommonStates> m_states;
             std::unique_ptr<DirectX::GeometricPrimitive> m_geometry;
 
             DirectX::SimpleMath::Matrix  m_world;
