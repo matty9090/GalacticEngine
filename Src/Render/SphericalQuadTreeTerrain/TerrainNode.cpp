@@ -81,16 +81,16 @@ void TerrainNode::Generate()
         {
             PlanetVertex v;
 
-            // TODO: GetTextureIndex
-            /*if (hasParent && (x % 2 == 0) && (y % 2 == 0))
+            if (hasParent && (x % 2 == 0) && (y % 2 == 0))
             {
                 int xh = sx + x / 2;
                 int yh = sy + y / 2;
 
                 v = parent->GetVertex(xh + yh * gridsize);
                 v.normal = Vector3::Zero;
+                v.texIndex = GetTextureIndex(m_terrain->GetBiome(v.biome));
             }
-            else*/
+            else
             {
                 float xx = m_bounds.x + x * step;
 
@@ -282,8 +282,6 @@ void TerrainNode::Split()
         m_children[2]->FixEdges();
         m_children[3]->FixEdges();*/
 
-        //m_planet->GetGrassDistributor().RemovePatch(m_dbgName);
-
         std::vector<std::thread> threads;
 
         for (auto &child : m_children)
@@ -363,7 +361,7 @@ void TerrainNode::FixEdges()
     Init();
 }
 
-size_t TerrainNode::GetTextureIndex(std::string biome)
+size_t TerrainNode::GetTextureIndex(std::string &biome)
 {
     assert(m_textures.size() <= 16);
 
@@ -378,9 +376,11 @@ size_t TerrainNode::GetTextureIndex(std::string biome)
         tex = TextureManager::getInstance().GetTexture(m_device, texStr);
         norm = TextureManager::getInstance().GetTexture(m_device, normalStr);
 
+#ifdef _DEBUG
         assert(tex);
         assert(norm);
         assert(tex != norm);
+#endif
     }
 
     for (size_t n = 0; n < m_textures.size(); ++n)

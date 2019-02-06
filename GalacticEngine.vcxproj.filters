@@ -48,9 +48,6 @@
     </Manifest>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\StepTimer.h">
-      <Filter>Client</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Game.h">
       <Filter>Client</Filter>
     </ClInclude>
@@ -190,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="Inc\Body\FlatEarth.hpp">
       <Filter>Body</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StepTimer.h">
+      <Filter>Client</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

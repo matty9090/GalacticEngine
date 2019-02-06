@@ -13,7 +13,8 @@ FlatEarth::FlatEarth(ID3D11DeviceContext *context, std::string name) : m_context
     ID3D11Device *device;
     context->GetDevice(&device);
 
-    m_texture =TextureManager::getInstance().GetTexture(device, "Resources/flatearth.jpg");
+    m_states  = std::make_unique<CommonStates>(device);
+    m_texture = TextureManager::getInstance().GetTexture(device, "Resources/flatearth.jpg");
 
     m_rotation.x = -0.6f;
 }
@@ -25,7 +26,9 @@ FlatEarth::~FlatEarth()
 
 void FlatEarth::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
 {
-    m_geometry->Draw(m_world, view, proj, Colors::White, m_texture);
+    m_geometry->Draw(m_world, view, proj, Colors::White, m_texture, false, [&]() {
+        m_context->RSSetState(m_states->CullCounterClockwise());
+    });
 }
 
 void FlatEarth::Update(float dt)

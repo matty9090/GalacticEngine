@@ -49,7 +49,6 @@ namespace Galactic
             void Update(float dt);
             void Reset();
 
-            PlanetVertex &GetVertex(int i) { return m_originalVertices[i]; }
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
 
             void Generate();
@@ -64,8 +63,10 @@ namespace Galactic
             void FixEdges();
 
             int GetDepth() const { return m_depth; }
-            std::vector<uint16_t> GetEdge(EDir edge) const { return m_edges[edge]; }
-            TerrainNode *GetChild(int dir) const { return m_children[dir].get(); }
+
+            __forceinline PlanetVertex &GetVertex(int i) { return m_originalVertices[i]; }
+            __forceinline std::vector<uint16_t> GetEdge(EDir edge) const { return m_edges[edge]; }
+            __forceinline TerrainNode *GetChild(int dir) const { return m_children[dir].get(); }
 
             static float SplitDistance;
 
@@ -105,7 +106,7 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
-            size_t GetTextureIndex(std::string biome);
+            __forceinline size_t GetTextureIndex(std::string &biome);
             void NotifyNeighbours();
             void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             

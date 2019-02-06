@@ -26,7 +26,9 @@ namespace Galactic
             void Reset();
 
             float GetRadius() const { return m_radius; }
-            void  GetHeight(DirectX::SimpleMath::Vector3 point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
+
+            __forceinline std::string GetBiome(const DirectX::SimpleMath::Vector2 &lookup);
+            __forceinline void GetHeight(const DirectX::SimpleMath::Vector3 &point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
