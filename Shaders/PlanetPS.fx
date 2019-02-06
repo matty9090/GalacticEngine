@@ -46,7 +46,7 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	
 	// Sample biome colour
 	float4 biomeCol = BiomeTex.Sample(Sampler, v.Biome);
-	//col *= sColour.b;
+    biomeCol *= sColour.b;
 	
 	// Sample texture/normal map colour
 	float4 texCol;
@@ -71,7 +71,7 @@ float4 main(VS_OUTPUT v) : SV_Target {
     float3 lightDist = length(lightPos - v.WorldPos);
     float3 diffuseLight = lightCol * max(dot(normal, lightDir), 0.0f);
 	
-	float3 finalCol = lerp(biomeCol, texCol, mLerp) * diffuseLight;
+	float3 finalCol = lerp(biomeCol, texCol, mLerp) * diffuseLight + sColour;
 
 	return float4(finalCol, 1.0f);
 }

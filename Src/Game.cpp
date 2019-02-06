@@ -26,9 +26,12 @@ Game::Game() noexcept :
 {
 //#ifdef _DEBUG
     AllocConsole();
-    freopen("conin$", "r", stdin);
-    freopen("conout$", "w", stdout);
-    freopen("conout$", "w", stderr);
+
+    FILE *stdOut, *stdErr, *stdIn;
+
+    freopen_s(&stdOut, "conin$", "r", stdin);
+    freopen_s(&stdErr, "conout$", "w", stdout);
+    freopen_s(&stdIn, "conout$", "w", stderr);
 //#endif
 }
 

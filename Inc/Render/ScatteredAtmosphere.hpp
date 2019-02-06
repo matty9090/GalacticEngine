@@ -33,6 +33,8 @@ namespace Galactic
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
 
         private:
+            ID3D11Device *m_device;
+
             DirectX::SimpleMath::Matrix m_world;
 
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster;
@@ -43,5 +45,7 @@ namespace Galactic
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::unique_ptr<ConstantBuffer<ScatteredAtmosphereBuffer>> m_buffer;
             std::unique_ptr<ConstantBuffer<ScatterBuffer>> m_buffer2;
+
+            void InitEffect();
     };
 }

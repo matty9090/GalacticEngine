@@ -20,28 +20,20 @@ ScatteredAtmosphere::ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *
 
     vertices.clear();
 
-    ID3D11Device *device;
-    context->GetDevice(&device);
+    context->GetDevice(&m_device);
 
-    D3D11_INPUT_ELEMENT_DESC els[] = {
-        // Semantic   Index  Format                             Slot   Offset    Slot Class                     Instance Step
-        { "POSITION", 0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-
-    unsigned int num = sizeof(els) / sizeof(els[0]);
-
-    m_effect = EffectManager::getInstance().GetEffect(device, L"Shaders/ScatteredAtmosphereVS.fx", L"Shaders/ScatteredAtmospherePS.fx", els, num, false);
-
+    InitEffect();
+    
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_BACK, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
 
-    DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
+    DX::ThrowIfFailed(m_device->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()));
 
-    m_buffer  = std::make_unique<ConstantBuffer<ScatteredAtmosphereBuffer>>(device);
-    m_buffer2 = std::make_unique<ConstantBuffer<ScatterBuffer>>(device);
+    m_buffer  = std::make_unique<ConstantBuffer<ScatteredAtmosphereBuffer>>(m_device);
+    m_buffer2 = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device);
 
-    m_states  = std::make_unique<CommonStates>(device);
+    m_states  = std::make_unique<CommonStates>(m_device);
 
     Init();
 }
@@ -99,6 +91,22 @@ void ScatteredAtmosphere::Reset()
     m_raster.Reset();
 
     Cleanup();
+}
+
+void Galactic::ScatteredAtmosphere::InitEffect()
+{
+    D3D11_INPUT_ELEMENT_DESC els[] = {
+        // Semantic   Index  Format                             Slot   Offset    Slot Class                     Instance Step
+        { "POSITION", 0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
+    unsigned int num = sizeof(els) / sizeof(els[0]);
+
+#ifdef _DEBUG
+    m_effect = new Effect(m_device, L"Shaders/ScatteredAtmosphereVS.fx", L"Shaders/ScatteredAtmospherePS.fx", els, num, false);
+#else
+    m_effect = EffectManager::getInstance().GetEffect(m_device, L"Shaders/ScatteredAtmosphereVS.fx", L"Shaders/ScatteredAtmospherePS.fx", els, num, false);
+#endif
 }
 
 ScatteredAtmosphere::~ScatteredAtmosphere()

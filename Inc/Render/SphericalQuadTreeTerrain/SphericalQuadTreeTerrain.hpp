@@ -32,7 +32,6 @@ namespace Galactic
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             Effect *GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_context; };
-            ID3D11ShaderResourceView *GetTexture(int tex) const { return m_textures[tex]; }
 
             static bool   CancelGeneration;
             static size_t GridSize;
@@ -58,11 +57,10 @@ namespace Galactic
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context;
-            
-            std::vector<ID3D11ShaderResourceView*> m_textures;
 
             float m_radius;
 
+            void InitEffect();
             void GetBiomeTexture();
     };
 }

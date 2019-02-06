@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 20.0f;
+float TerrainNode::SplitDistance = 32.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -178,7 +178,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         if (IsLeaf())
         {
-            float lerp = (Vector3::Distance(m_planet->GetCameraPos(), m_planet->GetPosition()) - m_planet->GetRadius() / Constants::Scale) * 2.0f;
+            float lerp = (Vector3::Distance(m_planet->GetCameraPos(), m_planet->GetPosition()) - (float)(m_planet->GetRadius() / Constants::Scale)) * 2.0f;
 
             if (lerp < 0.0f) lerp = 0.0f;
             if (lerp > 1.0f) lerp = 1.0f;
@@ -218,7 +218,7 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = m_depth < 3 || distance < m_scale * SplitDistance;
+        bool divide = m_depth < 2 || distance < m_scale * SplitDistance;
 
         if (!divide)
             Merge();

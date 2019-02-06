@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 51;
+    size_t SphericalQuadTreeTerrain::GridSize = 33;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -42,20 +42,7 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
 
 void SphericalQuadTreeTerrain::CreateEffect()
 {
-    D3D11_INPUT_ELEMENT_DESC els[] = {
-        // Semantic      Index  Format                           Slot      Offset     Slot Class                   Instance Step
-        { "POSITION",    0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,         D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "NORMAL",      0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        12,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TANGENT",     0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "NORMAL",      1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        36,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        48,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32_FLOAT,        0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    2,     DXGI_FORMAT_R32_UINT,            0,        64,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-
-    unsigned int num = sizeof(els) / sizeof(els[0]);
-
-    m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), L"Shaders/PlanetVS.fx", L"Shaders/PlanetPS.fx", els, num, false);
+    InitEffect();
 
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_NONE, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
@@ -68,20 +55,15 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()), "Creating raster");
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()), "Creating raster");
 
-    //m_textures.resize(2);
-
-    // TODO: Cache resources as this is very slow
-    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/biomes.png", NULL, NULL, &m_texBiomes, NULL);
-    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/grass01d.jpg", NULL, NULL, &m_textures[0], NULL);
-    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Biomes/grass01n.png", NULL, NULL, &m_textures[0], NULL);
-    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/snow01d.png", NULL, NULL, &m_textures[2], NULL);
-    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Biomes/snow01n.png", NULL, NULL, &m_textures[1], NULL);
-
     m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
 
 void SphericalQuadTreeTerrain::Generate()
 {
+#ifdef _DEBUG
+    InitEffect();
+#endif
+    
     CancelGeneration = false;
 
     m_noise.SetInterp(FastNoise::Quintic);
@@ -123,12 +105,11 @@ void SphericalQuadTreeTerrain::Generate()
     auto row5 = BiomeConfig::Row().AddBiome(1.0f, "Beach");
     auto row6 = BiomeConfig::Row().AddBiome(1.0f, "Ocean");
 
-    m_biomeConf.AddBiomeRow(row1, 0.10f);
-    m_biomeConf.AddBiomeRow(row2, 0.20f);
-    m_biomeConf.AddBiomeRow(row3, 0.48f);
-    m_biomeConf.AddBiomeRow(row4, 0.60f);
-    m_biomeConf.AddBiomeRow(row5, 0.62f);
-    m_biomeConf.AddBiomeRow(row6, 1.00f);
+    m_biomeConf.AddBiomeRow(row1, 0.20f);
+    m_biomeConf.AddBiomeRow(row2, 0.40f);
+    m_biomeConf.AddBiomeRow(row3, 0.66f);
+    m_biomeConf.AddBiomeRow(row4, 0.86f);
+    m_biomeConf.AddBiomeRow(row5, 1.00f);
 
     m_biomeConf.Generate(m_device.Get(), &m_texBiomes, 100, 100);
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/biomes.png", NULL, NULL, &m_texBiomes, NULL);
@@ -161,12 +142,14 @@ void SphericalQuadTreeTerrain::Generate()
         m_faces[i]->Init();
     }
 
+#ifdef _DEBUG
     for (auto c : counts)
         std::cout << c.first << ": " << c.second << "\n";
 
     std::cout << std::endl;
     std::cout << "Min h: " << hmin << "\n";
     std::cout << "Max h: " << hmax << "\n\n";
+#endif
 }
 
 void SphericalQuadTreeTerrain::SetRenderContext()
@@ -191,6 +174,28 @@ void SphericalQuadTreeTerrain::SetRenderContext()
 
     m_context->VSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
     m_context->PSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
+}
+
+void Galactic::SphericalQuadTreeTerrain::InitEffect()
+{
+    D3D11_INPUT_ELEMENT_DESC els[] = {
+        // Semantic      Index  Format                           Slot      Offset     Slot Class                   Instance Step
+        { "POSITION",    0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,         D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL",      0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        12,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TANGENT",     0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL",      1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        36,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        48,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32_FLOAT,        0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    2,     DXGI_FORMAT_R32_UINT,            0,        64,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
+    unsigned int num = sizeof(els) / sizeof(els[0]);
+
+#ifdef _DEBUG
+    m_effect = new Effect(m_device.Get(), L"Shaders/PlanetVS.fx", L"Shaders/PlanetPS.fx", els, num, false);
+#else
+    m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), L"Shaders/PlanetVS.fx", L"Shaders/PlanetPS.fx", els, num, false);
+#endif
 }
 
 void SphericalQuadTreeTerrain::GetBiomeTexture()
@@ -226,32 +231,32 @@ void SphericalQuadTreeTerrain::Reset()
 
     for (auto &face : m_faces)
         face->Release();
-
-    for (auto &tex : m_textures)
-        tex->Release();
 }
 
 void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &height, Vector2 &biomeLookup, std::string &texIndex)
 {
     float scale = m_planet->GetParam(EParams::NoiseScale);
     float bscale = m_planet->GetParam(EParams::BiomeScale);
-    //float minvalue = m_planet->GetParam(EParams::MinValue);
+    float minvalue = m_planet->GetParam(EParams::MinValue);
     
     float x = p.x * 40.0f;
     float y = p.y * 40.0f;
     float z = p.z * 40.0f;
 
     float e = (m_noise.GetNoise(x * scale, y * scale, z * scale) + 1.0f) / 2.0f;
-    float s = (m_snoise.GetNoise(x * scale, y * scale, z * scale) + 1.0f) / 2.0f;
+    //float s = (m_snoise.GetNoise(x * scale, y * scale, z * scale) + 1.0f) / 2.0f;
     float m = (m_bnoise.GetNoise(x * bscale, y * bscale, z * bscale) + 1.0f) / 2.0f;
-    float h = (e + s * m_planet->GetParam(EParams::DetailHeightMod)) * m_planet->GetParam(EParams::Height);
+    float h = (e /*+ s * m_planet->GetParam(EParams::DetailHeightMod)*/) * m_planet->GetParam(EParams::Height);
 
     if (e < hmin) hmin = e;
     if (e > hmax) hmax = e;
 
-    texIndex = m_biomeConf.Sample(m, 1.0f - e);
-    height = h;
+    texIndex    = m_biomeConf.Sample(m, 1.0f - e);
     biomeLookup = Vector2(m, 1.0f - e);
+    //height      = fmaxf(0.0f, h - 1.0f);
+    height      = h;
 
+#ifdef _DEBUG
     counts[texIndex]++;
+#endif
 }

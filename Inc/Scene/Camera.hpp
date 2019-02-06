@@ -15,6 +15,7 @@ namespace Galactic
 
             void Move(DirectX::SimpleMath::Vector3 v) { m_cameraPos += v; }
             void Rotate(DirectX::SimpleMath::Vector3 r) { m_yaw += r.y; m_pitch += r.z; }
+            void SetRotation(DirectX::SimpleMath::Vector3 r) { m_yaw = r.y; m_pitch = r.z; }
             void Attach(IBody *body) { m_body = body; }
             void SetPosition(DirectX::SimpleMath::Vector3 p) { m_cameraPos = p; }
 

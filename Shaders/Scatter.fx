@@ -47,7 +47,6 @@ float scale(float fCos) {
 void scatter(float3 pos) {
 	// Get the ray from the camera to the vertex and its length (which
 	// is the far point of the ray passing through the atmosphere)
-	
 	float3 v3Pos = pos;
 	float3 v3Ray = v3Pos - v3CameraPos;
 	float fFar = length(v3Ray);
