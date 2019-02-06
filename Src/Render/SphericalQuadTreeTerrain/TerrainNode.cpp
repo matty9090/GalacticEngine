@@ -111,7 +111,7 @@ void TerrainNode::Generate()
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
-                v.uv = Vector2(xx * 4000.0f, yy * 4000.0f);
+                v.uv = Vector2(xx * 1000.0f, yy * 1000.0f);
                 v.texIndex = texIndex;
             }
 
@@ -178,15 +178,19 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         if (IsLeaf())
         {
-            //m_terrain->SetRenderContext();
+            float lerp = (Vector3::Distance(m_planet->GetCameraPos(), m_planet->GetPosition()) - m_planet->GetRadius() / Constants::Scale) * 2.0f;
+
+            if (lerp < 0.0f) lerp = 0.0f;
+            if (lerp > 1.0f) lerp = 1.0f;
 
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
-            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose() };
+            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), 1.0f - lerp };
 
             m_buffer->SetData(m_context, buffer);
 
             m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+            m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
             Draw();
         }
@@ -361,7 +365,7 @@ void TerrainNode::FixEdges()
 
 size_t TerrainNode::GetTextureIndex(std::string biome)
 {
-    assert(m_textures.size() <= 8);
+    assert(m_textures.size() <= 16);
 
     auto texStr = "Resources/Biomes/" + BiomeConfig::Biomes[biome].Texture;
     auto normalStr = "Resources/Biomes/" + BiomeConfig::Biomes[biome].NormalMap;

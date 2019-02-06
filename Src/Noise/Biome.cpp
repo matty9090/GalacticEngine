@@ -54,8 +54,10 @@ void BiomeConfig::Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv,
             auto   colour = Biomes[col.second].Colour;
             size_t maxX = (int)((float)m_width * moisture);
 
-            for (size_t y = minY; y < maxY; ++y) {
-                for (size_t x = minX * 4; x < maxX * 4; x += 4) {
+            for (size_t y = minY; y < maxY; ++y)
+            {
+                for (size_t x = minX * 4; x < maxX * 4; x += 4)
+                {
                     m_pixels[y][x + 0]  = colour.R() - 0.2f;
                     m_pixels[y][x + 1]  = colour.G() - 0.2f;
                     m_pixels[y][x + 2]  = colour.B() - 0.2f;

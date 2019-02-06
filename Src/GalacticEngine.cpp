@@ -11,21 +11,21 @@ using DirectX::SimpleMath::Color;
 namespace Galactic {
     void InitEngine()
     {
-        BiomeConfig::Biomes["Scorched"]         = { "rock01d.png"   , "rock01n.png",     { 0.33f, 0.33f, 0.33f } };
         BiomeConfig::Biomes["Bare"]             = { "test0.png"     , "whiten.png",      { 0.53f, 0.53f, 0.53f } };
-        BiomeConfig::Biomes["Tundra"]           = { "white.png"     , "whiten.png",      { 0.73f, 0.73f, 0.67f } };
-        BiomeConfig::Biomes["Snowy"]            = { "snow01d.png"   , "snow01n.png",     { 0.86f, 0.86f, 0.89f } };
-        BiomeConfig::Biomes["Desert"]           = { "test1.png"     , "whiten.png",      { 0.79f, 0.82f, 0.61f } };
-        BiomeConfig::Biomes["ShrubLand"]        = { "test0.png"     , "whiten.png",      { 0.53f, 0.67f, 0.46f } };
-        BiomeConfig::Biomes["Taiga"]            = { "white.png"     , "whiten.png",      { 0.60f, 0.67f, 0.46f } };
+        BiomeConfig::Biomes["Beach"]            = { "sand01d.jpg"   , "grass01n.png",    { 0.63f, 0.56f, 0.46f } };
+        BiomeConfig::Biomes["Desert"]           = { "sand01d.jpg"   , "grass01n.png",    { 0.79f, 0.82f, 0.61f } };
+        BiomeConfig::Biomes["DryDesert"]        = { "sand01d.jpg"   , "grass01n.png",    { 0.82f, 0.72f, 0.54f } };
+        BiomeConfig::Biomes["Forest"]           = { "grass03d.jpg"  , "grass01n.png",    { 0.40f, 0.59f, 0.35f } };
         BiomeConfig::Biomes["GrassLand"]        = { "grass01d.jpg"  , "grass01n.png",    { 0.53f, 0.67f, 0.33f } };
-        BiomeConfig::Biomes["Forest"]           = { "test1.png"     , "whiten.png",      { 0.40f, 0.59f, 0.35f } };
+        BiomeConfig::Biomes["Ocean"]            = { "white.png"     , "whiten.png",      { 0.26f, 0.26f, 0.48f } };
+        BiomeConfig::Biomes["Tundra"]           = { "grass03d.jpg"  , "grass01n.png",    { 0.73f, 0.73f, 0.67f } };
+        BiomeConfig::Biomes["Scorched"]         = { "rock01d.png"   , "rock01n.png",     { 0.33f, 0.33f, 0.33f } };
+        BiomeConfig::Biomes["Snowy"]            = { "snow02d.jpg"   , "snow02n.jpg",     { 0.86f, 0.86f, 0.89f } };
+        BiomeConfig::Biomes["ShrubLand"]        = { "grass02d.jpg"  , "grass02n.jpg",    { 0.53f, 0.67f, 0.46f } };
+        BiomeConfig::Biomes["Taiga"]            = { "snow02d.jpg"   , "snow02n.jpg",     { 0.60f, 0.67f, 0.46f } };
         BiomeConfig::Biomes["TempRainForest"]   = { "grass01d.jpg"  , "grass01n.png",    { 0.26f, 0.53f, 0.33f } };
-        BiomeConfig::Biomes["DryDesert"]        = { "test0.png"     , "whiten.png",      { 0.82f, 0.72f, 0.54f } };
         BiomeConfig::Biomes["TropForest"]       = { "grass01d.jpg"  , "grass01n.png",    { 0.33f, 0.60f, 0.26f } };
         BiomeConfig::Biomes["TropRainForest"]   = { "grass01d.jpg"  , "grass01n.png",    { 0.20f, 0.46f, 0.33f } };
-        BiomeConfig::Biomes["Beach"]            = { "rock01d.png"   , "rock01n.png",     { 0.63f, 0.56f, 0.46f } };
-        BiomeConfig::Biomes["Ocean"]            = { "white.png"     , "whiten.png",      { 0.26f, 0.26f, 0.48f } };
     }
 
     void CancelCurrentGeneration()

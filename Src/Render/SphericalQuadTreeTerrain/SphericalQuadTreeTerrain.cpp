@@ -15,7 +15,10 @@ using namespace DirectX::SimpleMath;
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
 size_t SphericalQuadTreeTerrain::FrameSplits = 0;
-size_t SphericalQuadTreeTerrain::MaxSplitsPerFrame = 6;
+size_t SphericalQuadTreeTerrain::MaxSplitsPerFrame = 999;
+
+std::map<std::string, size_t> counts;
+float hmin = 999.0f, hmax = -999.0f;
 
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
     : m_context(deviceContext),
@@ -65,14 +68,14 @@ void SphericalQuadTreeTerrain::CreateEffect()
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()), "Creating raster");
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()), "Creating raster");
 
-    m_textures.resize(2);
+    //m_textures.resize(2);
 
     // TODO: Cache resources as this is very slow
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/biomes.png", NULL, NULL, &m_texBiomes, NULL);
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/grass01d.jpg", NULL, NULL, &m_textures[0], NULL);
-    D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Biomes/grass01n.png", NULL, NULL, &m_textures[0], NULL);
+    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Biomes/grass01n.png", NULL, NULL, &m_textures[0], NULL);
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/snow01d.png", NULL, NULL, &m_textures[2], NULL);
-    D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Biomes/snow01n.png", NULL, NULL, &m_textures[1], NULL);
+    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/Biomes/snow01n.png", NULL, NULL, &m_textures[1], NULL);
 
     m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
@@ -128,6 +131,7 @@ void SphericalQuadTreeTerrain::Generate()
     m_biomeConf.AddBiomeRow(row6, 1.00f);
 
     m_biomeConf.Generate(m_device.Get(), &m_texBiomes, 100, 100);
+    //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/biomes.png", NULL, NULL, &m_texBiomes, NULL);
 
     std::array<Matrix, 6> orientations = 
     {
@@ -156,6 +160,13 @@ void SphericalQuadTreeTerrain::Generate()
     for (int i = 0; i < 6; ++i) {
         m_faces[i]->Init();
     }
+
+    for (auto c : counts)
+        std::cout << c.first << ": " << c.second << "\n";
+
+    std::cout << std::endl;
+    std::cout << "Min h: " << hmin << "\n";
+    std::cout << "Max h: " << hmax << "\n\n";
 }
 
 void SphericalQuadTreeTerrain::SetRenderContext()
@@ -225,7 +236,7 @@ void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &
     float scale = m_planet->GetParam(EParams::NoiseScale);
     float bscale = m_planet->GetParam(EParams::BiomeScale);
     //float minvalue = m_planet->GetParam(EParams::MinValue);
-
+    
     float x = p.x * 40.0f;
     float y = p.y * 40.0f;
     float z = p.z * 40.0f;
@@ -235,7 +246,12 @@ void SphericalQuadTreeTerrain::GetHeight(DirectX::SimpleMath::Vector3 p, float &
     float m = (m_bnoise.GetNoise(x * bscale, y * bscale, z * bscale) + 1.0f) / 2.0f;
     float h = (e + s * m_planet->GetParam(EParams::DetailHeightMod)) * m_planet->GetParam(EParams::Height);
 
+    if (e < hmin) hmin = e;
+    if (e > hmax) hmax = e;
+
     texIndex = m_biomeConf.Sample(m, 1.0f - e);
     height = h;
     biomeLookup = Vector2(m, 1.0f - e);
+
+    counts[texIndex]++;
 }

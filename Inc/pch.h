@@ -82,16 +82,16 @@ namespace DX
             MessageBoxW(NULL, errMsg, L"Error", MB_OK);
             throw std::exception();*/
 
-            TCHAR szBuffer[200];
+            /*TCHAR szBuffer[200];
 
             FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
                 NULL, hr,
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
                 (LPTSTR)szBuffer,
                 200,
-                NULL);
+                NULL);*/
 
-            MessageBoxW(NULL, szBuffer, L"Error", MB_OK);
+            MessageBoxA(NULL, reason.c_str(), "Error", MB_OK);
             throw std::exception();
         }
     }
