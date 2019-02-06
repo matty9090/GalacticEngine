@@ -8,42 +8,51 @@
 
 namespace Galactic
 {
-    enum class EBiomes { Grass, Mountains, Desert, Ocean, Beach };
-
-    struct NoiseParameters
+    struct Biome
     {
-        int octaves;
-        float gain;
-        float lacunarity;
-        float frequency;
-        float height;
-        float scale;
-
-        DirectX::SimpleMath::Color colour;
+        std::string Texture, NormalMap;
+        DirectX::SimpleMath::Color Colour;
     };
 
-    extern std::map<EBiomes, NoiseParameters> Biomes;
-
-    class Biome
+    class BiomeConfig
     {
         public:
-            Biome(FastNoise &noise, NoiseParameters params) : m_noise(noise), m_params(params) {}
+            struct Row
+            {
+                friend class BiomeConfig;
 
-            virtual float GetHeight(float x, float y, float z);
-            virtual DirectX::SimpleMath::Color GetColour(float h);
+                public:
+                    Row &AddBiome(float moisture, std::string name)
+                    {
+                        moisture = (moisture > 1.0f) ? 1.0f : moisture;
+                        biomes[moisture] = name;
+                        return *this;
+                    }
 
-        protected:
-            FastNoise &m_noise;
-            NoiseParameters m_params;
+                    size_t GetCount() { return biomes.size(); }
 
-            void SetNoiseParams();
-    };
+                private:
+                    std::map<float, std::string> biomes;
+            };
 
-    class OceanBiome : public Biome
-    {
-        public:
-            OceanBiome(FastNoise &noise, NoiseParameters params) : Biome(noise, params) {}
+            BiomeConfig() : m_pixels(NULL), m_pixelBiomes(NULL) {}
+            ~BiomeConfig();
 
-            float GetHeight(float x, float y, float z);
+            void Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv, size_t width, size_t height);
+            void AddBiomeRow(Row row, float elevation);
+            void Clear();
+
+            std::string Sample(float moisture, float elevation);
+
+            static std::map<std::string, Biome> Biomes;
+
+        private:
+            std::map<float, Row> m_biomes;
+
+            ID3D11Texture2D *m_tex;
+            float **m_pixels;
+            std::string **m_pixelBiomes;
+
+            size_t m_width, m_height;
     };
 }

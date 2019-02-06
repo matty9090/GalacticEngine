@@ -2,6 +2,7 @@
 
 #include "IBody.hpp"
 #include "Render/Gradient.hpp"
+#include "Render/GrassDistributor.hpp"
 
 namespace Galactic
 {
@@ -21,6 +22,8 @@ namespace Galactic
         BiomeFrequency,
         BiomeScale,
         BiomeLacunarity,
+        DetailFrequency,
+        DetailHeightMod
     };
 
     class IPlanet : public IBody
@@ -40,12 +43,15 @@ namespace Galactic
             virtual void SetAtmosphereHeight(float h) = 0;
             virtual void SetAtmosphereColour(DirectX::SimpleMath::Color colour) = 0;
 
+            virtual void EnableClouds(bool enabled) = 0;
+
             virtual float GetAtmosphereHeight() const = 0;
             virtual DirectX::SimpleMath::Color GetAtmosphereColour() const = 0;
 
             virtual void IncrementVertices(size_t num) = 0;
             virtual size_t GetVertexCount() = 0;
             virtual DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal) = 0;
+            virtual GrassDistributor &GetGrassDistributor() = 0;
 
             virtual ~IPlanet() {}
     };

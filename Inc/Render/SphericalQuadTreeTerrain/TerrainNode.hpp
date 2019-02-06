@@ -2,6 +2,8 @@
 
 #include "Body/IPlanet.hpp"
 #include "ISphericalTerrain.hpp"
+
+#include "Render/Billboard.hpp"
 #include "Render/Drawable.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
 
@@ -13,15 +15,19 @@ namespace Galactic
     {
         DirectX::SimpleMath::Vector3 position;
         DirectX::SimpleMath::Vector3 normal;
+        DirectX::SimpleMath::Vector3 tangent;
         DirectX::SimpleMath::Vector3 sphere;
         DirectX::SimpleMath::Vector2 biome;
         DirectX::SimpleMath::Vector2 uv;
+        size_t texIndex;
     };
 
     struct MatrixBuffer
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
-        DirectX::SimpleMath::Matrix world; // 64 bytes
+        DirectX::SimpleMath::Matrix world;         // 64 bytes
+        float lerp;                                // 4  bytes
+        float p0, p1, p2;                          // 16 bytes
     };
 
     struct Square
@@ -45,7 +51,6 @@ namespace Galactic
 
             PlanetVertex &GetVertex(int i) { return m_originalVertices[i]; }
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
-            DirectX::SimpleMath::Vector3 GetHighestPoint() const { return m_highestPoint; }
 
             void Generate();
             bool IsLeaf() { return m_children[0] == nullptr; }
@@ -68,7 +73,6 @@ namespace Galactic
             int m_depth;
             bool m_visible;
             float m_scale, m_diameter;
-            DirectX::SimpleMath::Vector3 m_highestPoint;
 
             int m_quad;
             Square m_bounds;
@@ -76,6 +80,10 @@ namespace Galactic
             IPlanet *m_planet;
             TerrainNode *m_parent;
             ISphericalTerrain *m_terrain;
+
+            ID3D11Device *m_device;
+
+            std::mutex mutex;
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
 
             // Debug
@@ -85,8 +93,10 @@ namespace Galactic
             std::unique_ptr<DirectX::BasicEffect> m_dbgEffect;
             std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_dbgBatch;
             Microsoft::WRL::ComPtr<ID3D11InputLayout> m_dbgInputLayout;
-
+            
+            std::vector<ID3D11ShaderResourceView*> m_textures;
             std::vector<PlanetVertex> m_originalVertices;
+            std::vector<int> m_texIndex;
             std::array<std::vector<uint16_t>, 4> m_edges;
             std::array<std::unique_ptr<TerrainNode>, 4> m_children;
 
@@ -95,6 +105,7 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
+            size_t GetTextureIndex(std::string biome);
             void NotifyNeighbours();
             void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             

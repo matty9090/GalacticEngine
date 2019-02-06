@@ -10,19 +10,23 @@ struct VS_OUTPUT {
 	float4 Position : SV_POSITION;
 	float3 WorldPos : POSITION;
 	float3 Normal : NORMAL0;
+	float3 Tangent : TANGENT;
 	float3 Sphere : NORMAL1;
 	float2 Biome : COLOR0;
 	float3 Colour1 : COLOR1;
 	float3 Colour2 : COLOR2;
 	float2 UV : TEXCOORD0;
+	uint   TexIndex : TEXCOORD1;
 };
 
 struct VS_INPUT {
 	float4 vPosition : POSITION;
-	float3 vNormal : NORMAL;
-	float3 vSphere : TANGENT;
-	float2 vBiome : COLOR;
-	float2 vUV : TEXCOORD;
+	float3 vNormal : NORMAL0;
+	float3 vTangent : TANGENT;
+	float3 vSphere : NORMAL1;
+	float2 vBiome : TEXCOORD0;
+	float2 vUV : TEXCOORD1;
+	uint   vTexIndex : TEXCOORD2;
 };
 
 VS_OUTPUT main(VS_INPUT v_in) {
@@ -35,11 +39,13 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	Output.Position = mul(v_in.vPosition, mWorldViewProj);
 	Output.WorldPos = mul(v_in.vPosition, mWorld);
 	Output.Normal   = mul(v_in.vNormal, mWorld);
+	Output.Tangent  = mul(v_in.vTangent, mWorld);
 	Output.Sphere   = v_in.vSphere;
 	Output.Biome 	= v_in.vBiome;
 	Output.Colour1	= PrimaryColour;
 	Output.Colour2	= SecondaryColour;
 	Output.UV 		= v_in.vUV;
+	Output.TexIndex	= v_in.vTexIndex;
 	
 	//Output.Position.z = LogDepthBuffer(Output.Position.w);
 

@@ -4,6 +4,8 @@
 
 #include "Render/IPlanetRenderer.hpp"
 #include "Render/IAtmosphereRenderer.hpp"
+#include "Render/NoiseCloudRenderer.hpp"
+#include "Render/GrassRenderer.hpp"
 
 namespace Galactic
 {
@@ -19,6 +21,7 @@ namespace Galactic
             void Update(float dt);
             void Reset();
             void ReadSettings(std::string file);
+            void EnableClouds(bool enabled) { m_cloudsEnabled = enabled; }
 
             void SetParam(EParams name, float value) { m_params[(int)name] = value; }
             float GetParam(EParams name) { return m_params[(int)name]; }
@@ -60,12 +63,13 @@ namespace Galactic
             size_t GetVertexCount() { return m_vertexCount; }
 
             DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal);
+            GrassDistributor &GetGrassDistributor() { return m_grass->GetDistributor(); }
 
         private:
             std::string m_name;
 
             int m_seed;
-            bool m_isGenerated;
+            bool m_isGenerated, m_cloudsEnabled;
             double m_radius;
             long double m_mass;
             float m_atmosphereHeight;
@@ -81,6 +85,8 @@ namespace Galactic
             IBody *m_influence;
             std::unique_ptr<IPlanetRenderer> m_renderer;
             std::unique_ptr<IAtmosphereRenderer> m_atmosphere;
+            std::unique_ptr<NoiseCloudRenderer> m_clouds;
+            std::unique_ptr<GrassRenderer> m_grass;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
     };
 }

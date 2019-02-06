@@ -176,6 +176,21 @@
     <ClInclude Include="Inc\Render\DirectX\EffectManager.hpp">
       <Filter>Render\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\NoiseCloudRenderer.hpp">
+      <Filter>Render\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\DirectX\TextureManager.hpp">
+      <Filter>Render\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\GrassRenderer.hpp">
+      <Filter>Render\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Render\GrassDistributor.hpp">
+      <Filter>Render\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Body\FlatEarth.hpp">
+      <Filter>Body</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -255,6 +270,21 @@
     <ClCompile Include="Src\Render\DirectX\EffectManager.cpp">
       <Filter>Render\DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Render\NoiseCloudRenderer.cpp">
+      <Filter>Render\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\DirectX\TextureManager.cpp">
+      <Filter>Render\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\GrassRenderer.cpp">
+      <Filter>Render\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Render\GrassDistributor.cpp">
+      <Filter>Render\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Body\FlatEarth.cpp">
+      <Filter>Body</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\planet.ico">
@@ -272,10 +302,58 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\AtmosphereVS.fx">
+    <FxCompile Include="Shaders\Common.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\CubePS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\CubeVS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Noise.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\NoiseCloudsPS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\NoiseCloudsVS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PlanetPS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PlanetVS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PositionColourPS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PositionColourVS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PositionTexPS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PositionTexVS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Scatter.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\ScatteredAtmospherePS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\ScatteredAtmosphereVS.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\AtmospherePS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\AtmosphereVS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\BillboardVS.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

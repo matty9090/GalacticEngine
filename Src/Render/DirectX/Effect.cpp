@@ -15,7 +15,7 @@ Effect::Effect(ID3D11Device *device, std::wstring vs, std::wstring ps, D3D11_INP
 
     if (compiled)
     {
-        DX::ThrowIfFailed(D3DReadFileToBlob(vs.c_str(), &v_buffer));
+        DX::ThrowIfFailed(D3DReadFileToBlob(vs.c_str(), &v_buffer), "Loading compiled shader");
         DX::ThrowIfFailed(D3DReadFileToBlob(ps.c_str(), &p_buffer));
     }
     else
@@ -28,18 +28,22 @@ Effect::Effect(ID3D11Device *device, std::wstring vs, std::wstring ps, D3D11_INP
         
         HRESULT res;
 
-        res = D3DCompileFromFile(vs.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_5_0", flags, 0, &v_buffer, &v_error);
+        std::ofstream file("errors.txt");
+        file << "";
+        file.close();
+
+        res = D3DCompileFromFile(vs.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "vs_4_0", flags, 0, &v_buffer, &v_error);
         LogErrors(v_error);
-        DX::ThrowIfFailed(res);
+        DX::ThrowIfFailed(res, "Creating vertex shader");
         
-        res = D3DCompileFromFile(ps.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_5_0", flags, 0, &p_buffer, &p_error);
+        res = D3DCompileFromFile(ps.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_4_0", flags, 0, &p_buffer, &p_error);
         LogErrors(p_error);
-        DX::ThrowIfFailed(res);
+        DX::ThrowIfFailed(res, "Creating pixel shader");
     }
 
-    DX::ThrowIfFailed(device->CreateVertexShader(v_buffer->GetBufferPointer(), v_buffer->GetBufferSize(), nullptr, m_vertexShader.ReleaseAndGetAddressOf()));
-    DX::ThrowIfFailed(device->CreatePixelShader(p_buffer->GetBufferPointer(), p_buffer->GetBufferSize(), nullptr, m_pixelShader.ReleaseAndGetAddressOf()));
-    DX::ThrowIfFailed(device->CreateInputLayout(layout, num, v_buffer->GetBufferPointer(), v_buffer->GetBufferSize(), m_layout.ReleaseAndGetAddressOf()));
+    DX::ThrowIfFailed(device->CreateVertexShader(v_buffer->GetBufferPointer(), v_buffer->GetBufferSize(), nullptr, m_vertexShader.ReleaseAndGetAddressOf()), "Failed to create buffer");
+    DX::ThrowIfFailed(device->CreatePixelShader(p_buffer->GetBufferPointer(), p_buffer->GetBufferSize(), nullptr, m_pixelShader.ReleaseAndGetAddressOf()), "Failed to create buffer");
+    DX::ThrowIfFailed(device->CreateInputLayout(layout, num, v_buffer->GetBufferPointer(), v_buffer->GetBufferSize(), m_layout.ReleaseAndGetAddressOf()), "Failed to create buffer");
 
     v_buffer->Release();
     p_buffer->Release();

@@ -11,10 +11,21 @@ using DirectX::SimpleMath::Color;
 namespace Galactic {
     void InitEngine()
     {
-        Biomes[EBiomes::Grass] = { 10, 0.45f, 1.9f, 0.04f, 0.04f, 1.0f, Color(0.0f, 1.0f, 0.0f) };
-        Biomes[EBiomes::Desert] = { 10, 0.45f, 1.9f, 0.04f, 0.04f, 1.0f, Color(1.0f, 1.0f, 0.0f) };
-        Biomes[EBiomes::Mountains] = { 10, 0.6f, 1.9f, 0.04f, 0.04f, 1.0f, Color(0.6f, 0.6f, 0.6f) };
-        Biomes[EBiomes::Ocean].colour = Color(0.0f, 0.0f, 1.0f);
+        BiomeConfig::Biomes["Bare"]             = { "test0.png"     , "whiten.png",      { 0.53f, 0.53f, 0.53f } };
+        BiomeConfig::Biomes["Beach"]            = { "sand01d.jpg"   , "grass01n.png",    { 0.63f, 0.56f, 0.46f } };
+        BiomeConfig::Biomes["Desert"]           = { "sand01d.jpg"   , "grass01n.png",    { 0.79f, 0.82f, 0.61f } };
+        BiomeConfig::Biomes["DryDesert"]        = { "sand01d.jpg"   , "grass01n.png",    { 0.82f, 0.72f, 0.54f } };
+        BiomeConfig::Biomes["Forest"]           = { "grass03d.jpg"  , "grass01n.png",    { 0.40f, 0.59f, 0.35f } };
+        BiomeConfig::Biomes["GrassLand"]        = { "grass01d.jpg"  , "grass01n.png",    { 0.53f, 0.67f, 0.33f } };
+        BiomeConfig::Biomes["Ocean"]            = { "white.png"     , "whiten.png",      { 0.26f, 0.26f, 0.48f } };
+        BiomeConfig::Biomes["Tundra"]           = { "grass03d.jpg"  , "grass01n.png",    { 0.73f, 0.73f, 0.67f } };
+        BiomeConfig::Biomes["Scorched"]         = { "rock01d.png"   , "rock01n.png",     { 0.33f, 0.33f, 0.33f } };
+        BiomeConfig::Biomes["Snowy"]            = { "snow02d.jpg"   , "snow02n.jpg",     { 0.86f, 0.86f, 0.89f } };
+        BiomeConfig::Biomes["ShrubLand"]        = { "grass02d.jpg"  , "grass02n.jpg",    { 0.53f, 0.67f, 0.46f } };
+        BiomeConfig::Biomes["Taiga"]            = { "snow02d.jpg"   , "snow02n.jpg",     { 0.60f, 0.67f, 0.46f } };
+        BiomeConfig::Biomes["TempRainForest"]   = { "grass01d.jpg"  , "grass01n.png",    { 0.26f, 0.53f, 0.33f } };
+        BiomeConfig::Biomes["TropForest"]       = { "grass01d.jpg"  , "grass01n.png",    { 0.33f, 0.60f, 0.26f } };
+        BiomeConfig::Biomes["TropRainForest"]   = { "grass01d.jpg"  , "grass01n.png",    { 0.20f, 0.46f, 0.33f } };
     }
 
     void CancelCurrentGeneration()
@@ -53,5 +64,14 @@ namespace Galactic {
         planet->SetRadius(radius);
 
         return planet;
+    }
+
+    std::unique_ptr<Galactic::FlatEarth> CreateFlatEarth(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius)
+    {
+        std::unique_ptr<Galactic::FlatEarth> fe = std::make_unique<Galactic::FlatEarth>(deviceContext, name);
+        fe->SetMass(mass);
+        fe->SetRadius(radius);
+
+        return fe;
     }
 }

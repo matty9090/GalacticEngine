@@ -32,7 +32,7 @@ namespace Galactic
     {
         float radius = (float)(planet->GetRadius() / Constants::Scale);
         float atmheight = (float)(planet->GetAtmosphereHeight() / Constants::Scale);
-        float atmradius = atmheight + radius;
+        float atmradius = (atmheight + radius);
         float camHeight = (planet->GetCameraPos() - planet->GetPosition()).Length();
 
         float scale = 1 / (atmradius - radius);
