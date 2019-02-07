@@ -12,6 +12,8 @@
 
 #include "Physics/Constants.hpp"
 
+#include <mutex>
+
 namespace Galactic
 {
     class SphericalQuadTreeTerrain : public ISphericalTerrain
@@ -41,10 +43,12 @@ namespace Galactic
             static size_t MaxSplitsPerFrame;
 
         private:
-            BiomeConfig m_biomeConf;
-            FastNoise m_noise, m_snoise, m_bnoise;
             DirectX::SimpleMath::Matrix m_world;
 
+            FastNoise m_biomeMap;
+            std::vector<FastNoise> m_noiseMaps;
+
+            std::mutex m_mutex;
             IPlanet *m_planet;
             Effect *m_effect;
 

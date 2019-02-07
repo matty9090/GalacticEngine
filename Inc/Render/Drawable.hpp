@@ -94,7 +94,7 @@ namespace Galactic
         m_context->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
         m_context->IASetPrimitiveTopology(m_topology);
 
-        m_context->DrawIndexed(m_indices.size(), 0, 0);
+        m_context->DrawIndexed(m_indices.size(), 0U, 0U);
     }
 
     template<class VertexType, class IndexType>

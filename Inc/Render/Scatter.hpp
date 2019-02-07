@@ -31,7 +31,7 @@ namespace Galactic
     inline ScatterBuffer GetScatterBuffer(IPlanet *planet)
     {
         float radius = (float)(planet->GetRadius() / Constants::Scale);
-        float atmheight = (float)(planet->GetAtmosphereHeight() / Constants::Scale);
+        float atmheight = (float)(planet->GetSettings().AtmHeight / Constants::Scale);
         float atmradius = (atmheight + radius);
         float camHeight = (planet->GetCameraPos() - planet->GetPosition()).Length();
 

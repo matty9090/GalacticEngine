@@ -16,22 +16,19 @@ namespace Galactic
             ~Planet();
 
             void Generate(EDetail detail = EDetail::Medium);
-
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
             void Reset();
             void ReadSettings(std::string file);
+            void SetSettings(PlanetSettings settings) { m_settings = settings; }
             void EnableClouds(bool enabled) { m_cloudsEnabled = enabled; }
+            
+            void SetRadius(double r) { m_settings.Radius = r; }
+            double GetRadius() const { return m_settings.Radius; }
 
-            void SetParam(EParams name, float value) { m_params[(int)name] = value; }
-            float GetParam(EParams name) { return m_params[(int)name]; }
-            
-            void SetRadius(double r) { m_radius = r; }
-            double GetRadius() const { return m_radius; }
-            
-            void SetMass(long double mass) { m_mass = mass; }
-            long double GetMass() const { return m_mass; }
-            
+            void SetMass(long double m) { m_settings.Mass = m; }
+            long double GetMass() const { return m_settings.Mass; }
+
             void SetPosition(DirectX::SimpleMath::Vector3 pos) { m_position = pos; }
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
             
@@ -44,15 +41,7 @@ namespace Galactic
             void SetCameraPos(DirectX::SimpleMath::Vector3 camPos) { m_camPos = camPos; }
             DirectX::SimpleMath::Vector3 GetCameraPos() const { return m_camPos; }
 
-            void SetAtmosphereHeight(float h) { m_atmosphereHeight = h; }
-            float GetAtmosphereHeight() const { return m_atmosphereHeight; }
-            
-            void SetAtmosphereColour(DirectX::SimpleMath::Color colour) { m_atmColour = colour; }
-            DirectX::SimpleMath::Color GetAtmosphereColour() const { return m_atmColour; }
-
-            void SetSeed(int seed) { m_seed = seed; }
-            int GetSeed() { return m_seed; }
-
+            PlanetSettings &GetSettings() { return m_settings; };
             std::string GetName() const { return m_name; }
             IBody *GetInfluence() const { return m_influence; }
             bool IsGenerated() const { return m_isGenerated; }
@@ -67,18 +56,12 @@ namespace Galactic
 
         private:
             std::string m_name;
+            PlanetSettings m_settings;
 
-            int m_seed;
             bool m_isGenerated, m_cloudsEnabled;
-            double m_radius;
-            long double m_mass;
-            float m_atmosphereHeight;
 
             size_t m_vertexCount;
 
-            std::vector<float> m_params;
-
-            DirectX::SimpleMath::Color m_atmColour;
             DirectX::SimpleMath::Matrix  m_world;
             DirectX::SimpleMath::Vector3 m_position, m_velocity, m_rotation, m_camPos;
 

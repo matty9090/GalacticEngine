@@ -57,13 +57,9 @@ namespace Galactic {
         return star;
     }
 
-    std::unique_ptr<IPlanet> CreatePlanet(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius)
+    std::unique_ptr<IPlanet> CreatePlanet(ID3D11DeviceContext *deviceContext, std::string name)
     {
-        std::unique_ptr<IPlanet> planet = std::make_unique<Planet>(deviceContext, name);
-        planet->SetMass(mass);
-        planet->SetRadius(radius);
-
-        return planet;
+        return std::make_unique<Planet>(deviceContext, name);
     }
 
     std::unique_ptr<Galactic::FlatEarth> CreateFlatEarth(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius)

@@ -54,7 +54,7 @@ void ScatteredAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::Simp
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
     float radius = (float)(m_planet->GetRadius() / Constants::Scale);
-    float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
+    float atmheight = (float)(m_planet->GetSettings().AtmHeight / Constants::Scale);
     float atmradius = atmheight + radius;
 
     m_world = Matrix::CreateScale(atmradius) * Matrix::CreateTranslation(m_planet->GetPosition());
