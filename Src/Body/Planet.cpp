@@ -16,13 +16,18 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_renderer(nullptr),
       m_atmosphere(nullptr),
       m_isGenerated(false),
-      m_atmosphereHeight(200.0f),
-      m_atmColour(Color(0.0f, 0.7f, 1.0f)),
       m_vertexCount(0),
       m_cloudsEnabled(true)
 {
-    m_params.resize(20);
-    SetParam(EParams::Biomes, 0.0f);
+    m_settings.GridSize = 33;
+    m_settings.Radius = 6700.0;
+    m_settings.AtmColour = { 0.0f, 0.7f, 1.0f };
+    m_settings.AtmHeight = 200.0;
+    m_settings.Biomes.AddBiomeRow(BiomeConfig::Row().AddBiome(1.0f, "Ocean"), 1.0f);
+    m_settings.Mass = 5e24;
+    m_settings.MinValue = 0.0f;
+    m_settings.NoiseMaps.push_back(PlanetSettings::Map { 0.05f, 0.02f, 0.02, 2.0f, 1.0f });
+    m_settings.Seed = rand() % RAND_MAX;
 }
 
 Planet::~Planet()
@@ -97,7 +102,7 @@ void Planet::Update(float dt)
     Matrix rotY = Matrix::CreateRotationY(m_rotation.y);
     Matrix rotZ = Matrix::CreateRotationZ(m_rotation.z);
 
-    Matrix scale = Matrix::CreateScale((float)(m_radius / Constants::Scale));
+    Matrix scale = Matrix::CreateScale((float)(m_settings.Radius / Constants::Scale));
     Matrix translation = Matrix::CreateTranslation(m_position);
 
     m_world = scale * rotX * rotY * rotZ * translation;
@@ -118,9 +123,9 @@ void Planet::Reset()
     m_clouds.reset();
 }
 
-void Galactic::Planet::ReadSettings(std::string file)
+void Planet::ReadSettings(std::string file)
 {
-    std::ifstream f(file.c_str());
+    /*std::ifstream f(file.c_str());
 
     while (!f.eof())
     {
@@ -132,7 +137,7 @@ void Galactic::Planet::ReadSettings(std::string file)
         SetParam((EParams)param, value);
     }
 
-    f.close();
+    f.close();*/
 }
 
 Vector3 Galactic::Planet::GetPoint(Vector3 normal) {

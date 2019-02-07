@@ -3,50 +3,54 @@
 #include "IBody.hpp"
 #include "Render/Gradient.hpp"
 #include "Render/GrassDistributor.hpp"
+#include "Noise/Biome.hpp"
 
 namespace Galactic
 {
-    enum class EParams
+    struct PlanetSettings
     {
-        Gain,
-        Height,
-        Biomes,
-        Octaves,
-        GridSize,
-        MinValue,
-        Frequency,
-        AtmHeight,
-        NoiseScale,
-        Lacunarity,
-        BiomeGain,
-        BiomeFrequency,
-        BiomeScale,
-        BiomeLacunarity,
-        DetailFrequency,
-        DetailHeightMod
+        size_t GridSize;
+
+        int Seed;
+        float MinValue;
+
+        double Radius;
+        double Mass;
+        double AtmHeight;
+        double AtmRadius;
+
+        DirectX::SimpleMath::Color AtmColour;
+
+        struct Map
+        {
+            float Gain;
+            float Height;
+            float Frequency;
+            float Lacunarity;
+            float Mod;
+
+            size_t Octaves;
+        };
+
+        BiomeConfig Biomes;
+        Map BiomeMap;
+        std::vector<Map> NoiseMaps;
     };
 
     class IPlanet : public IBody
     {
         public:
+            virtual PlanetSettings &GetSettings() = 0;
+
             virtual void ReadSettings(std::string file) = 0;
-
-            virtual void SetParam(EParams, float value) = 0;
-            virtual float GetParam(EParams name) = 0;
-
-            virtual void SetSeed(int seed) = 0;
-            virtual int GetSeed() = 0;
 
             virtual void SetRadius(double r) = 0;
             virtual double GetRadius() const = 0;
 
-            virtual void SetAtmosphereHeight(float h) = 0;
-            virtual void SetAtmosphereColour(DirectX::SimpleMath::Color colour) = 0;
+            virtual void SetMass(long double m) = 0;
+            virtual long double GetMass() const = 0;
 
             virtual void EnableClouds(bool enabled) = 0;
-
-            virtual float GetAtmosphereHeight() const = 0;
-            virtual DirectX::SimpleMath::Color GetAtmosphereColour() const = 0;
 
             virtual void IncrementVertices(size_t num) = 0;
             virtual size_t GetVertexCount() = 0;

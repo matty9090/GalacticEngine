@@ -204,7 +204,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 
 void TerrainNode::Update(float dt)
 {
-    int gridsize = SphericalQuadTreeTerrain::GridSize;
+    size_t gridsize = SphericalQuadTreeTerrain::GridSize;
 
     Vector3 cam = m_planet->GetCameraPos();
     Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
@@ -323,7 +323,7 @@ void TerrainNode::Merge()
         m_children[2].reset();
         m_children[3].reset();
 
-        int gridsize = SphericalQuadTreeTerrain::GridSize;
+        size_t gridsize = SphericalQuadTreeTerrain::GridSize;
         m_planet->IncrementVertices(-(gridsize * gridsize * 4));
 
         NotifyNeighbours();
@@ -423,7 +423,7 @@ void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t
     neighbour;
 
     int diff = m_depth - depth;
-    int grid = SphericalQuadTreeTerrain::GridSize;
+    size_t grid = SphericalQuadTreeTerrain::GridSize;
 
     if (diff == 0)
     {

@@ -117,13 +117,14 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
     if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
     
-    float detailHeightMod = planet->GetParam(Galactic::EParams::DetailHeightMod);
+    /*float detailHeightMod = planet->GetParam(Galactic::EParams::DetailHeightMod);
     float detailFrequency = planet->GetParam(Galactic::EParams::DetailFrequency);
 
     if (m_tracker.IsKeyReleased(Keyboard::NumPad7)) { planet->SetParam(Galactic::EParams::DetailHeightMod, detailHeightMod + 0.02f); planet->Generate(Galactic::EDetail::High); }
     if (m_tracker.IsKeyReleased(Keyboard::NumPad8)) { planet->SetParam(Galactic::EParams::DetailHeightMod, detailHeightMod - 0.02f); planet->Generate(Galactic::EDetail::High); }
     if (m_tracker.IsKeyReleased(Keyboard::NumPad4)) { planet->SetParam(Galactic::EParams::DetailFrequency, detailFrequency + 0.02f); planet->Generate(Galactic::EDetail::High); }
     if (m_tracker.IsKeyReleased(Keyboard::NumPad5)) { planet->SetParam(Galactic::EParams::DetailFrequency, detailFrequency - 0.02f); planet->Generate(Galactic::EDetail::High); }
+    */
 
     m_camera->Events(m_mouse.get(), mouse, dt);
 
@@ -332,18 +333,18 @@ void Game::CreateDevice()
     
     Galactic::PlanetGenerator gen(m_d3dContext.Get());
 
-    auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet", 5.683e26, 58232.0);
+    auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet"/*, 5.683e26, 58232.0*/);
     planet->SetInfluence(star.get());
     planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
-    planet->SetAtmosphereHeight(800.0f);
+    //planet->SetAtmosphereHeight(800.0f);
     planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 5.971e24, 6371.0);
     moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
     moon->SetVelocity(Vector3(-1.0e5, 0.0f, 1.3e6));
-    moon->SetAtmosphereHeight(200.0f);
+    //moon->SetAtmosphereHeight(200.0f);
     moon->ReadSettings("settings.txt");
     moon->Generate(Galactic::EDetail::High);
 

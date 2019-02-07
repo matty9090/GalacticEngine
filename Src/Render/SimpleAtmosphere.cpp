@@ -58,7 +58,7 @@ void SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleM
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
     
     float radius = (float)(m_planet->GetRadius() / Constants::Scale);
-    float atmheight = (float)(m_planet->GetAtmosphereHeight() / Constants::Scale);
+    float atmheight = (float)(m_planet->GetSettings().AtmHeight / Constants::Scale);
     float atmradius = atmheight + radius;
     float camHeight = (m_planet->GetCameraPos() - m_planet->GetPosition()).Length();
     
@@ -73,7 +73,7 @@ void SimpleAtmosphere::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleM
         radius,
         m_planet->GetCameraPos() - m_planet->GetPosition(),
         atmradius,
-        m_planet->GetAtmosphereColour(),
+        m_planet->GetSettings().AtmColour,
         camHeight
     };
 

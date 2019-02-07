@@ -1,7 +1,8 @@
 #pragma once
 
-#include <map>
 #include <string>
+#include <map>
+#include <unordered_map>
 
 #include "FastNoise.h"
 #include "Render/Gradient.hpp"
@@ -41,10 +42,11 @@ namespace Galactic
             void Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv, size_t width, size_t height);
             void AddBiomeRow(Row row, float elevation);
             void Clear();
+            void ClearBiomes() { m_biomes.clear(); }
 
             std::string Sample(float moisture, float elevation);
 
-            static std::map<std::string, Biome> Biomes;
+            static std::unordered_map<std::string, Biome> Biomes;
 
         private:
             std::map<float, Row> m_biomes;

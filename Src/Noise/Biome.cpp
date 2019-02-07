@@ -2,11 +2,12 @@
 #include "Noise/Biome.hpp"
 
 #include <fstream>
+#include <algorithm>
 #include <wincodecsdk.h>
 
 using namespace Galactic;
 
-std::map<std::string, Biome> BiomeConfig::Biomes;
+std::unordered_map<std::string, Biome> BiomeConfig::Biomes;
 
 BiomeConfig::~BiomeConfig()
 {
@@ -143,8 +144,11 @@ void BiomeConfig::Clear()
 
 std::string Galactic::BiomeConfig::Sample(float m, float e)
 {
-    size_t ee = (int)(e * m_height);
-    size_t mm = (int)(m * m_width);
+    size_t ee = (size_t)(e * (m_height - 1));
+    size_t mm = (size_t)(m * (m_width - 1));
 
-    return m_pixelBiomes[ee > m_height ? m_height : ee][mm > m_width ? m_width : mm];
+    ee = (ee > (m_height - 1)) ? m_height - 1 : ee;
+    mm = (mm > (m_width - 1)) ? m_width - 1 : mm;
+
+    return m_pixelBiomes[ee][mm];
 }

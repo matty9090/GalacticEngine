@@ -24,7 +24,7 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     : m_context(deviceContext),
       m_planet(planet),
       m_world(planet->GetMatrix()),
-      m_radius((float)(planet->GetRadius() / Constants::Scale))
+      m_radius((float)(planet->GetSettings().Radius / Constants::Scale))
 {
     m_context->GetDevice(&m_device);
 
@@ -65,23 +65,31 @@ void SphericalQuadTreeTerrain::Generate()
 #endif
     
     CancelGeneration = false;
+    auto &settings = m_planet->GetSettings();
 
-    m_noise.SetInterp(FastNoise::Quintic);
-    m_noise.SetNoiseType(FastNoise::SimplexFractal);
-    m_noise.SetFractalOctaves((int)m_planet->GetParam(EParams::Octaves));
-    m_noise.SetFractalGain(m_planet->GetParam(EParams::Gain));
-    m_noise.SetFractalLacunarity(m_planet->GetParam(EParams::Lacunarity));
-    m_noise.SetFrequency(m_planet->GetParam(EParams::Frequency));
-    m_noise.SetSeed(m_planet->GetSeed());
+    for (const auto &map : settings.NoiseMaps)
+    {
+        FastNoise noise;
+        noise.SetInterp(FastNoise::Quintic);
+        noise.SetNoiseType(FastNoise::SimplexFractal);
+        noise.SetFractalOctaves(map.Octaves);
+        noise.SetFractalGain(map.Gain);
+        noise.SetFractalLacunarity(map.Lacunarity);
+        noise.SetFrequency(map.Frequency);
+        noise.SetSeed(settings.Seed);
 
-    m_snoise = m_noise;
-    m_snoise.SetFrequency(m_planet->GetParam(EParams::Frequency) * m_planet->GetParam(EParams::DetailFrequency));
+        m_noiseMaps.push_back(noise);
+    }
 
-    m_bnoise = m_noise;
-    m_bnoise.SetSeed(m_planet->GetSeed() + 1);
-    m_bnoise.SetFrequency(m_planet->GetParam(EParams::BiomeFrequency));
-    m_bnoise.SetFractalGain(m_planet->GetParam(EParams::BiomeGain));
-    m_bnoise.SetFractalLacunarity(m_planet->GetParam(EParams::BiomeLacunarity));
+    auto &biomeSettings = settings.BiomeMap;
+
+    m_biomeMap.SetInterp(FastNoise::Quintic);
+    m_biomeMap.SetNoiseType(FastNoise::SimplexFractal);
+    m_biomeMap.SetFractalOctaves(biomeSettings.Octaves);
+    m_biomeMap.SetFractalGain(biomeSettings.Gain);
+    m_biomeMap.SetFractalLacunarity(biomeSettings.Lacunarity);
+    m_biomeMap.SetFrequency(biomeSettings.Frequency);
+    m_biomeMap.SetSeed(settings.Seed);
 
     auto row1 = BiomeConfig::Row().AddBiome(0.1f, "Scorched")
                                   .AddBiome(0.2f, "Bare")
@@ -105,13 +113,14 @@ void SphericalQuadTreeTerrain::Generate()
     auto row5 = BiomeConfig::Row().AddBiome(1.0f, "Beach");
     auto row6 = BiomeConfig::Row().AddBiome(1.0f, "Ocean");
 
-    m_biomeConf.AddBiomeRow(row1, 0.20f);
-    m_biomeConf.AddBiomeRow(row2, 0.40f);
-    m_biomeConf.AddBiomeRow(row3, 0.66f);
-    m_biomeConf.AddBiomeRow(row4, 0.86f);
-    m_biomeConf.AddBiomeRow(row5, 1.00f);
+    settings.Biomes.ClearBiomes();
+    settings.Biomes.AddBiomeRow(row1, 0.20f);
+    settings.Biomes.AddBiomeRow(row2, 0.40f);
+    settings.Biomes.AddBiomeRow(row3, 0.66f);
+    settings.Biomes.AddBiomeRow(row4, 0.86f);
+    settings.Biomes.AddBiomeRow(row5, 1.00f);
 
-    m_biomeConf.Generate(m_device.Get(), &m_texBiomes, 100, 100);
+    settings.Biomes.Generate(m_device.Get(), &m_texBiomes, 100, 100);
     //D3DX11CreateShaderResourceViewFromFileA(m_device.Get(), "Resources/biomes.png", NULL, NULL, &m_texBiomes, NULL);
 
     std::array<Matrix, 6> orientations = 
@@ -235,31 +244,31 @@ void SphericalQuadTreeTerrain::Reset()
 
 std::string Galactic::SphericalQuadTreeTerrain::GetBiome(const DirectX::SimpleMath::Vector2 &lookup)
 {
-    return m_biomeConf.Sample(lookup.x, lookup.y);
+    return m_planet->GetSettings().Biomes.Sample(lookup.x, lookup.y);
 }
 
 void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, float &height, Vector2 &biomeLookup, std::string &texIndex)
 {
-    float scale = m_planet->GetParam(EParams::NoiseScale);
-    float bscale = m_planet->GetParam(EParams::BiomeScale);
-    float minvalue = m_planet->GetParam(EParams::MinValue);
+    auto &settings = m_planet->GetSettings();
     
-    float x = p.x * 40.0f;
-    float y = p.y * 40.0f;
-    float z = p.z * 40.0f;
+    float h = 0.0f;
+    float m = (m_biomeMap.GetValue(p.x, p.y, p.z) + 1.0f) / 2.0f;
+    float mod = 1.0f;
 
-    float e = (m_noise.GetNoise(x * scale, y * scale, z * scale) + 1.0f) / 2.0f;
-    //float s = (m_snoise.GetNoise(x * scale, y * scale, z * scale) + 1.0f) / 2.0f;
-    float m = (m_bnoise.GetNoise(x * bscale, y * bscale, z * bscale) + 1.0f) / 2.0f;
-    float h = (e /*+ s * m_planet->GetParam(EParams::DetailHeightMod)*/) * m_planet->GetParam(EParams::Height);
+    for (int i = 0; i < settings.NoiseMaps.size(); ++i)
+    {
+        mod *= settings.NoiseMaps[i].Mod;
+        h += m_noiseMaps[i].GetValue(p.x, p.y, p.z) * mod;
+    }
+
+    float e = 1.0f - (h + 1.0f) / 2.0f;
 
     if (e < hmin) hmin = e;
     if (e > hmax) hmax = e;
 
-    texIndex    = m_biomeConf.Sample(m, 1.0f - e);
-    biomeLookup = Vector2(m, 1.0f - e);
-    //height      = fmaxf(0.0f, h - 1.0f);
-    height      = h;
+    texIndex    = settings.Biomes.Sample(m, e);
+    biomeLookup = Vector2(m, e);
+    height      = fmaxf(0.0f, h - settings.MinValue);
 
 #ifdef _DEBUG
     counts[texIndex]++;
