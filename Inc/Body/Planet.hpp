@@ -21,7 +21,12 @@ namespace Galactic
             void Reset();
             void ReadSettings(std::string file);
             void SetSettings(PlanetSettings settings) { m_settings = settings; }
+
             void EnableClouds(bool enabled) { m_cloudsEnabled = enabled; }
+            void EnableAtmosphere(bool enabled) { m_atmEnabled = enabled; Generate(m_detail); }
+
+            bool IsCloudsEnabled() const { return m_cloudsEnabled; }
+            bool IsAtmosphereEnabled() const { return m_atmEnabled; }
             
             void SetRadius(double r) { m_settings.Radius = r; }
             double GetRadius() const { return m_settings.Radius; }
@@ -58,7 +63,8 @@ namespace Galactic
             std::string m_name;
             PlanetSettings m_settings;
 
-            bool m_isGenerated, m_cloudsEnabled;
+            EDetail m_detail;
+            bool m_isGenerated, m_cloudsEnabled, m_atmEnabled;
 
             size_t m_vertexCount;
 

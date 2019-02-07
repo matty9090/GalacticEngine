@@ -115,7 +115,8 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::F1)) planet->Generate(Galactic::EDetail::Low);
     if (m_tracker.IsKeyReleased(Keyboard::F2)) planet->Generate(Galactic::EDetail::Medium);
     if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
-    if (m_tracker.IsKeyReleased(Keyboard::Q)) Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
+    if (m_tracker.IsKeyReleased(Keyboard::D1)) planet->EnableClouds(!planet->IsCloudsEnabled());
+    if (m_tracker.IsKeyReleased(Keyboard::D2)) planet->EnableAtmosphere(!planet->IsAtmosphereEnabled());
     
     /*float detailHeightMod = planet->GetParam(Galactic::EParams::DetailHeightMod);
     float detailFrequency = planet->GetParam(Galactic::EParams::DetailFrequency);
@@ -134,6 +135,8 @@ void Game::Update(DX::StepTimer const& timer)
     if (kb.S) move.z -= 1.f;
     if (kb.A) move.x += 1.f;
     if (kb.D) move.x -= 1.f;
+    if (kb.E) move.y += 1.f;
+    if (kb.X) move.y -= 1.f;
 
     move = Vector3::Transform(move, m_camera->GetQuaternion());
     move *= 0.05f;

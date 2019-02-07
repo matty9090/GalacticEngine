@@ -89,7 +89,7 @@ void SphericalQuadTreeTerrain::Generate()
     m_biomeMap.SetFractalGain(biomeSettings.Gain);
     m_biomeMap.SetFractalLacunarity(biomeSettings.Lacunarity);
     m_biomeMap.SetFrequency(biomeSettings.Frequency);
-    m_biomeMap.SetSeed(settings.Seed);
+    m_biomeMap.SetSeed(settings.Seed + 1);
 
     auto row1 = BiomeConfig::Row().AddBiome(0.1f, "Scorched")
                                   .AddBiome(0.2f, "Bare")
@@ -185,7 +185,7 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_context->PSSetConstantBuffers(1, 1, m_buffer->GetBuffer());
 }
 
-void Galactic::SphericalQuadTreeTerrain::InitEffect()
+void SphericalQuadTreeTerrain::InitEffect()
 {
     D3D11_INPUT_ELEMENT_DESC els[] = {
         // Semantic      Index  Format                           Slot      Offset     Slot Class                   Instance Step
@@ -200,10 +200,13 @@ void Galactic::SphericalQuadTreeTerrain::InitEffect()
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
 
+    std::wstring vs = L"Shaders/PlanetVS.fx";
+    std::wstring ps = (m_planet->IsAtmosphereEnabled()) ? L"Shaders/PlanetPS.fx" : L"Shaders/PlanetNoAtmPS.fx";
+
 #ifdef _DEBUG
-    m_effect = new Effect(m_device.Get(), L"Shaders/PlanetVS.fx", L"Shaders/PlanetPS.fx", els, num, false);
+    m_effect = new Effect(m_device.Get(), vs, ps, els, num, false);
 #else
-    m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), L"Shaders/PlanetVS.fx", L"Shaders/PlanetPS.fx", els, num, false);
+    m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), vs, ps, els, num, false);
 #endif
 }
 
@@ -251,24 +254,26 @@ void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, 
 {
     auto &settings = m_planet->GetSettings();
     
-    float h = 0.0f;
-    float m = (m_biomeMap.GetValue(p.x, p.y, p.z) + 1.0f) / 2.0f;
+    float m = (m_biomeMap.GetNoise(p.x, p.y, p.z) + 1.0f) / 2.0f;
     float mod = 1.0f;
 
-    for (int i = 0; i < settings.NoiseMaps.size(); ++i)
+    float e = m_noiseMaps[0].GetNoise(p.x, p.y, p.z);
+    float h = e * settings.NoiseMaps[0].Height;
+
+    for (int i = 1; i < settings.NoiseMaps.size(); ++i)
     {
         mod *= settings.NoiseMaps[i].Mod;
-        h += m_noiseMaps[i].GetValue(p.x, p.y, p.z) * mod;
+        h += m_noiseMaps[i].GetNoise(p.x, p.y, p.z) * settings.NoiseMaps[i].Height * mod;
     }
 
-    float e = 1.0f - (h + 1.0f) / 2.0f;
+    e = 1.0f - ((e + 1.0f) / 2.0f);
 
     if (e < hmin) hmin = e;
     if (e > hmax) hmax = e;
 
     texIndex    = settings.Biomes.Sample(m, e);
     biomeLookup = Vector2(m, e);
-    height      = fmaxf(0.0f, h - settings.MinValue);
+    height      = h;
 
 #ifdef _DEBUG
     counts[texIndex]++;

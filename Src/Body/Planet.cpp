@@ -17,7 +17,9 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_atmosphere(nullptr),
       m_isGenerated(false),
       m_vertexCount(0),
-      m_cloudsEnabled(true)
+      m_cloudsEnabled(true),
+      m_atmEnabled(true),
+      m_detail(EDetail::Medium)
 {
     m_settings.GridSize = 33;
     m_settings.Radius = 6700.0;
@@ -25,8 +27,9 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
     m_settings.AtmHeight = 200.0;
     m_settings.Biomes.AddBiomeRow(BiomeConfig::Row().AddBiome(1.0f, "Ocean"), 1.0f);
     m_settings.Mass = 5e24;
-    m_settings.MinValue = 0.0f;
-    m_settings.NoiseMaps.push_back(PlanetSettings::Map { 0.05f, 0.02f, 0.02, 2.0f, 1.0f });
+    m_settings.MinValue = 0.0f;                       // Gain   H      Freq   Lac   Mod   Octaves
+    m_settings.NoiseMaps.push_back(PlanetSettings::Map { 0.50f, 0.02f, 1.60f, 2.0f, 1.0f, 13 });
+    m_settings.BiomeMap = m_settings.NoiseMaps[0];
     m_settings.Seed = rand() % RAND_MAX;
 }
 
@@ -37,6 +40,8 @@ Planet::~Planet()
 
 void Planet::Generate(EDetail detail)
 {
+    m_detail = detail;
+
     double PCFreq = 0.0;
     __int64 CounterStart = 0;
 
@@ -68,8 +73,8 @@ void Planet::Generate(EDetail detail)
         m_clouds.reset();
     }
 
-    m_renderer = CreatePlanetRenderer(m_deviceContext, this, detail);
-    m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this, detail);
+    m_renderer = CreatePlanetRenderer(m_deviceContext, this, m_detail);
+    m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this, m_detail);
     m_clouds = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);
 
     if (m_isGenerated)
@@ -87,7 +92,7 @@ void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matri
     if (m_renderer)
         m_renderer->Render(view, proj);
 
-    if (m_atmosphere)
+    if (m_atmEnabled && m_atmosphere)
         m_atmosphere->Render(view, proj);
 
     if (m_cloudsEnabled && m_clouds)
@@ -108,7 +113,7 @@ void Planet::Update(float dt)
     m_world = scale * rotX * rotY * rotZ * translation;
 
     if (m_renderer) m_renderer->Update(dt);
-    if (m_atmosphere) m_atmosphere->Update(dt);
+    if (m_atmEnabled && m_atmosphere) m_atmosphere->Update(dt);
     if (m_cloudsEnabled && m_clouds) m_clouds->Update(dt);
 }
 

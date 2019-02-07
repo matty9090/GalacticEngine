@@ -51,6 +51,10 @@ namespace Galactic
             virtual long double GetMass() const = 0;
 
             virtual void EnableClouds(bool enabled) = 0;
+            virtual void EnableAtmosphere(bool enabled) = 0;
+
+            virtual bool IsCloudsEnabled() const = 0;
+            virtual bool IsAtmosphereEnabled() const = 0;
 
             virtual void IncrementVertices(size_t num) = 0;
             virtual size_t GetVertexCount() = 0;

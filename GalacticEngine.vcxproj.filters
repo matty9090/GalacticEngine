@@ -356,5 +356,8 @@
     <FxCompile Include="Shaders\BillboardVS.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="Shaders\PlanetNoAtmPS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
