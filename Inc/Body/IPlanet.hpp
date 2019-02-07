@@ -50,16 +50,17 @@ namespace Galactic
             virtual void SetMass(long double m) = 0;
             virtual long double GetMass() const = 0;
 
+            virtual void EnableWater(bool enabled) = 0;
             virtual void EnableClouds(bool enabled) = 0;
             virtual void EnableAtmosphere(bool enabled) = 0;
 
+            virtual bool IsWaterEnabled() const = 0;
             virtual bool IsCloudsEnabled() const = 0;
             virtual bool IsAtmosphereEnabled() const = 0;
 
             virtual void IncrementVertices(size_t num) = 0;
             virtual size_t GetVertexCount() = 0;
             virtual DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal) = 0;
-            virtual GrassDistributor &GetGrassDistributor() = 0;
 
             virtual ~IPlanet() {}
     };

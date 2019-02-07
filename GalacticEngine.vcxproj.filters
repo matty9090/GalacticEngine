@@ -191,6 +191,9 @@
     <ClInclude Include="Inc\StepTimer.h">
       <Filter>Client</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\SphericalQuadTreeWater.hpp">
+      <Filter>Render\SphericalQuadTreeTerrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -285,6 +288,9 @@
     <ClCompile Include="Src\Body\FlatEarth.cpp">
       <Filter>Body</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeWater.cpp">
+      <Filter>Render\SphericalQuadTreeTerrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\planet.ico">
@@ -357,6 +363,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\PlanetNoAtmPS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\WaterPS.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\WaterNoAtmPS.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

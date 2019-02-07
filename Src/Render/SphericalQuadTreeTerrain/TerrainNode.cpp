@@ -11,7 +11,7 @@ using namespace DirectX::SimpleMath;
 
 float TerrainNode::SplitDistance = 32.0f;
 
-TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad)
+TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
       m_terrain(terrain),
       m_parent(parent),
@@ -19,7 +19,8 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
       m_bounds(bounds),
       m_scale(bounds.size),
       m_visible(true),
-      m_quad(quad)
+      m_quad(quad),
+      m_simple(simple)
 {
     ID3D11Device *device;
     m_context->GetDevice(&device);
@@ -29,11 +30,6 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
     m_depth = -(int)log2f(m_scale);
     m_diameter = m_scale * m_terrain->GetRadius() * 2;
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
-        
-    //Vector3 mid = Vector3::Transform(Vector3(0, m_terrain->GetRadius(), 0), m_world);
-
-    //m_grass = std::make_unique<Billboard>(m_context, m_planet, mid, "Resources/grass.png", Billboard::Alpha);
-    //m_grass->SetScale(0.1f);
 
 #ifdef _DEBUG
     m_dbgCol    = Color(0.0f, 0.0f, 1.0f, 0.15f);
@@ -54,7 +50,7 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
 
 void TerrainNode::Generate()
 {
-    uint16_t gridsize = (uint16_t)SphericalQuadTreeTerrain::GridSize;
+    uint16_t gridsize = (uint16_t)m_terrain->GetGridSize();
 
     float step = m_bounds.size / (gridsize - 1);
     bool hasParent = !IsRoot();
@@ -100,12 +96,15 @@ void TerrainNode::Generate()
                 pos = Vector3::TransformNormal(pos, m_world);
 
                 std::string tex;
-                float height;
+                float height = 0.0f;
                 Vector2 biome;
-                size_t texIndex;
+                size_t texIndex = 0.0f;
                 
-                m_terrain->GetHeight(pos, height, biome, tex);
-                texIndex = GetTextureIndex(tex);
+                if (!m_simple)
+                {
+                    m_terrain->GetHeight(pos, height, biome, tex);
+                    texIndex = GetTextureIndex(tex);
+                }
 
                 v.biome = biome;
                 v.position = pos + pos * height;
@@ -188,7 +187,9 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 
             m_buffer->SetData(m_context, buffer);
 
-            m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
+            if(!m_simple)
+                m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
+
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
             m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
@@ -204,7 +205,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 
 void TerrainNode::Update(float dt)
 {
-    size_t gridsize = SphericalQuadTreeTerrain::GridSize;
+    size_t gridsize = m_terrain->GetGridSize();
 
     Vector3 cam = m_planet->GetCameraPos();
     Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
@@ -218,7 +219,7 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = m_depth < 2 || distance < m_scale * SplitDistance;
+        bool divide = (!m_simple && m_depth < 2) || distance < m_scale * SplitDistance;
 
         if (!divide)
             Merge();
@@ -254,6 +255,9 @@ void TerrainNode::Split()
     if (m_depth >= 12 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
         return;
 
+    if (m_simple && m_depth >= 6)
+        return;
+
     if (IsLeaf())
     {
         SphericalQuadTreeTerrain::FrameSplits++;
@@ -261,10 +265,10 @@ void TerrainNode::Split()
         float x = m_bounds.x, y = m_bounds.y;
         float d = m_bounds.size / 2;
 
-        m_children[NW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y    , d }, NW);
-        m_children[NE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y    , d }, NE);
-        m_children[SE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y + d, d }, SE);
-        m_children[SW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y + d, d }, SW);
+        m_children[NW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y    , d }, NW, m_simple);
+        m_children[NE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y    , d }, NE, m_simple);
+        m_children[SE] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x + d, y + d, d }, SE, m_simple);
+        m_children[SW] = std::make_unique<TerrainNode>(m_terrain, this, m_planet, Square{ x    , y + d, d }, SW, m_simple);
 
 #ifdef _DEBUG
         m_children[NW]->SetDebugName(m_dbgName + "_" + std::to_string(NW));
@@ -298,7 +302,8 @@ void TerrainNode::Split()
         for (auto &t : threads)
             t.join();
 
-        NotifyNeighbours();
+        if(!m_simple)
+            NotifyNeighbours();
     }
     else
     {
@@ -323,7 +328,7 @@ void TerrainNode::Merge()
         m_children[2].reset();
         m_children[3].reset();
 
-        size_t gridsize = SphericalQuadTreeTerrain::GridSize;
+        size_t gridsize = m_terrain->GetGridSize();
         m_planet->IncrementVertices(-(gridsize * gridsize * 4));
 
         NotifyNeighbours();
@@ -347,16 +352,19 @@ void TerrainNode::Release()
 }
 
 void TerrainNode::FixEdges()
-{    
-    auto n1 = GetGreaterThanOrEqualNeighbour(North);
-    auto n2 = GetGreaterThanOrEqualNeighbour(East);
-    auto n3 = GetGreaterThanOrEqualNeighbour(South);
-    auto n4 = GetGreaterThanOrEqualNeighbour(West);
+{
+    if (!m_simple)
+    {
+        auto n1 = GetGreaterThanOrEqualNeighbour(North);
+        auto n2 = GetGreaterThanOrEqualNeighbour(East);
+        auto n3 = GetGreaterThanOrEqualNeighbour(South);
+        auto n4 = GetGreaterThanOrEqualNeighbour(West);
 
-    if (n1) FixEdge(North, n1, n1->GetEdge(South), n1->GetDepth());
-    if (n2) FixEdge(East, n2, n2->GetEdge(West), n2->GetDepth());
-    if (n3) FixEdge(South, n3, n3->GetEdge(North), n3->GetDepth());
-    if (n4) FixEdge(West, n4, n4->GetEdge(East), n4->GetDepth());
+        if (n1) FixEdge(North, n1, n1->GetEdge(South), n1->GetDepth());
+        if (n2) FixEdge(East, n2, n2->GetEdge(West), n2->GetDepth());
+        if (n3) FixEdge(South, n3, n3->GetEdge(North), n3->GetDepth());
+        if (n4) FixEdge(West, n4, n4->GetEdge(East), n4->GetDepth());
+    }
     
     Init();
 }
@@ -423,7 +431,7 @@ void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t
     neighbour;
 
     int diff = m_depth - depth;
-    size_t grid = SphericalQuadTreeTerrain::GridSize;
+    size_t grid = m_terrain->GetGridSize();
 
     if (diff == 0)
     {

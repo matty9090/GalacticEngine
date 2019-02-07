@@ -6,6 +6,7 @@
 #include "Render/IAtmosphereRenderer.hpp"
 #include "Render/NoiseCloudRenderer.hpp"
 #include "Render/GrassRenderer.hpp"
+#include "Render/SphericalQuadTreeTerrain/ISphericalTerrain.hpp"
 
 namespace Galactic
 {
@@ -22,9 +23,11 @@ namespace Galactic
             void ReadSettings(std::string file);
             void SetSettings(PlanetSettings settings) { m_settings = settings; }
 
+            void EnableWater(bool enabled) { m_waterEnabled = enabled; Generate(m_detail); }
             void EnableClouds(bool enabled) { m_cloudsEnabled = enabled; }
             void EnableAtmosphere(bool enabled) { m_atmEnabled = enabled; Generate(m_detail); }
 
+            bool IsWaterEnabled() const { return m_waterEnabled; }
             bool IsCloudsEnabled() const { return m_cloudsEnabled; }
             bool IsAtmosphereEnabled() const { return m_atmEnabled; }
             
@@ -57,14 +60,13 @@ namespace Galactic
             size_t GetVertexCount() { return m_vertexCount; }
 
             DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal);
-            GrassDistributor &GetGrassDistributor() { return m_grass->GetDistributor(); }
 
         private:
             std::string m_name;
             PlanetSettings m_settings;
 
             EDetail m_detail;
-            bool m_isGenerated, m_cloudsEnabled, m_atmEnabled;
+            bool m_isGenerated, m_waterEnabled, m_cloudsEnabled, m_atmEnabled;
 
             size_t m_vertexCount;
 
@@ -75,7 +77,7 @@ namespace Galactic
             std::unique_ptr<IPlanetRenderer> m_renderer;
             std::unique_ptr<IAtmosphereRenderer> m_atmosphere;
             std::unique_ptr<NoiseCloudRenderer> m_clouds;
-            std::unique_ptr<GrassRenderer> m_grass;
+            std::unique_ptr<ISphericalTerrain> m_water;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
     };
 }

@@ -42,7 +42,7 @@ namespace Galactic
             enum EDir { North, East, South, West };
             enum EQuad { NE, NW, SE, SW };
 
-            TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad);
+            TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple = false);
 
             void SetMatrix(DirectX::SimpleMath::Matrix m) { m_world = m; }
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
@@ -72,7 +72,7 @@ namespace Galactic
 
         private:
             int m_depth;
-            bool m_visible;
+            bool m_visible, m_simple;
             float m_scale, m_diameter;
 
             int m_quad;

@@ -87,6 +87,8 @@ namespace Galactic
     template<class VertexType, class IndexType>
     inline void Drawable<VertexType, IndexType>::Draw()
     {
+        std::lock_guard<std::mutex> lock(mutex);
+
         unsigned int stride = sizeof(VertexType);
         unsigned int offset = 0;
 

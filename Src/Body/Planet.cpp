@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "Body/Planet.hpp"
-#include "Render/PlanetRendererFactory.hpp"
 #include "Physics/Constants.hpp"
 #include "StepTimer.h"
+
+#include "Render/PlanetRendererFactory.hpp"
+#include "Render/SphericalQuadTreeTerrain/SphericalQuadTreeWater.hpp"
 
 #include <fstream>
 
@@ -19,6 +21,7 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_vertexCount(0),
       m_cloudsEnabled(true),
       m_atmEnabled(true),
+      m_waterEnabled(true),
       m_detail(EDetail::Medium)
 {
     m_settings.GridSize = 33;
@@ -71,11 +74,15 @@ void Planet::Generate(EDetail detail)
 
         m_clouds->Reset();
         m_clouds.reset();
+
+        m_water->Reset();
+        m_water.reset();
     }
 
-    m_renderer = CreatePlanetRenderer(m_deviceContext, this, m_detail);
-    m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this, m_detail);
-    m_clouds = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);
+    m_renderer      = CreatePlanetRenderer(m_deviceContext, this, m_detail);
+    m_atmosphere    = CreateAtmosphereRenderer(m_deviceContext, this, m_detail);
+    m_clouds        = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);
+    m_water         = std::make_unique<SphericalQuadTreeWater>(m_deviceContext.Get(), this);
 
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
@@ -94,6 +101,9 @@ void Planet::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matri
 
     if (m_atmEnabled && m_atmosphere)
         m_atmosphere->Render(view, proj);
+
+    if (m_waterEnabled && m_water)
+        m_water->Render(view, proj);
 
     if (m_cloudsEnabled && m_clouds)
         m_clouds->Render(view, proj);
@@ -115,6 +125,7 @@ void Planet::Update(float dt)
     if (m_renderer) m_renderer->Update(dt);
     if (m_atmEnabled && m_atmosphere) m_atmosphere->Update(dt);
     if (m_cloudsEnabled && m_clouds) m_clouds->Update(dt);
+    if (m_waterEnabled && m_water) m_water->Update(dt);
 }
 
 void Planet::Reset()
@@ -122,10 +133,12 @@ void Planet::Reset()
     if (m_renderer) m_renderer->Reset();
     if (m_atmosphere) m_atmosphere->Reset();
     if (m_clouds) m_clouds->Reset();
+    if (m_water) m_water->Reset();
 
     m_renderer.reset();
     m_atmosphere.reset();
     m_clouds.reset();
+    m_water.reset();
 }
 
 void Planet::ReadSettings(std::string file)

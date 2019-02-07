@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 33;
+    size_t SphericalQuadTreeTerrain::GridSize = 37;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -34,8 +34,6 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     m_gradient.addColorStop(0.06f, Gradient::GradientColor(0.93f * 255.0f, 0.79f * 255.0f, 0.69f * 255.0f, 255.0f));
     m_gradient.addColorStop(0.2f, Gradient::GradientColor(0.22f * 255.0f, 0.62f * 255.0f, 0.14f * 255.0f, 255.0f));
     m_gradient.addColorStop(1.0f, Gradient::GradientColor(0.22f * 255.0f, 0.62f * 255.0f, 0.14f * 255.0f, 255.0f));
-
-    GetBiomeTexture();
 
     CreateEffect();
 }
@@ -176,7 +174,6 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
     m_context->PSSetShaderResources(0, 1, &m_texBiomes);
-    //m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
 
     ScatterBuffer buffer = GetScatterBuffer(m_planet);
     m_buffer->SetData(m_context.Get(), buffer);
@@ -208,11 +205,6 @@ void SphericalQuadTreeTerrain::InitEffect()
 #else
     m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), vs, ps, els, num, false);
 #endif
-}
-
-void SphericalQuadTreeTerrain::GetBiomeTexture()
-{
-    
 }
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)

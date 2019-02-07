@@ -112,11 +112,13 @@ void Game::Update(DX::StepTimer const& timer)
 
     auto planet = static_cast<Galactic::IPlanet*>(m_system->FindBody("Moon"));
 
+    if (m_tracker.IsKeyReleased(Keyboard::Q))  Galactic::IBody::Wireframe = !Galactic::IBody::Wireframe;
     if (m_tracker.IsKeyReleased(Keyboard::F1)) planet->Generate(Galactic::EDetail::Low);
     if (m_tracker.IsKeyReleased(Keyboard::F2)) planet->Generate(Galactic::EDetail::Medium);
     if (m_tracker.IsKeyReleased(Keyboard::F3)) planet->Generate(Galactic::EDetail::High);
     if (m_tracker.IsKeyReleased(Keyboard::D1)) planet->EnableClouds(!planet->IsCloudsEnabled());
     if (m_tracker.IsKeyReleased(Keyboard::D2)) planet->EnableAtmosphere(!planet->IsAtmosphereEnabled());
+    if (m_tracker.IsKeyReleased(Keyboard::D3)) planet->EnableWater(!planet->IsWaterEnabled());
     
     /*float detailHeightMod = planet->GetParam(Galactic::EParams::DetailHeightMod);
     float detailFrequency = planet->GetParam(Galactic::EParams::DetailFrequency);

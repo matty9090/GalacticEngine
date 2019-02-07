@@ -14,7 +14,7 @@ Camera::Camera(size_t width, size_t height)
       m_yaw(0.0f),
       m_pitch(0.0f)
 {
-    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(width) / float(height), 0.0001f, 500000.f);
+    m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f, float(width) / float(height), 0.0001f, 5000.f);
 }
 
 void Camera::Update(float dt)

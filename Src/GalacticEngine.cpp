@@ -17,7 +17,7 @@ namespace Galactic {
         BiomeConfig::Biomes["DryDesert"]        = { "sand01d.jpg"   , "grass01n.png",    { 0.82f, 0.72f, 0.54f } };
         BiomeConfig::Biomes["Forest"]           = { "grass03d.jpg"  , "grass01n.png",    { 0.40f, 0.59f, 0.35f } };
         BiomeConfig::Biomes["GrassLand"]        = { "grass01d.jpg"  , "grass01n.png",    { 0.53f, 0.67f, 0.33f } };
-        BiomeConfig::Biomes["Ocean"]            = { "white.png"     , "whiten.png",      { 0.26f, 0.26f, 0.48f } };
+        BiomeConfig::Biomes["Ocean"]            = { "white.png"     , "water.png",       { 0.26f, 0.26f, 0.48f } };
         BiomeConfig::Biomes["Tundra"]           = { "grass03d.jpg"  , "grass01n.png",    { 0.73f, 0.73f, 0.67f } };
         BiomeConfig::Biomes["Scorched"]         = { "rock01d.png"   , "rock01n.png",     { 0.33f, 0.33f, 0.33f } };
         BiomeConfig::Biomes["Snowy"]            = { "snow02d.jpg"   , "snow02n.jpg",     { 0.86f, 0.86f, 0.89f } };

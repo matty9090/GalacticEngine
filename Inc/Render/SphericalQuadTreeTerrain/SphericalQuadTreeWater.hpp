@@ -16,10 +16,16 @@
 
 namespace Galactic
 {
-    class SphericalQuadTreeTerrain : public ISphericalTerrain
+    struct WaterBuffer
+    {
+        float Scroll;
+        float p0, p1, p2;
+    };
+
+    class SphericalQuadTreeWater : public ISphericalTerrain
     {
         public:
-            SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
+            SphericalQuadTreeWater(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
 
             void Generate();
             void CreateEffect();
@@ -28,7 +34,7 @@ namespace Galactic
             void Reset();
 
             float GetRadius() const { return m_radius; }
-            size_t GetGridSize() const { return SphericalQuadTreeTerrain::GridSize; }
+            size_t GetGridSize() const { return SphericalQuadTreeWater::GridSize; }
 
             __forceinline std::string GetBiome(const DirectX::SimpleMath::Vector2 &lookup);
             __forceinline void GetHeight(const DirectX::SimpleMath::Vector3 &point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
@@ -46,8 +52,7 @@ namespace Galactic
         private:
             DirectX::SimpleMath::Matrix m_world;
 
-            FastNoise m_biomeMap;
-            std::vector<FastNoise> m_noiseMaps;
+            float m_scroll, m_waterLevel;
 
             std::mutex m_mutex;
             IPlanet *m_planet;
@@ -57,9 +62,10 @@ namespace Galactic
 
             std::unique_ptr<DirectX::CommonStates> m_states;
             std::array<std::unique_ptr<TerrainNode>, 6> m_faces;
+            std::unique_ptr<ConstantBuffer<WaterBuffer>> m_waterBuffer;
             std::unique_ptr<ConstantBuffer<ScatterBuffer>> m_buffer;
 
-            ID3D11ShaderResourceView *m_texBiomes;
+            ID3D11ShaderResourceView *m_texNormalMap;
 
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;

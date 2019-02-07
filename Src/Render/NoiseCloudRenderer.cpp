@@ -54,7 +54,7 @@ void NoiseCloudRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX::Simpl
     m_context->PSSetSamplers(0, 1, &sampler);
     m_context->RSSetState(m_raster.Get());
     m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-    m_context->OMSetBlendState(m_states->NonPremultiplied(), factor, 0xFFFFFFFF);
+    m_context->OMSetBlendState(m_states->AlphaBlend(), factor, 0xFFFFFFFF);
 
     m_context->IASetInputLayout(m_effect->GetInputLayout());
     m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
