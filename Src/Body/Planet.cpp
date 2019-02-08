@@ -28,11 +28,13 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
     m_settings.Radius = 6700.0;
     m_settings.AtmColour = { 0.0f, 0.7f, 1.0f };
     m_settings.AtmHeight = 200.0;
-    m_settings.Biomes.AddBiomeRow(BiomeConfig::Row().AddBiome(1.0f, "Ocean"), 1.0f);
+    m_settings.AtmRadius = 6700.0;
     m_settings.Mass = 5e24;
     m_settings.MinValue = 0.0f;                       // Gain   H      Freq   Lac   Mod   Octaves
-    m_settings.NoiseMaps.push_back(PlanetSettings::Map { 0.50f, 0.02f, 1.60f, 2.0f, 1.0f, 13 });
+    m_settings.NoiseMaps.push_back(PlanetSettings::Map { 0.50f, 0.02f, 1.60f, 2.0f, 1.0f, 17 });
+    m_settings.NoiseMaps.push_back(PlanetSettings::Map { 0.50f, 0.02f, 3.80f, 2.0f, 0.2f, 17 });
     m_settings.BiomeMap = m_settings.NoiseMaps[0];
+    m_settings.Biomes.AddBiomeRow(BiomeConfig::Row().AddBiome(1.0f, "Ocean"), 1.0f);
     m_settings.Seed = rand() % RAND_MAX;
 }
 
@@ -69,20 +71,30 @@ void Planet::Generate(EDetail detail)
         m_renderer->Reset();
         m_renderer.reset();
         
-        m_atmosphere->Reset();
-        m_atmosphere.reset();
+        if (m_atmEnabled)
+        {
+            m_atmosphere->Reset();
+            m_atmosphere.reset();
+        }
 
-        m_clouds->Reset();
-        m_clouds.reset();
+        if (m_cloudsEnabled)
+        {
+            m_clouds->Reset();
+            m_clouds.reset();
+        }
 
-        m_water->Reset();
-        m_water.reset();
+        if (m_waterEnabled)
+        {
+            m_water->Reset();
+            m_water.reset();
+        }
     }
 
-    m_renderer      = CreatePlanetRenderer(m_deviceContext, this, m_detail);
-    m_atmosphere    = CreateAtmosphereRenderer(m_deviceContext, this, m_detail);
-    m_clouds        = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);
-    m_water         = std::make_unique<SphericalQuadTreeWater>(m_deviceContext.Get(), this);
+    m_renderer = CreatePlanetRenderer(m_deviceContext, this, m_detail);
+
+    if (m_atmEnabled) m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this, m_detail);
+    if (m_cloudsEnabled) m_clouds = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);
+    if (m_waterEnabled) m_water = std::make_unique<SphericalQuadTreeWater>(m_deviceContext.Get(), this);
 
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
@@ -143,20 +155,64 @@ void Planet::Reset()
 
 void Planet::ReadSettings(std::string file)
 {
-    /*std::ifstream f(file.c_str());
+    std::ifstream f(file.c_str());
 
-    while (!f.eof())
+    picojson::value json;
+    picojson::parse(json, f);
+
+    f.close();
+
+    picojson::object obj = json.get<picojson::object>();
+
+    auto atmColour = obj["AtmColour"].get<picojson::array>();
+    float r = static_cast<float>(atmColour[0].get<double>());
+    float g = static_cast<float>(atmColour[1].get<double>());
+    float b = static_cast<float>(atmColour[2].get<double>());
+    float a = static_cast<float>(atmColour[3].get<double>());
+
+    BiomeConfig biomes;
+    std::vector<PlanetSettings::Map> noiseMaps;
+
+    for (const auto &map : obj["NoiseMaps"].get<picojson::array>())
+        noiseMaps.push_back(ParseMap(map.get<picojson::object>()));
+
+    for (const auto &rows : obj["Biomes"].get<picojson::object>())
     {
-        int param;
-        float value;
+        BiomeConfig::Row row;
 
-        f >> param >> value;
+        for (const auto &cols : rows.second.get<picojson::object>())
+            row.AddBiome(atoi(cols.first.c_str()), cols.second.get<std::string>());
 
-        SetParam((EParams)param, value);
+        biomes.AddBiomeRow(row, atoi(rows.first.c_str()));
     }
 
-    f.close();*/
+    m_settings.GridSize     = static_cast<size_t>(obj["GridSize"].get<double>());
+    m_settings.Seed         = static_cast<int>(obj["Seed"].get<double>());
+    m_settings.MinValue     = static_cast<float>(obj["MinValue"].get<double>());
+    m_settings.Radius       = obj["Radius"].get<double>();
+    m_settings.Mass         = obj["GridSize"].get<double>();
+    m_settings.AtmHeight    = obj["AtmHeight"].get<double>();
+    m_settings.AtmRadius    = obj["AtmRadius"].get<double>();
+    m_settings.AtmColour    = DirectX::SimpleMath::Color(r, g, b, a);
+    m_settings.Biomes       = biomes;
+    m_settings.BiomeMap     = ParseMap(obj["BiomeMap"].get<picojson::object>());
+    m_settings.NoiseMaps    = noiseMaps;
 }
+
+PlanetSettings::Map Galactic::Planet::ParseMap(picojson::object obj)
+{
+    PlanetSettings::Map map;
+
+    map.Frequency   = static_cast<float>(obj["Frequency"].get<double>());
+    map.Gain        = static_cast<float>(obj["Gain"].get<double>());
+    map.Height      = static_cast<float>(obj["Height"].get<double>());
+    map.Lacunarity  = static_cast<float>(obj["Lacunarity"].get<double>());
+    map.Mod         = static_cast<float>(obj["Mod"].get<double>());
+    map.Octaves     = static_cast<size_t>(obj["Octaves"].get<double>());
+
+    return map;
+}
+
 
 Vector3 Galactic::Planet::GetPoint(Vector3 normal) {
     return m_renderer->GetPoint(normal);

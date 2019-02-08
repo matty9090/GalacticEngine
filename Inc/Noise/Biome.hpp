@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "FastNoise.h"
+#include "Utils/Json.hpp"
 #include "Render/Gradient.hpp"
 
 namespace Galactic
@@ -31,6 +32,7 @@ namespace Galactic
                     }
 
                     size_t GetCount() { return biomes.size(); }
+                    std::map<float, std::string> GetCols() { return biomes; }
 
                 private:
                     std::map<float, std::string> biomes;
@@ -41,6 +43,8 @@ namespace Galactic
 
             void Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv, size_t width, size_t height);
             void AddBiomeRow(Row row, float elevation);
+            std::map<float, Row> GetRows() { return m_biomes; }
+
             void Clear();
             void ClearBiomes() { m_biomes.clear(); }
 

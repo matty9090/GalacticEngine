@@ -194,6 +194,9 @@
     <ClInclude Include="Inc\Render\SphericalQuadTreeTerrain\SphericalQuadTreeWater.hpp">
       <Filter>Render\SphericalQuadTreeTerrain</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Utils\Json.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">

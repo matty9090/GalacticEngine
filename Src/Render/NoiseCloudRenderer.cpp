@@ -90,7 +90,7 @@ void NoiseCloudRenderer::Render(DirectX::SimpleMath::Matrix view, DirectX::Simpl
 
 void NoiseCloudRenderer::Update(float dt)
 {
-    m_time += dt;
+    m_time += dt * 4.0f;
 }
 
 void NoiseCloudRenderer::Reset()

@@ -79,5 +79,7 @@ namespace Galactic
             std::unique_ptr<NoiseCloudRenderer> m_clouds;
             std::unique_ptr<ISphericalTerrain> m_water;
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
+
+            PlanetSettings::Map ParseMap(picojson::object obj);
     };
 }

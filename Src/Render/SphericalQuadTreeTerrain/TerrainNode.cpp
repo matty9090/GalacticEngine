@@ -110,7 +110,7 @@ void TerrainNode::Generate()
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
-                v.uv = Vector2(xx * 1000.0f, yy * 1000.0f);
+                v.uv = Vector2(xx * 10000.0f, yy * 10000.0f);
                 v.texIndex = texIndex;
             }
 
@@ -252,10 +252,7 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (m_depth >= 12 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
-        return;
-
-    if (m_simple && m_depth >= 6)
+    if (m_depth >= 14 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
         return;
 
     if (IsLeaf())

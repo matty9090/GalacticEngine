@@ -119,6 +119,16 @@ void Game::Update(DX::StepTimer const& timer)
     if (m_tracker.IsKeyReleased(Keyboard::D1)) planet->EnableClouds(!planet->IsCloudsEnabled());
     if (m_tracker.IsKeyReleased(Keyboard::D2)) planet->EnableAtmosphere(!planet->IsAtmosphereEnabled());
     if (m_tracker.IsKeyReleased(Keyboard::D3)) planet->EnableWater(!planet->IsWaterEnabled());
+
+    if (m_tracker.IsKeyReleased(Keyboard::B))
+    {
+        auto &settings = planet->GetSettings();
+        Galactic::PlanetSettings::Map map = settings.NoiseMaps.back();
+        map.Mod *= 0.2f;
+        map.Frequency *= 0.2f;
+        settings.NoiseMaps.push_back(map);
+        planet->Generate(Galactic::EDetail::High);
+    }
     
     /*float detailHeightMod = planet->GetParam(Galactic::EParams::DetailHeightMod);
     float detailFrequency = planet->GetParam(Galactic::EParams::DetailFrequency);
@@ -343,6 +353,7 @@ void Game::CreateDevice()
     planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     //planet->SetAtmosphereHeight(800.0f);
+    planet->ReadSettings("settings.txt");
     planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 5.971e24, 6371.0);

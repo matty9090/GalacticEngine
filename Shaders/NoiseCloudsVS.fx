@@ -24,7 +24,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	VS_OUTPUT Output;
 	
 	float3 pos = v_in.vPosition;
-	pos.z += time * 20.0f;
+	pos.z += time;
 	
 	float3 npos = pos * 2;
 	
