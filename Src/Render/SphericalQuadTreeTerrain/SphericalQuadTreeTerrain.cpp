@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 37;
+    size_t SphericalQuadTreeTerrain::GridSize = 33;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -36,6 +36,7 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     m_gradient.addColorStop(1.0f, Gradient::GradientColor(0.22f * 255.0f, 0.62f * 255.0f, 0.14f * 255.0f, 255.0f));
 
     CreateEffect();
+    LoadTextures();
 }
 
 void SphericalQuadTreeTerrain::CreateEffect()
@@ -50,8 +51,16 @@ void SphericalQuadTreeTerrain::CreateEffect()
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
 
+    const float border[4] = { 0.f, 0.f, 0.f, 0.f };
+    float maxAnisotropy = (m_device->GetFeatureLevel() > D3D_FEATURE_LEVEL_9_1) ? 16 : 2;
+
+    CD3D11_SAMPLER_DESC samplerDesc(D3D11_FILTER_ANISOTROPIC,
+        D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_CLAMP,
+        0.f, maxAnisotropy, D3D11_COMPARISON_NEVER, border, 0.f, FLT_MAX);
+
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()), "Creating raster");
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()), "Creating raster");
+    DX::ThrowIfFailed(m_device.Get()->CreateSamplerState(&samplerDesc, m_sampler.ReleaseAndGetAddressOf()), "Creating raster");
 
     m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
@@ -161,10 +170,10 @@ void SphericalQuadTreeTerrain::Generate()
 
 void SphericalQuadTreeTerrain::SetRenderContext()
 {
-    auto sampler = m_states->AnisotropicWrap();
+    //auto sampler = m_states->AnisotropicWrap();
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    m_context->PSSetSamplers(0, 1, &sampler);
+    m_context->PSSetSamplers(0, 1, m_sampler.GetAddressOf());
     m_context->RSSetState(IBody::Wireframe ? m_rasterWire.Get() : m_raster.Get());
     m_context->OMSetBlendState(m_states->Opaque(), factor, 0xFFFFFFFF);
     m_context->OMSetDepthStencilState(m_states->DepthDefault(), 1);
@@ -174,6 +183,8 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
     m_context->PSSetShaderResources(0, 1, &m_texBiomes);
+    m_context->PSSetShaderResources(1, 1, &m_textures);
+    m_context->PSSetShaderResources(2, 1, &m_normalMaps);
 
     ScatterBuffer buffer = GetScatterBuffer(m_planet);
     m_buffer->SetData(m_context.Get(), buffer);
@@ -191,8 +202,8 @@ void SphericalQuadTreeTerrain::InitEffect()
         { "TANGENT",     0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL",      1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        36,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        48,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32_FLOAT,        0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    2,     DXGI_FORMAT_R32_UINT,            0,        64,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    2,     DXGI_FORMAT_R32_FLOAT,           0,        68,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -205,6 +216,25 @@ void SphericalQuadTreeTerrain::InitEffect()
 #else
     m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), vs, ps, els, num, false);
 #endif
+}
+
+void Galactic::SphericalQuadTreeTerrain::LoadTextures()
+{
+    std::cout << "Reading biomes\n";
+
+    ID3D11Resource *m_tex, *m_ntex;
+
+    DX::ThrowIfFailed(DirectX::CreateDDSTextureFromFileEx(m_device.Get(), m_context.Get(), L"Resources/Biomes.dds", 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, D3D11_RESOURCE_MISC_GENERATE_MIPS, 0, &m_tex, &m_textures));
+    DX::ThrowIfFailed(DirectX::CreateDDSTextureFromFileEx(m_device.Get(), m_context.Get(), L"Resources/NormalMaps.dds", 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, D3D11_RESOURCE_MISC_GENERATE_MIPS, 0, &m_ntex, &m_normalMaps));
+
+    D3D11_TEXTURE2D_DESC desc;
+    ((ID3D11Texture2D*)m_tex)->GetDesc(&desc);
+
+    std::cout << desc.Width << "x" << desc.Height << "\n";
+    std::cout << desc.ArraySize << " textures, " << desc.MipLevels << " mips\n";
+
+    m_tex->Release();
+    m_ntex->Release();
 }
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -230,6 +260,7 @@ void SphericalQuadTreeTerrain::Update(float dt)
 void SphericalQuadTreeTerrain::Reset()
 {
     m_texBiomes->Release();
+    m_textures->Release();
     m_states.reset();
     m_effect->Reset();
 

@@ -353,7 +353,7 @@ void Game::CreateDevice()
     planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     //planet->SetAtmosphereHeight(800.0f);
-    planet->ReadSettings("settings.txt");
+    planet->ReadSettings("settings.json");
     planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 5.971e24, 6371.0);
@@ -361,7 +361,7 @@ void Game::CreateDevice()
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
     moon->SetVelocity(Vector3(-1.0e5, 0.0f, 1.3e6));
     //moon->SetAtmosphereHeight(200.0f);
-    moon->ReadSettings("settings.txt");
+    moon->ReadSettings("settings.json");
     moon->Generate(Galactic::EDetail::High);
 
     m_fe = Galactic::CreateFlatEarth(m_d3dContext.Get(), "Flat Earth", 5e26, 60000.0);

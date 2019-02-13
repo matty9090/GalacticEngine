@@ -1,0 +1,152 @@
+{
+  "Bare": {
+    "Colour": [
+      0.52999997138977051,
+      0.52999997138977051,
+      0.52999997138977051,
+      1
+    ],
+    "Diffuse": "test0.png",
+    "Normal": "grass01n.png"
+  },
+  "Beach": {
+    "Colour": [
+      0.62999999523162842,
+      0.56000000238418579,
+      0.46000000834465027,
+      1
+    ],
+    "Diffuse": "sand01d.jpg",
+    "Normal": "grass01n.png"
+  },
+  "Desert": {
+    "Colour": [
+      0.79000002145767212,
+      0.81999999284744263,
+      0.61000001430511475,
+      1
+    ],
+    "Diffuse": "sand01d.jpg",
+    "Normal": "grass01n.png"
+  },
+  "DryDesert": {
+    "Colour": [
+      0.81999999284744263,
+      0.72000002861022949,
+      0.54000002145767212,
+      1
+    ],
+    "Diffuse": "sand01d.jpg",
+    "Normal": "grass01n.png"
+  },
+  "Forest": {
+    "Colour": [
+      0.40000000596046448,
+      0.5899999737739563,
+      0.34999999403953552,
+      1
+    ],
+    "Diffuse": "grass03d.jpg",
+    "Normal": "grass01n.png"
+  },
+  "GrassLand": {
+    "Colour": [
+      0.52999997138977051,
+      0.67000001668930054,
+      0.33000001311302185,
+      1
+    ],
+    "Diffuse": "grass01d.jpg",
+    "Normal": "grass01n.png"
+  },
+  "Ocean": {
+    "Colour": [
+      0.25999999046325684,
+      0.25999999046325684,
+      0.47999998927116394,
+      1
+    ],
+    "Diffuse": "white.png",
+    "Normal": "water.png"
+  },
+  "Scorched": {
+    "Colour": [
+      0.33000001311302185,
+      0.33000001311302185,
+      0.33000001311302185,
+      1
+    ],
+    "Diffuse": "rock01d.png",
+    "Normal": "rock01n.png"
+  },
+  "ShrubLand": {
+    "Colour": [
+      0.52999997138977051,
+      0.67000001668930054,
+      0.46000000834465027,
+      1
+    ],
+    "Diffuse": "grass02d.jpg",
+    "Normal": "grass02n.jpg"
+  },
+  "Snowy": {
+    "Colour": [
+      0.86000001430511475,
+      0.86000001430511475,
+      0.88999998569488525,
+      1
+    ],
+    "Diffuse": "snow02d.jpg",
+    "Normal": "snow02n.jpg"
+  },
+  "Taiga": {
+    "Colour": [
+      0.60000002384185791,
+      0.67000001668930054,
+      0.46000000834465027,
+      1
+    ],
+    "Diffuse": "snow02d.jpg",
+    "Normal": "snow02n.jpg"
+  },
+  "TempRainForest": {
+    "Colour": [
+      0.25999999046325684,
+      0.52999997138977051,
+      0.33000001311302185,
+      1
+    ],
+    "Diffuse": "grass01d.jpg",
+    "Normal": "grass01n.png"
+  },
+  "TropForest": {
+    "Colour": [
+      0.33000001311302185,
+      0.60000002384185791,
+      0.25999999046325684,
+      1
+    ],
+    "Diffuse": "grass01d.jpg",
+    "Normal": "grass01n.png"
+  },
+  "TropRainForest": {
+    "Colour": [
+      0.20000000298023224,
+      0.46000000834465027,
+      0.33000001311302185,
+      1
+    ],
+    "Diffuse": "grass01d.jpg",
+    "Normal": "grass01n.png"
+  },
+  "Tundra": {
+    "Colour": [
+      0.73000001907348633,
+      0.73000001907348633,
+      0.67000001668930054,
+      1
+    ],
+    "Diffuse": "grass03d.jpg",
+    "Normal": "grass01n.png"
+  }
+}

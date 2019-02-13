@@ -12,8 +12,8 @@ namespace Galactic
 {
     struct Biome
     {
-        std::string Texture, NormalMap;
         DirectX::SimpleMath::Color Colour;
+        int Tex, NormalMap;
     };
 
     class BiomeConfig

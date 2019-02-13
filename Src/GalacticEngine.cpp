@@ -4,6 +4,10 @@
 #include "Body/Planet.hpp"
 #include "Noise/Biome.hpp"
 #include "Scene/SimpleStarSystem.hpp"
+#include "Utils/Json.hpp"
+
+#include <fstream>
+#include <set>
 
 using Microsoft::WRL::ComPtr;
 using DirectX::SimpleMath::Color;
@@ -11,21 +15,64 @@ using DirectX::SimpleMath::Color;
 namespace Galactic {
     void InitEngine()
     {
-        BiomeConfig::Biomes["Bare"]             = { "test0.png"     , "whiten.png",      { 0.53f, 0.53f, 0.53f } };
-        BiomeConfig::Biomes["Beach"]            = { "sand01d.jpg"   , "grass01n.png",    { 0.63f, 0.56f, 0.46f } };
-        BiomeConfig::Biomes["Desert"]           = { "sand01d.jpg"   , "grass01n.png",    { 0.79f, 0.82f, 0.61f } };
-        BiomeConfig::Biomes["DryDesert"]        = { "sand01d.jpg"   , "grass01n.png",    { 0.82f, 0.72f, 0.54f } };
-        BiomeConfig::Biomes["Forest"]           = { "grass03d.jpg"  , "grass01n.png",    { 0.40f, 0.59f, 0.35f } };
-        BiomeConfig::Biomes["GrassLand"]        = { "grass01d.jpg"  , "grass01n.png",    { 0.53f, 0.67f, 0.33f } };
-        BiomeConfig::Biomes["Ocean"]            = { "white.png"     , "water.png",       { 0.26f, 0.26f, 0.48f } };
-        BiomeConfig::Biomes["Tundra"]           = { "grass03d.jpg"  , "grass01n.png",    { 0.73f, 0.73f, 0.67f } };
-        BiomeConfig::Biomes["Scorched"]         = { "rock01d.png"   , "rock01n.png",     { 0.33f, 0.33f, 0.33f } };
-        BiomeConfig::Biomes["Snowy"]            = { "snow02d.jpg"   , "snow02n.jpg",     { 0.86f, 0.86f, 0.89f } };
-        BiomeConfig::Biomes["ShrubLand"]        = { "grass02d.jpg"  , "grass02n.jpg",    { 0.53f, 0.67f, 0.46f } };
-        BiomeConfig::Biomes["Taiga"]            = { "snow02d.jpg"   , "snow02n.jpg",     { 0.60f, 0.67f, 0.46f } };
-        BiomeConfig::Biomes["TempRainForest"]   = { "grass01d.jpg"  , "grass01n.png",    { 0.26f, 0.53f, 0.33f } };
-        BiomeConfig::Biomes["TropForest"]       = { "grass01d.jpg"  , "grass01n.png",    { 0.33f, 0.60f, 0.26f } };
-        BiomeConfig::Biomes["TropRainForest"]   = { "grass01d.jpg"  , "grass01n.png",    { 0.20f, 0.46f, 0.33f } };
+        std::ifstream f("biomes.json");
+
+        picojson::value json;
+        picojson::parse(json, f);
+
+        f.close();
+
+        picojson::object obj = json.get<picojson::object>();
+
+        std::set<std::string> textures;
+        std::set<std::string> ntextures;
+
+        size_t numBiomes = 0;
+
+        for (const auto &biome : obj)
+        {
+            auto arr = biome.second.get("Colour").get<picojson::array>();
+
+            float r = static_cast<float>(arr[0].get<double>());
+            float g = static_cast<float>(arr[1].get<double>());
+            float b = static_cast<float>(arr[2].get<double>());
+            float a = static_cast<float>(arr[3].get<double>());
+
+            DirectX::SimpleMath::Color col(r, g, b, a);
+
+            std::string tex = biome.second.get("Diffuse").get<std::string>();
+            std::string norm = biome.second.get("Normal").get<std::string>();
+
+            BiomeConfig::Biomes[biome.first] = { col };
+
+            textures.insert(tex);
+            ntextures.insert(norm);
+
+            ++numBiomes;
+        }
+
+        for (const auto &biome : obj)
+        {
+            std::string tex = biome.second.get("Diffuse").get<std::string>();
+            std::string norm = biome.second.get("Normal").get<std::string>();
+
+            BiomeConfig::Biomes[biome.first].Tex = std::distance(textures.begin(), textures.find(tex));
+            BiomeConfig::Biomes[biome.first].NormalMap = std::distance(ntextures.begin(), ntextures.find(norm));
+        }
+        
+        std::string cmd = "texassemble.exe array -w 1024 -h 1024 -f R32G32B32A32_FLOAT -y -o Resources/Biomes.dds ";
+        std::string ncmd = "texassemble.exe array -w 1024 -h 1024 -f R32G32B32A32_FLOAT -y -o Resources/NormalMaps.dds ";
+
+        for (const auto &tex : textures)
+            cmd += "Resources/Biomes/" + tex + " ";
+
+        for (const auto &tex : ntextures)
+            ncmd += "Resources/Biomes/" + tex + " ";
+
+        system(cmd.c_str());
+        system(ncmd.c_str());
+
+        std::cout << "Loaded " << numBiomes << " biomes\n";
     }
 
     void CancelCurrentGeneration()

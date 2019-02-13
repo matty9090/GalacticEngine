@@ -18,8 +18,8 @@ namespace Galactic
         DirectX::SimpleMath::Vector3 tangent;
         DirectX::SimpleMath::Vector3 sphere;
         DirectX::SimpleMath::Vector2 biome;
-        DirectX::SimpleMath::Vector2 uv;
-        size_t texIndex;
+        DirectX::SimpleMath::Vector3 uv;
+        float normalIndex;
     };
 
     struct MatrixBuffer
@@ -95,7 +95,6 @@ namespace Galactic
             std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_dbgBatch;
             Microsoft::WRL::ComPtr<ID3D11InputLayout> m_dbgInputLayout;
             
-            std::vector<ID3D11ShaderResourceView*> m_textures;
             std::vector<PlanetVertex> m_originalVertices;
             std::vector<int> m_texIndex;
             std::array<std::vector<uint16_t>, 4> m_edges;
@@ -106,7 +105,6 @@ namespace Galactic
             DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
-            __forceinline size_t GetTextureIndex(std::string &biome);
             void NotifyNeighbours();
             void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             

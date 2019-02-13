@@ -84,7 +84,6 @@ void TerrainNode::Generate()
 
                 v = parent->GetVertex(xh + yh * gridsize);
                 v.normal = Vector3::Zero;
-                v.texIndex = GetTextureIndex(m_terrain->GetBiome(v.biome));
             }
             else
             {
@@ -98,20 +97,21 @@ void TerrainNode::Generate()
                 std::string tex;
                 float height = 0.0f;
                 Vector2 biome;
-                size_t texIndex = 0.0f;
+                float texIndex = 0.0f, normalIndex = 0.0f;
                 
                 if (!m_simple)
                 {
                     m_terrain->GetHeight(pos, height, biome, tex);
-                    texIndex = GetTextureIndex(tex);
+                    texIndex = static_cast<float>(BiomeConfig::Biomes[tex].Tex);
+                    normalIndex = static_cast<float>(BiomeConfig::Biomes[tex].NormalMap);
                 }
 
                 v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
-                v.uv = Vector2(xx * 10000.0f, yy * 10000.0f);
-                v.texIndex = texIndex;
+                v.uv = Vector3(xx * 10000.0f, yy * 10000.0f, texIndex);
+                v.normalIndex = normalIndex;
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -187,9 +187,6 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
 
             m_buffer->SetData(m_context, buffer);
 
-            if(!m_simple)
-                m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
-
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
             m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
@@ -252,7 +249,7 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (m_depth >= 14 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
+    if (m_depth >= 12 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
         return;
 
     if (IsLeaf())
@@ -364,40 +361,6 @@ void TerrainNode::FixEdges()
     }
     
     Init();
-}
-
-size_t TerrainNode::GetTextureIndex(std::string &biome)
-{
-    assert(m_textures.size() <= 16);
-
-    auto texStr = "Resources/Biomes/" + BiomeConfig::Biomes[biome].Texture;
-    auto normalStr = "Resources/Biomes/" + BiomeConfig::Biomes[biome].NormalMap;
-
-    ID3D11ShaderResourceView *tex, *norm;
-
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        tex = TextureManager::getInstance().GetTexture(m_device, texStr);
-        norm = TextureManager::getInstance().GetTexture(m_device, normalStr);
-
-#ifdef _DEBUG
-        assert(tex);
-        assert(norm);
-        assert(tex != norm);
-#endif
-    }
-
-    for (size_t n = 0; n < m_textures.size(); ++n)
-    {
-        if (m_textures[n] == tex)
-            return n;
-    }
-
-    m_textures.push_back(tex);
-    m_textures.push_back(norm);
-
-    return m_textures.size() - 2;
 }
 
 void TerrainNode::NotifyNeighbours()
