@@ -1,7 +1,5 @@
-static const float Far = 1000;
+static const float C = 1.0f;
 
 float LogDepthBuffer(float w) {
-	float Fcoef = 2.0 / log2(Far + 1.0);
-	float z = log2(max(1e-6, 1.0 + w)) * Fcoef - 1.0;
-	return z * w;
+    return log(C * w + 1) / log(C * Far + 1) * w;
 }

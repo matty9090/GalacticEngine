@@ -47,7 +47,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	Output.UV 		= v_in.vUV;
 	Output.TexIndex	= v_in.vTexIndex;
 	
-	//Output.Position.z = LogDepthBuffer(Output.Position.w);
+	Output.Position.z = LogDepthBuffer(Output.Position.w);
 
 	return Output;
 }
