@@ -42,7 +42,7 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	Output.Colour1	= PrimaryColour;
 	Output.Colour2	= SecondaryColour;
 	
-	//Output.Position.z = LogDepthBuffer(Output.Position.w);
+	Output.Position.z = LogDepthBuffer(Output.Position.w);
 
 	return Output;
 }

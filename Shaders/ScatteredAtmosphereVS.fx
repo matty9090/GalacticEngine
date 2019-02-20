@@ -1,4 +1,5 @@
 #include "Scatter.fx"
+#include "Common.fx"
 
 cbuffer MatrixBuffer : register(b0) {
 	matrix worldViewProj;
@@ -24,6 +25,8 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	Output.Colour1	= PrimaryColour;
 	Output.Colour2	= SecondaryColour;
 	Output.T0	    = T0;
+
+    Output.Position.z = LogDepthBuffer(Output.Position.w);
 
 	return Output;
 }

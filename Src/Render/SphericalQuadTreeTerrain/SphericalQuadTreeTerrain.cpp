@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 37;
+    size_t SphericalQuadTreeTerrain::GridSize = 33;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -237,7 +237,7 @@ void SphericalQuadTreeTerrain::Reset()
         face->Release();
 }
 
-std::string Galactic::SphericalQuadTreeTerrain::GetBiome(const DirectX::SimpleMath::Vector2 &lookup)
+std::string SphericalQuadTreeTerrain::GetBiome(const DirectX::SimpleMath::Vector2 &lookup)
 {
     return m_planet->GetSettings().Biomes.Sample(lookup.x, lookup.y);
 }
