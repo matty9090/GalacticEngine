@@ -159,13 +159,19 @@ void TerrainNode::Generate()
         tangent.y = (tvVector.y * vector1.y - tvVector.x * vector2.y) * den;
         tangent.z = (tvVector.y * vector1.z - tvVector.x * vector2.z) * den;
 
-        m_vertices[m_indices[i + 0]].normal = n;
-        m_vertices[m_indices[i + 1]].normal = n;
-        m_vertices[m_indices[i + 2]].normal = n;
+        m_vertices[m_indices[i + 0]].normal += n;
+        m_vertices[m_indices[i + 1]].normal += n;
+        m_vertices[m_indices[i + 2]].normal += n;
 
-        m_vertices[m_indices[i + 0]].tangent = tangent;
-        m_vertices[m_indices[i + 1]].tangent = tangent;
-        m_vertices[m_indices[i + 2]].tangent = tangent;
+        m_vertices[m_indices[i + 0]].tangent += tangent;
+        m_vertices[m_indices[i + 1]].tangent += tangent;
+        m_vertices[m_indices[i + 2]].tangent += tangent;
+    }
+
+    for (size_t i = 0; i < m_indices.size(); ++i)
+    {
+        m_vertices[m_indices[i]].normal.Normalize();
+        m_vertices[m_indices[i]].tangent.Normalize();
     }
 
     m_planet->IncrementVertices(gridsize * gridsize * 4);
@@ -443,8 +449,11 @@ void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t
     {
         const Vector3 p1 = m_originalVertices[m_edges[dir][i + 0]].position;
         const Vector3 p2 = m_originalVertices[m_edges[dir][i + 2]].position;
+        const Vector3 n1 = m_originalVertices[m_edges[dir][i + 2]].normal;
+        const Vector3 n2 = m_originalVertices[m_edges[dir][i + 2]].normal;
 
         m_vertices[m_edges[dir][i + 1]].position = (p1 + p2) / 2;
+        m_vertices[m_edges[dir][i + 1]].normal   = (n1 + n2) / 2;
     }
 }
 
@@ -452,13 +461,17 @@ Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
 {
     std::array<float, 9> s;
     Vector3 n;
-    //uint32_t i = 0;
+    float h;
+    Vector2 b;
+    std::string index;
+    uint32_t i = 0;
 
-    for (int yy = -1; yy <= 1; yy++) {
-        for (int xx = -1; xx <= 1; xx++) {
-            Vector3 v = Vector3(x + (float)xx * step, 0.5f, y + (float)yy * step);
+    for (int yy = -1; yy <= 1; ++yy) {
+        for (int xx = -1; xx <= 1; ++xx) {
+            Vector3 v(x + (float)xx * step, 0.5f, y + (float)yy * step);
             v.Normalize();
-            //s[i++] = m_terrain->GetHeight(Vector3::Transform(v, m_world));
+            m_terrain->GetHeight(v, h, b, index);
+            s[i++] = h;
         }
     }
 
@@ -469,6 +482,7 @@ Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
     n.y = 1.0;
 
     n.Normalize();
+    n = Vector3::TransformNormal(n, m_world);
 
     return n;
 }
