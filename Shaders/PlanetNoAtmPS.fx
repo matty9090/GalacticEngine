@@ -1,22 +1,22 @@
 #include "Scatter.fx"
 
 cbuffer MatrixBuffer : register(b0) {
-    matrix mWorldViewProj;
+    matrix mViewProj;
     matrix mWorld;
+    float3 mCamera;
     float  mLerp;
 }
 
-struct VS_OUTPUT {
-	float4 Position : SV_POSITION;
-	float3 WorldPos : POSITION;
-	float3 Normal : NORMAL0;
-	float3 Tangent : TANGENT;
-	float3 Sphere : NORMAL1;
-	float2 Biome : COLOR0;
-	float3 Colour1 : COLOR1;
-	float3 Colour2 : COLOR2;
-	float2 UV : TEXCOORD0;
-	uint   TexIndex : TEXCOORD1;
+struct DS_OUTPUT {
+    float4 ProjPos      : SV_Position;
+    float3 WorldPos     : POSITION;
+    float3 WorldNormal  : NORMAL;
+    float3 WorldTangent : TANGENT;
+    float2 Biome        : COLOR0;
+    float3 Colour1      : COLOR1;
+    float3 Colour2      : COLOR2;
+    float2 UV           : TEXCOORD0;
+    uint   TexIndex     : TEXCOORD1;
 };
 
 static const float PI = 3.14159265f;
@@ -26,7 +26,7 @@ Texture2D Tex[16] : register(t1);
 
 SamplerState Sampler : register(s0);
 	
-float4 main(VS_OUTPUT v) : SV_Target {
+float4 main(DS_OUTPUT v) : SV_Target {
 	float2 tex;
 	
 	// Spherical UV coordinates
@@ -58,8 +58,8 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	else					 { texCol = Tex[0].Sample(Sampler, v.UV); normalMap = Tex[1].Sample(Sampler, v.UV).xyz; }
 	
     // Normal mapping
-    float3 normal = normalize(v.Normal);
-    float3 tangent = normalize(v.Tangent - dot(v.Tangent, normal) * normal);
+    float3 normal = normalize(v.WorldNormal);
+    float3 tangent = normalize(v.WorldTangent - dot(v.WorldTangent, normal) * normal);
     float3 bitangent = cross(normal, tangent);
     float3x3 invTangent = float3x3(tangent, bitangent, normal);
 

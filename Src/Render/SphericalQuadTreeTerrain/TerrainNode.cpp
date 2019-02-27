@@ -12,7 +12,7 @@ using namespace DirectX::SimpleMath;
 float TerrainNode::SplitDistance = 32.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
-    : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
+    : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST),
       m_terrain(terrain),
       m_parent(parent),
       m_planet(planet),
@@ -30,6 +30,7 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
     m_depth = -(int)log2f(m_scale);
     m_diameter = m_scale * m_terrain->GetRadius() * 2;
     m_buffer = std::make_unique<ConstantBuffer<MatrixBuffer>>(device);
+    m_hullBuffer = std::make_unique<ConstantBuffer<HullShaderBuffer>>(device);
 
 #ifdef _DEBUG
     m_dbgCol    = Color(0.0f, 0.0f, 1.0f, 0.15f);
@@ -138,7 +139,7 @@ void TerrainNode::Generate()
         }
     }
 
-    for (size_t i = 0; i < m_indices.size() - 3; i += 3)
+    for (size_t i = 0; i < m_indices.size(); i += 3)
     {
         Vector3 p1 = m_vertices[m_indices[i + 0]].position;
         Vector3 p2 = m_vertices[m_indices[i + 1]].position;
@@ -159,13 +160,19 @@ void TerrainNode::Generate()
         tangent.y = (tvVector.y * vector1.y - tvVector.x * vector2.y) * den;
         tangent.z = (tvVector.y * vector1.z - tvVector.x * vector2.z) * den;
 
-        m_vertices[m_indices[i + 0]].normal = n;
-        m_vertices[m_indices[i + 1]].normal = n;
-        m_vertices[m_indices[i + 2]].normal = n;
+        m_vertices[m_indices[i + 0]].normal += n;
+        m_vertices[m_indices[i + 1]].normal += n;
+        m_vertices[m_indices[i + 2]].normal += n;
 
-        m_vertices[m_indices[i + 0]].tangent = tangent;
-        m_vertices[m_indices[i + 1]].tangent = tangent;
-        m_vertices[m_indices[i + 2]].tangent = tangent;
+        m_vertices[m_indices[i + 0]].tangent += tangent;
+        m_vertices[m_indices[i + 1]].tangent += tangent;
+        m_vertices[m_indices[i + 2]].tangent += tangent;
+    }
+
+    for (size_t i = 0; i < m_indices.size(); ++i)
+    {
+        m_vertices[m_indices[i]].normal.Normalize();
+        m_vertices[m_indices[i]].tangent.Normalize();
     }
 
     m_planet->IncrementVertices(gridsize * gridsize * 4);
@@ -182,15 +189,20 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             if (lerp < 0.0f) lerp = 0.0f;
             if (lerp > 1.0f) lerp = 1.0f;
 
-            Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
-            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), 1.0f - lerp };
+            Matrix worldViewProj = view * proj;
+            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), m_planet->GetCameraPos(), 1.0f - lerp };
+            HullShaderBuffer hbuffer = { 2.0f, 20.0f, 4.0f, 2.0f };
 
             m_buffer->SetData(m_context, buffer);
+            m_hullBuffer->SetData(m_context, hbuffer);
 
             if(!m_simple)
                 m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
 
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+            m_context->HSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
+            m_context->HSSetConstantBuffers(1, 1, m_hullBuffer->GetBuffer());
+            m_context->DSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
             m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
             Draw();

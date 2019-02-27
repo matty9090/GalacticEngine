@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 33;
+    size_t SphericalQuadTreeTerrain::GridSize = 9;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -167,10 +167,14 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_context->PSSetSamplers(0, 1, &sampler);
     m_context->RSSetState(IBody::Wireframe ? m_rasterWire.Get() : m_raster.Get());
     m_context->OMSetBlendState(m_states->Opaque(), factor, 0xFFFFFFFF);
-    m_context->OMSetDepthStencilState(m_states->DepthDefault(), 1);
+    m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
     m_context->IASetInputLayout(m_effect->GetInputLayout());
+
     m_context->VSSetShader(m_effect->GetVertexShader(), nullptr, 0);
+    m_context->HSSetShader(m_effect->GetHullShader(), nullptr, 0);
+    m_context->DSSetShader(m_effect->GetDomainShader(), nullptr, 0);
+    m_context->GSSetShader(nullptr, nullptr, 0);
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
     m_context->PSSetShaderResources(0, 1, &m_texBiomes);
@@ -199,11 +203,13 @@ void SphericalQuadTreeTerrain::InitEffect()
 
     std::wstring vs = L"Shaders/PlanetVS.fx";
     std::wstring ps = (m_planet->IsAtmosphereEnabled()) ? L"Shaders/PlanetPS.fx" : L"Shaders/PlanetNoAtmPS.fx";
+    std::wstring hs = L"Shaders/TerrainHS.fx";
+    std::wstring ds = L"Shaders/TerrainDS.fx";
 
 #ifdef _DEBUG
-    m_effect = new Effect(m_device.Get(), vs, ps, els, num, false);
+    m_effect = new Effect(m_device.Get(), vs, ps, hs, ds, els, num, false);
 #else
-    m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), vs, ps, els, num, false);
+    m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), vs, ps, hs, ds, els, num, false);
 #endif
 }
 
@@ -213,6 +219,10 @@ void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX:
 
     for (auto &face : m_faces)
         face->Render(view, proj);
+
+    m_context->HSSetShader(nullptr, nullptr, 0);
+    m_context->DSSetShader(nullptr, nullptr, 0);
+    m_context->GSSetShader(nullptr, nullptr, 0);
 }
 
 void SphericalQuadTreeTerrain::Update(float dt)

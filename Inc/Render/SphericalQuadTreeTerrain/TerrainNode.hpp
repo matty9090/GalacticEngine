@@ -26,8 +26,16 @@ namespace Galactic
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
         DirectX::SimpleMath::Matrix world;         // 64 bytes
+        DirectX::SimpleMath::Vector3 camera;       // 12 bytes
         float lerp;                                // 4  bytes
-        float p0, p1, p2;                          // 16 bytes
+    };
+
+    struct HullShaderBuffer
+    {
+        float MinTessDistance;
+        float MaxTessDistance;
+        float MinTessellation;
+        float MaxTessellation;
     };
 
     struct Square
@@ -86,6 +94,7 @@ namespace Galactic
 
             std::mutex mutex;
             std::unique_ptr<ConstantBuffer<MatrixBuffer>> m_buffer;
+            std::unique_ptr<ConstantBuffer<HullShaderBuffer>> m_hullBuffer;
 
             // Debug
             std::string m_dbgName;
