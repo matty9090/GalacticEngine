@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 9;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 33;
+    size_t SphericalQuadTreeTerrain::GridSize = 5;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;

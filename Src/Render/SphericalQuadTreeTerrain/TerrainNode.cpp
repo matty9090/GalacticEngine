@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 32.0f;
+float TerrainNode::SplitDistance = 128.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -125,17 +125,37 @@ void TerrainNode::Generate()
 
     m_originalVertices = m_vertices;
 
+    int i = 0;
+
     for (uint16_t y = 0; y < gridsize - 1; ++y)
     {
         for (uint16_t x = 0; x < gridsize - 1; ++x)
         {
-            m_indices.push_back(y * gridsize + x);
-            m_indices.push_back(y * gridsize + x + 1);
-            m_indices.push_back((y + 1) * gridsize + x);
-            m_indices.push_back(y * gridsize + x + 1);
-            m_indices.push_back((y + 1) * gridsize + x + 1);
-            m_indices.push_back((y + 1) * gridsize + x);
+            if (i % 2 == 0)
+            {
+                m_indices.push_back(y * gridsize + x);
+                m_indices.push_back(y * gridsize + x + 1);
+                m_indices.push_back((y + 1) * gridsize + x + 1);
+
+                m_indices.push_back((y + 1) * gridsize + x + 1);
+                m_indices.push_back((y + 1) * gridsize + x);
+                m_indices.push_back(y * gridsize + x);
+            }
+            else
+            {
+                m_indices.push_back(y * gridsize + x);
+                m_indices.push_back(y * gridsize + x + 1);
+                m_indices.push_back((y + 1) * gridsize + x);
+
+                m_indices.push_back(y * gridsize + x + 1);
+                m_indices.push_back((y + 1) * gridsize + x + 1);
+                m_indices.push_back((y + 1) * gridsize + x);
+            }
+
+            ++i;
         }
+
+        ++i;
     }
 
     for (size_t i = 0; i < m_indices.size() - 3; i += 3)
@@ -169,6 +189,8 @@ void TerrainNode::Generate()
     }
 
     m_planet->IncrementVertices(gridsize * gridsize * 4);
+
+    Init();
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -350,7 +372,7 @@ void TerrainNode::Release()
 
 void TerrainNode::FixEdges()
 {
-    if (!m_simple)
+    /*if (!m_simple)
     {
         auto n1 = GetGreaterThanOrEqualNeighbour(North);
         auto n2 = GetGreaterThanOrEqualNeighbour(East);
@@ -363,7 +385,7 @@ void TerrainNode::FixEdges()
         if (n4) FixEdge(West, n4, n4->GetEdge(East), n4->GetDepth());
     }
     
-    Init();
+    Init();*/
 }
 
 size_t TerrainNode::GetTextureIndex(std::string &biome)
