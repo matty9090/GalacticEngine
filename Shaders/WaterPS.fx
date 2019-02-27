@@ -54,7 +54,7 @@ float4 main(DS_OUTPUT v) : SV_Target {
 	// Sample texture/normal map colour
 	float4 texCol;
     float2 scrolledUV = float2(v.UV.x + mScroll, v.UV.y + mScroll);
-    float3 normalMap = NormalTex.Sample(Sampler, scrolledUV);
+    float3 normalMap = NormalTex.Sample(Sampler, scrolledUV).xyz;
 
     // Normal mapping
     float3 normal = normalize(v.WorldNormal);

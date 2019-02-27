@@ -110,9 +110,9 @@ void TerrainNode::Generate()
                 v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
-                v.sphere = pos;
                 v.uv = Vector2(xx * 10000.0f, yy * 10000.0f);
                 v.texIndex = texIndex;
+                v.tess = 4.0f;
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -189,9 +189,9 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             if (lerp < 0.0f) lerp = 0.0f;
             if (lerp > 1.0f) lerp = 1.0f;
 
-            Matrix worldViewProj = view * proj;
-            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), m_planet->GetCameraPos(), 1.0f - lerp };
-            HullShaderBuffer hbuffer = { 2.0f, 20.0f, 4.0f, 2.0f };
+            Matrix viewProj = view * proj;
+            MatrixBuffer buffer = { viewProj.Transpose(), m_terrain->GetMatrix().Transpose(), m_planet->GetCameraPos(), 1.0f - lerp };
+            HullShaderBuffer hbuffer = { 1.0f };
 
             m_buffer->SetData(m_context, buffer);
             m_hullBuffer->SetData(m_context, hbuffer);
@@ -445,18 +445,22 @@ void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t
     if (diff == 0)
     {
         for (int i = 0; i < grid; i++)
+        {
             m_vertices[m_edges[dir][i]].position = m_originalVertices[m_edges[dir][i]].position;
+            m_vertices[m_edges[dir][i]].tess = m_originalVertices[m_edges[dir][i]].tess;
+        }
     }
 
     if (diff < 1)
         return;
 
-    for (int i = 0; i < grid - 2; i += 2)
+    for (int i = 0; i < grid; i++)
     {
-        const Vector3 p1 = m_originalVertices[m_edges[dir][i + 0]].position;
+        /*const Vector3 p1 = m_originalVertices[m_edges[dir][i + 0]].position;
         const Vector3 p2 = m_originalVertices[m_edges[dir][i + 2]].position;
 
-        m_vertices[m_edges[dir][i + 1]].position = (p1 + p2) / 2;
+        m_vertices[m_edges[dir][i + 1]].position = (p1 + p2) / 2;*/
+        m_vertices[m_edges[dir][i]].tess = 1.0f;
     }
 }
 

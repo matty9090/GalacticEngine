@@ -33,7 +33,7 @@ struct HS_CONTROL_POINT_OUTPUT {
     float3 Colour2 : COLOR2;
     float2 UV : TEXCOORD0;
     uint   TexIndex : TEXCOORD1;
-    float  OppEdgeTess : TEXCOORD2;
+    float  Tess : TESSFACTOR;
 };
 
 [domain("tri")]

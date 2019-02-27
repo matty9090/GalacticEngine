@@ -16,10 +16,10 @@ namespace Galactic
         DirectX::SimpleMath::Vector3 position;
         DirectX::SimpleMath::Vector3 normal;
         DirectX::SimpleMath::Vector3 tangent;
-        DirectX::SimpleMath::Vector3 sphere;
         DirectX::SimpleMath::Vector2 biome;
         DirectX::SimpleMath::Vector2 uv;
-        size_t texIndex;
+        float tess;
+        uint32_t texIndex;
     };
 
     struct MatrixBuffer
@@ -32,10 +32,8 @@ namespace Galactic
 
     struct HullShaderBuffer
     {
-        float MinTessDistance;
-        float MaxTessDistance;
-        float MinTessellation;
-        float MaxTessellation;
+        float Tessellation;
+        float pad0, pad1, pad2;
     };
 
     struct Square
