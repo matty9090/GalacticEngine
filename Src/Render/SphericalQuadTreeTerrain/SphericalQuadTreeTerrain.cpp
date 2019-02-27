@@ -8,7 +8,7 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 #ifdef _DEBUG
-    size_t SphericalQuadTreeTerrain::GridSize = 9;
+    size_t SphericalQuadTreeTerrain::GridSize = 5;
 #else
     size_t SphericalQuadTreeTerrain::GridSize = 5;
 #endif
@@ -17,7 +17,9 @@ bool   SphericalQuadTreeTerrain::CancelGeneration = false;
 size_t SphericalQuadTreeTerrain::FrameSplits = 0;
 size_t SphericalQuadTreeTerrain::MaxSplitsPerFrame = 999;
 
+std::map<SphericalQuadTreeTerrain::EPermutations, std::vector<uint16_t>> SphericalQuadTreeTerrain::Perms;
 std::map<std::string, size_t> counts;
+
 float hmin = 999.0f, hmax = -999.0f;
 
 SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet)
@@ -36,6 +38,8 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     m_gradient.addColorStop(1.0f, Gradient::GradientColor(0.22f * 255.0f, 0.62f * 255.0f, 0.14f * 255.0f, 255.0f));
 
     CreateEffect();
+    LoadTextures();
+    GeneratePermutations();
 }
 
 void SphericalQuadTreeTerrain::CreateEffect()
@@ -50,8 +54,16 @@ void SphericalQuadTreeTerrain::CreateEffect()
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
 
+    const float border[4] = { 0.f, 0.f, 0.f, 0.f };
+    float maxAnisotropy = (m_device->GetFeatureLevel() > D3D_FEATURE_LEVEL_9_1) ? 16 : 2;
+
+    CD3D11_SAMPLER_DESC samplerDesc(D3D11_FILTER_ANISOTROPIC,
+        D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_CLAMP,
+        0.f, maxAnisotropy, D3D11_COMPARISON_NEVER, border, 0.f, FLT_MAX);
+
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDesc, m_raster.ReleaseAndGetAddressOf()), "Creating raster");
     DX::ThrowIfFailed(m_device.Get()->CreateRasterizerState(&rastDescWire, m_rasterWire.ReleaseAndGetAddressOf()), "Creating raster");
+    DX::ThrowIfFailed(m_device.Get()->CreateSamplerState(&samplerDesc, m_sampler.ReleaseAndGetAddressOf()), "Creating raster");
 
     m_buffer = std::make_unique<ConstantBuffer<ScatterBuffer>>(m_device.Get());
 }
@@ -161,10 +173,10 @@ void SphericalQuadTreeTerrain::Generate()
 
 void SphericalQuadTreeTerrain::SetRenderContext()
 {
-    auto sampler = m_states->AnisotropicWrap();
+    //auto sampler = m_states->AnisotropicWrap();
     float factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    m_context->PSSetSamplers(0, 1, &sampler);
+    m_context->PSSetSamplers(0, 1, m_sampler.GetAddressOf());
     m_context->RSSetState(IBody::Wireframe ? m_rasterWire.Get() : m_raster.Get());
     m_context->OMSetBlendState(m_states->Opaque(), factor, 0xFFFFFFFF);
     m_context->OMSetDepthStencilState(m_states->DepthDefault(), 1);
@@ -174,6 +186,8 @@ void SphericalQuadTreeTerrain::SetRenderContext()
     m_context->PSSetShader(m_effect->GetPixelShader(), nullptr, 0);
 
     m_context->PSSetShaderResources(0, 1, &m_texBiomes);
+    m_context->PSSetShaderResources(1, 1, &m_textures);
+    m_context->PSSetShaderResources(2, 1, &m_normalMaps);
 
     ScatterBuffer buffer = GetScatterBuffer(m_planet);
     m_buffer->SetData(m_context.Get(), buffer);
@@ -191,8 +205,8 @@ void SphericalQuadTreeTerrain::InitEffect()
         { "TANGENT",     0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL",      1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        36,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        48,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32_FLOAT,        0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    2,     DXGI_FORMAT_R32_UINT,            0,        64,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    2,     DXGI_FORMAT_R32_FLOAT,           0,        68,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -205,6 +219,25 @@ void SphericalQuadTreeTerrain::InitEffect()
 #else
     m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), vs, ps, els, num, false);
 #endif
+}
+
+void Galactic::SphericalQuadTreeTerrain::LoadTextures()
+{
+    std::cout << "Reading biomes\n";
+
+    ID3D11Resource *m_tex, *m_ntex;
+
+    DX::ThrowIfFailed(DirectX::CreateDDSTextureFromFileEx(m_device.Get(), m_context.Get(), L"Resources/Biomes.dds", 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, D3D11_RESOURCE_MISC_GENERATE_MIPS, 0, &m_tex, &m_textures));
+    DX::ThrowIfFailed(DirectX::CreateDDSTextureFromFileEx(m_device.Get(), m_context.Get(), L"Resources/NormalMaps.dds", 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, D3D11_RESOURCE_MISC_GENERATE_MIPS, 0, &m_ntex, &m_normalMaps));
+
+    D3D11_TEXTURE2D_DESC desc;
+    ((ID3D11Texture2D*)m_tex)->GetDesc(&desc);
+
+    std::cout << desc.Width << "x" << desc.Height << "\n";
+    std::cout << desc.ArraySize << " textures, " << desc.MipLevels << " mips\n";
+
+    m_tex->Release();
+    m_ntex->Release();
 }
 
 void SphericalQuadTreeTerrain::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -230,6 +263,7 @@ void SphericalQuadTreeTerrain::Update(float dt)
 void SphericalQuadTreeTerrain::Reset()
 {
     m_texBiomes->Release();
+    m_textures->Release();
     m_states.reset();
     m_effect->Reset();
 
@@ -270,4 +304,235 @@ void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, 
 #ifdef _DEBUG
     counts[texIndex]++;
 #endif
+}
+
+void SphericalQuadTreeTerrain::GeneratePermutations()
+{
+    int gridsize = GetGridSize();
+    int i;
+
+    std::vector<uint16_t> *ind;
+
+    auto func = [gridsize](std::vector<uint16_t> *ind, uint16_t x, uint16_t y, int i)
+    {
+        if (i % 2 == 0)
+        {
+            ind->push_back(y * gridsize + x);
+            ind->push_back(y * gridsize + x + 1);
+            ind->push_back((y + 1) * gridsize + x + 1);
+
+            ind->push_back((y + 1) * gridsize + x + 1);
+            ind->push_back((y + 1) * gridsize + x);
+            ind->push_back(y * gridsize + x);
+        }
+        else
+        {
+            ind->push_back(y * gridsize + x);
+            ind->push_back(y * gridsize + x + 1);
+            ind->push_back((y + 1) * gridsize + x);
+
+            ind->push_back(y * gridsize + x + 1);
+            ind->push_back((y + 1) * gridsize + x + 1);
+            ind->push_back((y + 1) * gridsize + x);
+        }
+    };
+
+    /*
+        None
+    */
+
+    ind = &Perms[None];
+    ind->clear();
+    i = 0;
+
+    for (uint16_t y = 0; y < gridsize - 1; ++y)
+    {
+        for (uint16_t x = 0; x < gridsize - 1; ++x)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+
+        ++i;
+    }
+
+    /*
+        Top
+    */
+
+    ind = &Perms[Top];
+    ind->clear();
+    i = 1;
+
+    ind->insert(ind->begin(), { 6, 5, 0,   0, 2, 6,   2, 7, 6,
+                                8, 7, 2,   2, 4, 8,   4, 9, 8 });
+
+    for (uint16_t y = 1; y < gridsize - 1; ++y)
+    {
+        for (uint16_t x = 0; x < gridsize - 1; ++x)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+
+        ++i;
+    }
+
+    /*
+        Bottom
+    */
+
+    ind = &Perms[Bottom];
+    ind->clear();
+    i = 0;
+
+    for (uint16_t y = 0; y < gridsize - 2; ++y)
+    {
+        for (uint16_t x = 0; x < gridsize - 1; ++x)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+
+        ++i;
+    }
+
+    ind->insert(ind->end(), { 15, 16, 20,   20, 22, 16,   22, 17, 16,
+                              22, 17, 18,   22, 24, 18,   24, 19, 18 });
+
+    /*
+        Right
+    */
+
+    ind = &Perms[Right];
+    ind->clear();
+    i = 0;
+
+    for (uint16_t x = 0; x < gridsize - 2; ++x)
+    {
+        for (uint16_t y = 0; y < gridsize - 1; ++y)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+
+        ++i;
+    }
+
+    ind->insert(ind->end(), { 4, 3, 8,   4, 14, 8,   14, 13, 8,
+                              14, 13, 18,   14, 24, 18,   24, 23, 18 });
+
+    /*
+        Left
+    */
+
+    ind = &Perms[Left];
+    ind->clear();
+    i = 1;
+
+    ind->insert(ind->end(), { 0, 1, 6,   0, 10, 6,   10, 11, 6,
+                              10, 11, 16,   10, 20, 16,   20, 21, 16 });
+
+    for (uint16_t x = 1; x < gridsize - 1; ++x)
+    {
+        for (uint16_t y = 0; y < gridsize - 1; ++y)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+
+        ++i;
+    }
+
+    /*
+        Top + Right
+    */
+
+    ind = &Perms[TopRight];
+    ind->clear();
+    i = 1;
+
+    ind->insert(ind->begin(), { 6, 5, 0,   0, 2, 6,   2, 7, 6,
+                                8, 7, 2,   2, 4, 8 });
+
+    for (uint16_t y = 1; y < gridsize - 1; ++y)
+    {
+        for (uint16_t x = 0; x < gridsize - 2; ++x)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+    }
+    
+    ind->insert(ind->end(), { 4, 14, 8,   14, 13, 8,
+                              14, 13, 18,  14, 24, 18,  24, 23, 18 });
+
+    /*
+        Right + Bottom
+    */
+
+    ind = &Perms[RightBottom];
+    ind->clear();
+    i = 0;
+
+    ind->insert(ind->begin(), { 15, 16, 20,   20, 22, 16,   22, 17, 16,
+                              22, 17, 18,   22, 24, 18 });
+
+    for (uint16_t y = 0; y < gridsize - 2; ++y)
+    {
+        for (uint16_t x = 0; x < gridsize - 2; ++x)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+    }
+
+    ind->insert(ind->end(), { 3, 4, 8,   4, 14, 8,   14, 13, 8,
+                              14, 13, 18,  14, 24, 18 });
+
+    /*
+        Bottom + Left
+    */
+
+    ind = &Perms[BottomLeft];
+    ind->clear();
+    i = 1;
+
+    ind->insert(ind->begin(), { 20, 22, 16,   22, 17, 16,
+                              22, 17, 18,   22, 24, 18,   24, 19, 18 });
+
+    for (uint16_t y = 0; y < gridsize - 2; ++y)
+    {
+        for (uint16_t x = 1; x < gridsize - 1; ++x)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+    }
+
+    ind->insert(ind->end(), { 0, 1, 6,   0, 10, 6,   10, 11, 6,
+                              10, 11, 16,   10, 20, 16 });
+
+    /*
+        Left + Top
+    */
+
+    ind = &Perms[LeftTop];
+    ind->clear();
+    i = 0;
+
+    ind->insert(ind->begin(), { 0, 2, 6,   2, 7, 6,
+                                8, 7, 2,   2, 4, 8,   4, 9, 8 });
+
+    for (uint16_t y = 1; y < gridsize - 1; ++y)
+    {
+        for (uint16_t x = 1; x < gridsize - 1; ++x)
+        {
+            func(ind, x, y, i);
+            ++i;
+        }
+    }
+
+    ind->insert(ind->end(), { 0, 10, 6,   10, 11, 6,
+                              10, 11, 16,   10, 20, 16,   20, 21, 16 });
 }

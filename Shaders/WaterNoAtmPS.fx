@@ -19,8 +19,8 @@ struct VS_OUTPUT {
     float2 Biome : COLOR0;
     float3 Colour1 : COLOR1;
     float3 Colour2 : COLOR2;
-    float2 UV : TEXCOORD0;
-    uint   TexIndex : TEXCOORD1;
+    float3 UV : TEXCOORD0;
+    float  NormalIndex : TEXCOORD1;
 };
 
 static const float PI = 3.14159265f;

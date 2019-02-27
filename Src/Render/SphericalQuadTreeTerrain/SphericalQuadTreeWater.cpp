@@ -8,9 +8,9 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 #ifdef _DEBUG
-    size_t SphericalQuadTreeWater::GridSize = 9;
+    size_t SphericalQuadTreeWater::GridSize = 5;
 #else
-    size_t SphericalQuadTreeWater::GridSize = 13;
+    size_t SphericalQuadTreeWater::GridSize = 5;
 #endif
 
 bool   SphericalQuadTreeWater::CancelGeneration = false;
@@ -124,8 +124,8 @@ void SphericalQuadTreeWater::InitEffect()
         { "TANGENT",     0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL",      1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        36,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        48,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32_FLOAT,        0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    2,     DXGI_FORMAT_R32_UINT,            0,        64,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    2,     DXGI_FORMAT_R32_FLOAT,           0,        68,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -166,6 +166,7 @@ void SphericalQuadTreeWater::Update(float dt)
 
 void SphericalQuadTreeWater::Reset()
 {
+    m_texNormalMap->Release();
     m_states.reset();
     m_effect->Reset();
 

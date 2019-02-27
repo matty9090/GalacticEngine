@@ -7,22 +7,23 @@ cbuffer MatrixBuffer : register(b0) {
 }
 
 struct VS_OUTPUT {
-	float4 Position : SV_POSITION;
-	float3 WorldPos : POSITION;
-	float3 Normal : NORMAL0;
-	float3 Tangent : TANGENT;
-	float3 Sphere : NORMAL1;
-	float2 Biome : COLOR0;
-	float3 Colour1 : COLOR1;
-	float3 Colour2 : COLOR2;
-	float2 UV : TEXCOORD0;
-	uint   TexIndex : TEXCOORD1;
+    float4 Position : SV_POSITION;
+    float3 WorldPos : POSITION;
+    float3 Normal : NORMAL0;
+    float3 Tangent : TANGENT;
+    float3 Sphere : NORMAL1;
+    float2 Biome : COLOR0;
+    float3 Colour1 : COLOR1;
+    float3 Colour2 : COLOR2;
+    float3 UV : TEXCOORD0;
+    float  NormalIndex : TEXCOORD1;
 };
 
 static const float PI = 3.14159265f;
 
 Texture2D BiomeTex : register(t0);
-Texture2D Tex[16] : register(t1);
+Texture2DArray Tex : register(t1);
+Texture2DArray NTex : register(t2);
 
 SamplerState Sampler : register(s0);
 	
@@ -47,15 +48,9 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	// Sample biome colour
 	float4 biomeCol = BiomeTex.Sample(Sampler, v.Biome);
 	
-	// Sample texture/normal map colour
-	float4 texCol;
-	float3 normalMap;
-	
-	if(v.TexIndex == 0)      { texCol = Tex[0].Sample(Sampler, v.UV); normalMap = Tex[1].Sample(Sampler, v.UV).xyz; }
-	else if(v.TexIndex == 2) { texCol = Tex[2].Sample(Sampler, v.UV); normalMap = Tex[3].Sample(Sampler, v.UV).xyz; }
-	else if(v.TexIndex == 4) { texCol = Tex[4].Sample(Sampler, v.UV); normalMap = Tex[5].Sample(Sampler, v.UV).xyz; }
-	else if(v.TexIndex == 6) { texCol = Tex[6].Sample(Sampler, v.UV); normalMap = Tex[7].Sample(Sampler, v.UV).xyz; }
-	else					 { texCol = Tex[0].Sample(Sampler, v.UV); normalMap = Tex[1].Sample(Sampler, v.UV).xyz; }
+    // Sample texture/normal map colour
+    float4 texCol = Tex.Sample(Sampler, v.UV);
+    float3 normalMap = NTex.Sample(Sampler, float3(v.UV.x, v.UV.y, v.NormalIndex)).xyz;
 	
     // Normal mapping
     float3 normal = normalize(v.Normal);

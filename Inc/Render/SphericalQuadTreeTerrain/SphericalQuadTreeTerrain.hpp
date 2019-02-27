@@ -13,6 +13,7 @@
 #include "Physics/Constants.hpp"
 
 #include <mutex>
+#include <functional>
 
 namespace Galactic
 {
@@ -38,6 +39,9 @@ namespace Galactic
             Effect *GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_context; };
 
+            enum EPermutations { None, Bottom, Left, Top, Right, BottomLeft, LeftTop, TopRight, RightBottom };
+            static std::map<EPermutations, std::vector<uint16_t>> Perms;
+
             static bool   CancelGeneration;
             static size_t GridSize;
             static size_t FrameSplits;
@@ -59,7 +63,8 @@ namespace Galactic
             std::array<std::unique_ptr<TerrainNode>, 6> m_faces;
             std::unique_ptr<ConstantBuffer<ScatterBuffer>> m_buffer;
 
-            ID3D11ShaderResourceView *m_texBiomes;
+            Microsoft::WRL::ComPtr<ID3D11SamplerState> m_sampler;
+            ID3D11ShaderResourceView *m_texBiomes, *m_textures, *m_normalMaps;
 
             Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_raster, m_rasterWire;
             Microsoft::WRL::ComPtr<ID3D11Device> m_device;
@@ -68,5 +73,7 @@ namespace Galactic
             float m_radius;
 
             void InitEffect();
+            void LoadTextures();
+            void GeneratePermutations();
     };
 }

@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 128.0f;
+float TerrainNode::SplitDistance = 100.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -36,6 +36,11 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
     m_dbgStates = std::make_unique<CommonStates>(device);
     m_dbgEffect = std::make_unique<BasicEffect>(device);
     m_dbgEffect->SetVertexColorEnabled(true);
+
+    m_neighbours[North] = nullptr;
+    m_neighbours[East] = nullptr;
+    m_neighbours[South] = nullptr;
+    m_neighbours[West] = nullptr;
 
     void const* shaderByteCode;
     size_t byteCodeLength;
@@ -84,7 +89,6 @@ void TerrainNode::Generate()
 
                 v = parent->GetVertex(xh + yh * gridsize);
                 v.normal = Vector3::Zero;
-                v.texIndex = GetTextureIndex(m_terrain->GetBiome(v.biome));
             }
             else
             {
@@ -98,20 +102,21 @@ void TerrainNode::Generate()
                 std::string tex;
                 float height = 0.0f;
                 Vector2 biome;
-                size_t texIndex = 0.0f;
+                float texIndex = 0.0f, normalIndex = 0.0f;
                 
                 if (!m_simple)
                 {
                     m_terrain->GetHeight(pos, height, biome, tex);
-                    texIndex = GetTextureIndex(tex);
+                    texIndex = static_cast<float>(BiomeConfig::Biomes[tex].Tex);
+                    normalIndex = static_cast<float>(BiomeConfig::Biomes[tex].NormalMap);
                 }
 
                 v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
                 v.sphere = pos;
-                v.uv = Vector2(xx * 10000.0f, yy * 10000.0f);
-                v.texIndex = texIndex;
+                v.uv = Vector3(xx * 10000.0f, yy * 10000.0f, texIndex);
+                v.normalIndex = normalIndex;
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -123,74 +128,11 @@ void TerrainNode::Generate()
         }
     }
 
-    m_originalVertices = m_vertices;
+    m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::None];
 
-    int i = 0;
-
-    for (uint16_t y = 0; y < gridsize - 1; ++y)
-    {
-        for (uint16_t x = 0; x < gridsize - 1; ++x)
-        {
-            if (i % 2 == 0)
-            {
-                m_indices.push_back(y * gridsize + x);
-                m_indices.push_back(y * gridsize + x + 1);
-                m_indices.push_back((y + 1) * gridsize + x + 1);
-
-                m_indices.push_back((y + 1) * gridsize + x + 1);
-                m_indices.push_back((y + 1) * gridsize + x);
-                m_indices.push_back(y * gridsize + x);
-            }
-            else
-            {
-                m_indices.push_back(y * gridsize + x);
-                m_indices.push_back(y * gridsize + x + 1);
-                m_indices.push_back((y + 1) * gridsize + x);
-
-                m_indices.push_back(y * gridsize + x + 1);
-                m_indices.push_back((y + 1) * gridsize + x + 1);
-                m_indices.push_back((y + 1) * gridsize + x);
-            }
-
-            ++i;
-        }
-
-        ++i;
-    }
-
-    for (size_t i = 0; i < m_indices.size() - 3; i += 3)
-    {
-        Vector3 p1 = m_vertices[m_indices[i + 0]].position;
-        Vector3 p2 = m_vertices[m_indices[i + 1]].position;
-        Vector3 p3 = m_vertices[m_indices[i + 2]].position;
-
-        Vector3 t1 = m_vertices[m_indices[i + 0]].uv;
-        Vector3 t2 = m_vertices[m_indices[i + 1]].uv;
-        Vector3 t3 = m_vertices[m_indices[i + 2]].uv;
-
-        Vector3 vector1 = p2 - p1, vector2 = p3 - p1;
-        Vector2 tuVector = t2 - t1, tvVector = t3 - t1;
-        Vector3 n = vector2.Cross(vector1);
-        Vector3 tangent;
-
-        float den = 1.0f / (tuVector.x * tvVector.y - tuVector.y * tvVector.x);
-
-        tangent.x = (tvVector.y * vector1.x - tvVector.x * vector2.x) * den;
-        tangent.y = (tvVector.y * vector1.y - tvVector.x * vector2.y) * den;
-        tangent.z = (tvVector.y * vector1.z - tvVector.x * vector2.z) * den;
-
-        m_vertices[m_indices[i + 0]].normal = n;
-        m_vertices[m_indices[i + 1]].normal = n;
-        m_vertices[m_indices[i + 2]].normal = n;
-
-        m_vertices[m_indices[i + 0]].tangent = tangent;
-        m_vertices[m_indices[i + 1]].tangent = tangent;
-        m_vertices[m_indices[i + 2]].tangent = tangent;
-    }
+    CalculateNormals();
 
     m_planet->IncrementVertices(gridsize * gridsize * 4);
-
-    Init();
 }
 
 void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)
@@ -208,9 +150,6 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), 1.0f - lerp };
 
             m_buffer->SetData(m_context, buffer);
-
-            if(!m_simple)
-                m_context->PSSetShaderResources(1, m_textures.size(), &m_textures[0]);
 
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
             m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
@@ -274,7 +213,7 @@ void TerrainNode::Reset()
 
 void TerrainNode::Split()
 {
-    if (m_depth >= 14 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
+    if (m_depth >= 12 || SphericalQuadTreeTerrain::FrameSplits >= SphericalQuadTreeTerrain::MaxSplitsPerFrame)
         return;
 
     if (IsLeaf())
@@ -295,7 +234,7 @@ void TerrainNode::Split()
         m_children[SE]->SetDebugName(m_dbgName + "_" + std::to_string(SE));
         m_children[SW]->SetDebugName(m_dbgName + "_" + std::to_string(SW));
 #endif
-        /*m_children[0]->Generate();
+        m_children[0]->Generate();
         m_children[1]->Generate();
         m_children[2]->Generate();
         m_children[3]->Generate();
@@ -303,11 +242,11 @@ void TerrainNode::Split()
         m_children[0]->FixEdges();
         m_children[1]->FixEdges();
         m_children[2]->FixEdges();
-        m_children[3]->FixEdges();*/
+        m_children[3]->FixEdges();
 
-        std::vector<std::thread> threads;
+        //std::vector<std::thread> threads;
 
-        for (auto &child : m_children)
+        /*for (auto &child : m_children)
             threads.push_back(std::thread([&]() { child->Generate(); }));
 
         for (auto &t : threads)
@@ -319,7 +258,7 @@ void TerrainNode::Split()
             threads.push_back(std::thread([&]() { child->FixEdges(); }));
 
         for (auto &t : threads)
-            t.join();
+            t.join();*/
 
         if(!m_simple)
             NotifyNeighbours();
@@ -372,54 +311,92 @@ void TerrainNode::Release()
 
 void TerrainNode::FixEdges()
 {
-    /*if (!m_simple)
-    {
-        auto n1 = GetGreaterThanOrEqualNeighbour(North);
-        auto n2 = GetGreaterThanOrEqualNeighbour(East);
-        auto n3 = GetGreaterThanOrEqualNeighbour(South);
-        auto n4 = GetGreaterThanOrEqualNeighbour(West);
+    m_neighbours[North] = GetGreaterThanOrEqualNeighbour(North);
+    m_neighbours[East] = GetGreaterThanOrEqualNeighbour(East);
+    m_neighbours[South] = GetGreaterThanOrEqualNeighbour(South);
+    m_neighbours[West] = GetGreaterThanOrEqualNeighbour(West);
 
-        if (n1) FixEdge(North, n1, n1->GetEdge(South), n1->GetDepth());
-        if (n2) FixEdge(East, n2, n2->GetEdge(West), n2->GetDepth());
-        if (n3) FixEdge(South, n3, n3->GetEdge(North), n3->GetDepth());
-        if (n4) FixEdge(West, n4, n4->GetEdge(East), n4->GetDepth());
-    }
+    auto depthNorth = m_neighbours[North] && (m_depth - m_neighbours[North]->GetDepth() >= 1);
+    auto depthEast = m_neighbours[East]   && (m_depth - m_neighbours[East]->GetDepth()  >= 1);
+    auto depthSouth = m_neighbours[South] && (m_depth - m_neighbours[South]->GetDepth() >= 1);
+    auto depthWest = m_neighbours[West]   && (m_depth - m_neighbours[West]->GetDepth()  >= 1);
+
+    if (!depthNorth && !depthEast && !depthSouth && !depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::None];
+    else if (depthNorth && !depthEast && !depthSouth && !depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::Top];
+    else if (!depthNorth && !depthEast && depthSouth && !depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::Bottom];
+    else if (!depthNorth && !depthEast && !depthSouth && depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::Left];
+    else if (!depthNorth && depthEast && !depthSouth && !depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::Right];
+    else if (depthNorth && depthEast && !depthSouth && !depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::TopRight];
+    else if (!depthNorth && depthEast && depthSouth && !depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::RightBottom];
+    else if (!depthNorth && !depthEast && depthSouth && depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::BottomLeft];
+    else if (depthNorth && !depthEast && !depthSouth && depthWest)
+        m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::LeftTop];
     
-    Init();*/
+    CalculateNormals();
+    Init();
 }
 
-size_t TerrainNode::GetTextureIndex(std::string &biome)
+void TerrainNode::CalculateNormals()
 {
-    assert(m_textures.size() <= 16);
-
-    auto texStr = "Resources/Biomes/" + BiomeConfig::Biomes[biome].Texture;
-    auto normalStr = "Resources/Biomes/" + BiomeConfig::Biomes[biome].NormalMap;
-
-    ID3D11ShaderResourceView *tex, *norm;
-
+    for (size_t i = 0; i < m_indices.size() - 3; i += 3)
     {
-        std::lock_guard<std::mutex> lock(mutex);
+        Vector3 p1 = m_vertices[m_indices[i + 0]].position;
+        Vector3 p2 = m_vertices[m_indices[i + 1]].position;
+        Vector3 p3 = m_vertices[m_indices[i + 2]].position;
 
-        tex = TextureManager::getInstance().GetTexture(m_device, texStr);
-        norm = TextureManager::getInstance().GetTexture(m_device, normalStr);
+        Vector3 t1 = m_vertices[m_indices[i + 0]].uv;
+        Vector3 t2 = m_vertices[m_indices[i + 1]].uv;
+        Vector3 t3 = m_vertices[m_indices[i + 2]].uv;
 
-#ifdef _DEBUG
-        assert(tex);
-        assert(norm);
-        assert(tex != norm);
-#endif
+        Vector3 vector1 = p2 - p1, vector2 = p3 - p1;
+        Vector2 tuVector = t2 - t1, tvVector = t3 - t1;
+        Vector3 n = vector2.Cross(vector1);
+        Vector3 tangent;
+
+        float den = 1.0f / (tuVector.x * tvVector.y - tuVector.y * tvVector.x);
+
+        tangent.x = (tvVector.y * vector1.x - tvVector.x * vector2.x) * den;
+        tangent.y = (tvVector.y * vector1.y - tvVector.x * vector2.y) * den;
+        tangent.z = (tvVector.y * vector1.z - tvVector.x * vector2.z) * den;
+
+        m_vertices[m_indices[i + 0]].normal += n;
+        m_vertices[m_indices[i + 1]].normal += n;
+        m_vertices[m_indices[i + 2]].normal += n;
+
+        m_vertices[m_indices[i + 0]].tangent += tangent;
+        m_vertices[m_indices[i + 1]].tangent += tangent;
+        m_vertices[m_indices[i + 2]].tangent += tangent;
     }
 
-    for (size_t n = 0; n < m_textures.size(); ++n)
+    /*if (m_neighbours[West] != nullptr && m_depth - m_neighbours[West]->GetDepth() >= 1)
     {
-        if (m_textures[n] == tex)
-            return n;
+        auto nedge = m_neighbours[West]->GetEdge(East);
+
+        for (size_t x = 0; x < m_edges[West].size(); ++x)
+            m_vertices[m_edges[West][x]].normal += m_neighbours[West]->GetVertex(nedge[x / 2]).normal;
     }
 
-    m_textures.push_back(tex);
-    m_textures.push_back(norm);
+    if (m_neighbours[South] != nullptr && m_depth - m_neighbours[South]->GetDepth() >= 1)
+    {
+        auto nedge = m_neighbours[South]->GetEdge(South);
 
-    return m_textures.size() - 2;
+        for (size_t x = 0; x < m_edges[South].size(); ++x)
+            m_vertices[m_edges[South][x]].normal += m_neighbours[South]->GetVertex(nedge[x / 2]).normal;
+    }*/
+
+    for (size_t i = 0; i < m_indices.size(); ++i)
+    {
+        m_vertices[m_indices[i]].normal.Normalize();
+        m_vertices[m_indices[i]].tangent.Normalize();
+    }
 }
 
 void TerrainNode::NotifyNeighbours()
@@ -443,31 +420,6 @@ void TerrainNode::NotifyNeighbours()
 
     for (auto n : neighbours)
         n->FixEdges();
-}
-
-void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth)
-{
-    neighbour;
-
-    int diff = m_depth - depth;
-    size_t grid = m_terrain->GetGridSize();
-
-    if (diff == 0)
-    {
-        for (int i = 0; i < grid; i++)
-            m_vertices[m_edges[dir][i]].position = m_originalVertices[m_edges[dir][i]].position;
-    }
-
-    if (diff < 1)
-        return;
-
-    for (int i = 0; i < grid - 2; i += 2)
-    {
-        const Vector3 p1 = m_originalVertices[m_edges[dir][i + 0]].position;
-        const Vector3 p2 = m_originalVertices[m_edges[dir][i + 2]].position;
-
-        m_vertices[m_edges[dir][i + 1]].position = (p1 + p2) / 2;
-    }
 }
 
 Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
