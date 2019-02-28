@@ -63,7 +63,7 @@ float4 main(VS_OUTPUT v) : SV_Target {
     float3x3 invTangent = float3x3(tangent, bitangent, normal);
 
 	normalMap = (normalMap * 2.0f) - 1.0f;
-    normal = normalize(mul(normalMap, invTangent));
+    //normal = normalize(mul(normalMap, invTangent));
     
     // Lighting
     float3 lightDist = length(lightPos - v.WorldPos);

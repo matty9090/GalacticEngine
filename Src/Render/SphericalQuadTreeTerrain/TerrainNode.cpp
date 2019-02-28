@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 100.0f;
+float TerrainNode::SplitDistance = 40.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -36,11 +36,6 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
     m_dbgStates = std::make_unique<CommonStates>(device);
     m_dbgEffect = std::make_unique<BasicEffect>(device);
     m_dbgEffect->SetVertexColorEnabled(true);
-
-    m_neighbours[North] = nullptr;
-    m_neighbours[East] = nullptr;
-    m_neighbours[South] = nullptr;
-    m_neighbours[West] = nullptr;
 
     void const* shaderByteCode;
     size_t byteCodeLength;
@@ -88,7 +83,7 @@ void TerrainNode::Generate()
                 int yh = sy + y / 2;
 
                 v = parent->GetVertex(xh + yh * gridsize);
-                v.normal = Vector3::Zero;
+                v.normal2 = Vector3::Zero;
             }
             else
             {
@@ -111,9 +106,34 @@ void TerrainNode::Generate()
                     normalIndex = static_cast<float>(BiomeConfig::Biomes[tex].NormalMap);
                 }
 
+                Vector3 avgPos = pos + pos * height;
+
+                if (hasParent)
+                {
+                    int xh1 = sx + x / 2, xh2 = sx + x / 2;
+                    int yh1 = sy + y / 2, yh2 = sy + y / 2;
+
+                    if (x % 2 != 0 && y % 2 == 0)
+                        xh2++;
+                    else if (x % 2 != 0 && y % 2 != 0)
+                    {
+                        xh2++;
+                        yh2++;
+                    }
+                    else if(x % 2 == 0 && y % 2 != 0)
+                        yh2++;
+                    else
+                    {
+                        std::cout << "Error!!\n";
+                    }
+
+                    avgPos = (parent->GetVertex(xh1 + yh1 * gridsize).position2 + (parent->GetVertex(xh2 + yh2 * gridsize).position2)) / 2;
+                }
+
                 v.biome = biome;
-                v.position = pos + pos * height;
-                v.normal = Vector3::Zero;
+                v.position1 = avgPos;
+                v.position2 = pos + pos * height;
+                v.normal2 = Vector3::Zero;
                 v.sphere = pos;
                 v.uv = Vector3(xx * 10000.0f, yy * 10000.0f, texIndex);
                 v.normalIndex = normalIndex;
@@ -141,13 +161,24 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
     {
         if (IsLeaf())
         {
+            auto gridsize = m_terrain->GetGridSize();
+
+            Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position2;
+            Vector3 mid = Vector3::Transform(midpoint, m_terrain->GetMatrix());
+
+            float distance = Vector3::Distance(m_planet->GetCameraPos(), mid);
             float lerp = (Vector3::Distance(m_planet->GetCameraPos(), m_planet->GetPosition()) - (float)(m_planet->GetRadius() / Constants::Scale)) * 2.0f;
+            
+            float morph = 1.0f - (distance - (m_scale * SplitDistance));
 
             if (lerp < 0.0f) lerp = 0.0f;
             if (lerp > 1.0f) lerp = 1.0f;
 
+            if (morph < 0.0f) morph = 0.0f;
+            if (morph > 1.0f) morph = 1.0f;
+
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
-            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), 1.0f - lerp };
+            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), 1.0f - lerp, morph };
 
             m_buffer->SetData(m_context, buffer);
 
@@ -169,7 +200,7 @@ void TerrainNode::Update(float dt)
     size_t gridsize = m_terrain->GetGridSize();
 
     Vector3 cam = m_planet->GetCameraPos();
-    Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position;
+    Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position2;
     Vector3 mid = Vector3::Transform(midpoint, m_terrain->GetMatrix());
 
     float distance = Vector3::Distance(cam, mid);
@@ -348,9 +379,9 @@ void TerrainNode::CalculateNormals()
 {
     for (size_t i = 0; i < m_indices.size() - 3; i += 3)
     {
-        Vector3 p1 = m_vertices[m_indices[i + 0]].position;
-        Vector3 p2 = m_vertices[m_indices[i + 1]].position;
-        Vector3 p3 = m_vertices[m_indices[i + 2]].position;
+        Vector3 p1 = m_vertices[m_indices[i + 0]].position2;
+        Vector3 p2 = m_vertices[m_indices[i + 1]].position2;
+        Vector3 p3 = m_vertices[m_indices[i + 2]].position2;
 
         Vector3 t1 = m_vertices[m_indices[i + 0]].uv;
         Vector3 t2 = m_vertices[m_indices[i + 1]].uv;
@@ -367,9 +398,9 @@ void TerrainNode::CalculateNormals()
         tangent.y = (tvVector.y * vector1.y - tvVector.x * vector2.y) * den;
         tangent.z = (tvVector.y * vector1.z - tvVector.x * vector2.z) * den;
 
-        m_vertices[m_indices[i + 0]].normal += n;
-        m_vertices[m_indices[i + 1]].normal += n;
-        m_vertices[m_indices[i + 2]].normal += n;
+        m_vertices[m_indices[i + 0]].normal2 += n;
+        m_vertices[m_indices[i + 1]].normal2 += n;
+        m_vertices[m_indices[i + 2]].normal2 += n;
 
         m_vertices[m_indices[i + 0]].tangent += tangent;
         m_vertices[m_indices[i + 1]].tangent += tangent;
@@ -394,7 +425,7 @@ void TerrainNode::CalculateNormals()
 
     for (size_t i = 0; i < m_indices.size(); ++i)
     {
-        m_vertices[m_indices[i]].normal.Normalize();
+        m_vertices[m_indices[i]].normal2.Normalize();
         m_vertices[m_indices[i]].tangent.Normalize();
     }
 }
@@ -426,13 +457,21 @@ Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
 {
     std::array<float, 9> s;
     Vector3 n;
-    //uint32_t i = 0;
+    uint32_t i = 0;
+
+    std::string tex;
+    float height = 0.0f;
+    Vector2 biome;
 
     for (int yy = -1; yy <= 1; yy++) {
         for (int xx = -1; xx <= 1; xx++) {
             Vector3 v = Vector3(x + (float)xx * step, 0.5f, y + (float)yy * step);
             v.Normalize();
-            //s[i++] = m_terrain->GetHeight(Vector3::Transform(v, m_world));
+            v = Vector3::TransformNormal(v, m_world);
+
+            m_terrain->GetHeight(v, height, biome, tex);
+
+            s[i++] = height;
         }
     }
 

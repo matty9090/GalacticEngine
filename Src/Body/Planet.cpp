@@ -22,7 +22,8 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_cloudsEnabled(false),
       m_atmEnabled(false),
       m_waterEnabled(false),
-      m_detail(EDetail::Medium)
+      m_detail(EDetail::Medium),
+      m_influence(nullptr)
 {
     m_settings.GridSize = 33;
     m_settings.Radius = 6700.0;

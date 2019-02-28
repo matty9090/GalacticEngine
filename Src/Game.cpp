@@ -357,7 +357,7 @@ void Game::CreateDevice()
     planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 5.971e24, 6371.0);
-    moon->SetInfluence(planet.get());
+    //moon->SetInfluence(planet.get());
     moon->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
     moon->SetVelocity(Vector3(-1.0e5, 0.0f, 1.3e6));
     //moon->SetAtmosphereHeight(200.0f);
@@ -365,14 +365,14 @@ void Game::CreateDevice()
     moon->Generate(Galactic::EDetail::High);
 
     m_fe = Galactic::CreateFlatEarth(m_d3dContext.Get(), "Flat Earth", 5e26, 60000.0);
-    m_fe->SetInfluence(planet.get());
+    //m_fe->SetInfluence(planet.get());
     m_fe->SetPosition(Vector3(0.0f, 0.0f, 100.0f));
     m_fe->SetVelocity(Vector3(-0.8e5, 0.0f, 0.3e6));
     m_fe->Generate();
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
     m_system->AddBody(std::move(star));
-    m_system->AddBody(std::move(planet));
+    //m_system->AddBody(std::move(planet));
     m_system->AddBody(std::move(moon));
 }
 
