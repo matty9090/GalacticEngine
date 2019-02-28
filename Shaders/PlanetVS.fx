@@ -36,7 +36,7 @@ struct VS_INPUT {
 VS_OUTPUT main(VS_INPUT v_in) {
 	VS_OUTPUT Output;
 	
-    float3 pos = lerp(v_in.vPosition1, v_in.vPosition2, 0.0f);
+    float3 pos = lerp(v_in.vPosition1, v_in.vPosition2, mMorph);
 	float3 objPos = float3(mWorld[3][0], mWorld[3][1], mWorld[3][2]);
 		
 	scatter_surf(mul(float4(pos, 1.0f), mWorld).xyz - objPos);

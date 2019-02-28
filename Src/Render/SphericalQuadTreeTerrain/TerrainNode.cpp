@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 40.0f;
+float TerrainNode::SplitDistance = 200.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -83,6 +83,7 @@ void TerrainNode::Generate()
                 int yh = sy + y / 2;
 
                 v = parent->GetVertex(xh + yh * gridsize);
+				v.position1 = v.position2;
                 v.normal2 = Vector3::Zero;
             }
             else
@@ -169,13 +170,19 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             float distance = Vector3::Distance(m_planet->GetCameraPos(), mid);
             float lerp = (Vector3::Distance(m_planet->GetCameraPos(), m_planet->GetPosition()) - (float)(m_planet->GetRadius() / Constants::Scale)) * 2.0f;
             
-            float morph = 1.0f - (distance - (m_scale * SplitDistance));
+			float morph0 = m_scale * SplitDistance * 2.0f;
+			float morph1 = m_scale * SplitDistance;
+
+            float morph = (morph0 - morph1) / distance;
 
             if (lerp < 0.0f) lerp = 0.0f;
             if (lerp > 1.0f) lerp = 1.0f;
 
             if (morph < 0.0f) morph = 0.0f;
             if (morph > 1.0f) morph = 1.0f;
+
+			if (m_dbgName == "3_2_2")
+				std::cout << morph << "\n";
 
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
             MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), 1.0f - lerp, morph };
@@ -185,7 +192,8 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
             m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
-            Draw();
+			//if (m_dbgName == "3_2_2")
+				Draw();
         }
         else
         {
