@@ -3,6 +3,7 @@
 cbuffer MatrixBuffer : register(b0) {
     matrix mWorldViewProj;
     matrix mWorld;
+    float3 mCam;
     float  mLerp;
 }
 

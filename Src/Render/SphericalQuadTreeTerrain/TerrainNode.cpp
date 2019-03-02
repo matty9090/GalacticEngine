@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 200.0f;
+float TerrainNode::SplitDistance = 100.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -84,7 +84,8 @@ void TerrainNode::Generate()
 
                 v = parent->GetVertex(xh + yh * gridsize);
 				v.position1 = v.position2;
-                v.normal2 = Vector3::Zero;
+                v.normal1 = v.normal2;
+                v.calcNormal = true;
             }
             else
             {
@@ -107,7 +108,9 @@ void TerrainNode::Generate()
                     normalIndex = static_cast<float>(BiomeConfig::Biomes[tex].NormalMap);
                 }
 
+                bool calcNormal = true;
                 Vector3 avgPos = pos + pos * height;
+                Vector3 avgNorm = Vector3::Zero;
 
                 if (hasParent)
                 {
@@ -129,15 +132,19 @@ void TerrainNode::Generate()
                     }
 
                     avgPos = (parent->GetVertex(xh1 + yh1 * gridsize).position2 + (parent->GetVertex(xh2 + yh2 * gridsize).position2)) / 2;
+                    avgNorm = (parent->GetVertex(xh1 + yh1 * gridsize).normal2 + (parent->GetVertex(xh2 + yh2 * gridsize).normal2)) / 2;
+                    calcNormal = false;
                 }
 
                 v.biome = biome;
                 v.position1 = avgPos;
                 v.position2 = pos + pos * height;
+                v.normal1 = avgNorm;
                 v.normal2 = Vector3::Zero;
                 v.sphere = pos;
                 v.uv = Vector3(xx * 10000.0f, yy * 10000.0f, texIndex);
                 v.normalIndex = normalIndex;
+                v.calcNormal = calcNormal;
             }
 
             if (x == 0)             m_edges[West].push_back(k);
@@ -167,33 +174,21 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             Vector3 midpoint = m_vertices[(gridsize * gridsize) / 2].position2;
             Vector3 mid = Vector3::Transform(midpoint, m_terrain->GetMatrix());
 
-            float distance = Vector3::Distance(m_planet->GetCameraPos(), mid);
-            float lerp = (Vector3::Distance(m_planet->GetCameraPos(), m_planet->GetPosition()) - (float)(m_planet->GetRadius() / Constants::Scale)) * 2.0f;
-            
-			float morph0 = m_scale * SplitDistance * 2.0f;
-			float morph1 = m_scale * SplitDistance;
-
-            float morph = (morph0 - morph1) / distance;
+            float lerp  = (Vector3::Distance(m_planet->GetCameraPos(), m_planet->GetPosition()) - (float)(m_planet->GetRadius() / Constants::Scale)) * 2.0f;
+            float morph = m_scale * SplitDistance;
 
             if (lerp < 0.0f) lerp = 0.0f;
             if (lerp > 1.0f) lerp = 1.0f;
 
-            if (morph < 0.0f) morph = 0.0f;
-            if (morph > 1.0f) morph = 1.0f;
-
-			if (m_dbgName == "3_2_2")
-				std::cout << morph << "\n";
-
             Matrix worldViewProj = m_terrain->GetMatrix() * view * proj;
-            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), 1.0f - lerp, morph };
+            MatrixBuffer buffer = { worldViewProj.Transpose(), m_terrain->GetMatrix().Transpose(), m_planet->GetCameraPos(), 1.0f - lerp, morph };
 
             m_buffer->SetData(m_context, buffer);
 
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
             m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
-			//if (m_dbgName == "3_2_2")
-				Draw();
+		    Draw();
         }
         else
         {
@@ -379,8 +374,45 @@ void TerrainNode::FixEdges()
     else if (depthNorth && !depthEast && !depthSouth && depthWest)
         m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::LeftTop];
     
+    /*if (m_neighbours[North]) FixEdge(North, m_neighbours[North], m_neighbours[North]->GetEdge(South), m_neighbours[North]->GetDepth());
+    if (m_neighbours[East])  FixEdge(East,  m_neighbours[East],  m_neighbours[East]->GetEdge(West),   m_neighbours[East]->GetDepth());
+    if (m_neighbours[South]) FixEdge(South, m_neighbours[South], m_neighbours[South]->GetEdge(North), m_neighbours[South]->GetDepth());
+    if (m_neighbours[West])  FixEdge(West,  m_neighbours[West],  m_neighbours[West]->GetEdge(East),   m_neighbours[West]->GetDepth());*/
+
     CalculateNormals();
     Init();
+}
+
+void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth)
+{
+    neighbour;
+
+    int diff = m_depth - depth;
+    size_t grid = m_terrain->GetGridSize();
+
+    if (diff == 0)
+    {
+        for (int i = 0; i < grid; ++i)
+        {
+            const Vector3 p1 = m_vertices[m_edges[dir][i]].position1;
+
+            m_vertices[m_edges[dir][i]].position1 = p1;
+        }
+    }
+
+    if (diff < 1)
+        return;
+
+    for (int i = 0; i < grid - 2; i += 2)
+    {
+        const Vector3 p1 = m_vertices[m_edges[dir][i + 0]].position1;
+        const Vector3 p2 = m_vertices[m_edges[dir][i + 2]].position1;
+        const Vector3 n1 = m_vertices[m_edges[dir][i + 2]].normal1;
+        const Vector3 n2 = m_vertices[m_edges[dir][i + 2]].normal1;
+
+        m_vertices[m_edges[dir][i + 1]].position1 = (p1 + p2) / 2;
+        //m_vertices[m_edges[dir][i + 1]].normal1 = (n1 + n2) / 2;
+    }
 }
 
 void TerrainNode::CalculateNormals()
@@ -415,26 +447,13 @@ void TerrainNode::CalculateNormals()
         m_vertices[m_indices[i + 2]].tangent += tangent;
     }
 
-    /*if (m_neighbours[West] != nullptr && m_depth - m_neighbours[West]->GetDepth() >= 1)
-    {
-        auto nedge = m_neighbours[West]->GetEdge(East);
-
-        for (size_t x = 0; x < m_edges[West].size(); ++x)
-            m_vertices[m_edges[West][x]].normal += m_neighbours[West]->GetVertex(nedge[x / 2]).normal;
-    }
-
-    if (m_neighbours[South] != nullptr && m_depth - m_neighbours[South]->GetDepth() >= 1)
-    {
-        auto nedge = m_neighbours[South]->GetEdge(South);
-
-        for (size_t x = 0; x < m_edges[South].size(); ++x)
-            m_vertices[m_edges[South][x]].normal += m_neighbours[South]->GetVertex(nedge[x / 2]).normal;
-    }*/
-
     for (size_t i = 0; i < m_indices.size(); ++i)
     {
         m_vertices[m_indices[i]].normal2.Normalize();
         m_vertices[m_indices[i]].tangent.Normalize();
+
+        if (m_vertices[m_indices[i]].calcNormal)
+           m_vertices[m_indices[i]].normal1 = m_vertices[m_indices[i]].normal2;
     }
 }
 
