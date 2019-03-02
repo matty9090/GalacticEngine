@@ -374,10 +374,10 @@ void TerrainNode::FixEdges()
     else if (depthNorth && !depthEast && !depthSouth && depthWest)
         m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::LeftTop];
     
-    /*if (m_neighbours[North]) FixEdge(North, m_neighbours[North], m_neighbours[North]->GetEdge(South), m_neighbours[North]->GetDepth());
+    if (m_neighbours[North]) FixEdge(North, m_neighbours[North], m_neighbours[North]->GetEdge(South), m_neighbours[North]->GetDepth());
     if (m_neighbours[East])  FixEdge(East,  m_neighbours[East],  m_neighbours[East]->GetEdge(West),   m_neighbours[East]->GetDepth());
     if (m_neighbours[South]) FixEdge(South, m_neighbours[South], m_neighbours[South]->GetEdge(North), m_neighbours[South]->GetDepth());
-    if (m_neighbours[West])  FixEdge(West,  m_neighbours[West],  m_neighbours[West]->GetEdge(East),   m_neighbours[West]->GetDepth());*/
+    if (m_neighbours[West])  FixEdge(West,  m_neighbours[West],  m_neighbours[West]->GetEdge(East),   m_neighbours[West]->GetDepth());
 
     CalculateNormals();
     Init();
@@ -385,8 +385,6 @@ void TerrainNode::FixEdges()
 
 void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth)
 {
-    neighbour;
-
     int diff = m_depth - depth;
     size_t grid = m_terrain->GetGridSize();
 
@@ -394,9 +392,7 @@ void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t
     {
         for (int i = 0; i < grid; ++i)
         {
-            const Vector3 p1 = m_vertices[m_edges[dir][i]].position1;
-
-            m_vertices[m_edges[dir][i]].position1 = p1;
+            m_vertices[m_edges[dir][i]].normal2 = neighbour->GetVertex(nEdge[i]).normal2;
         }
     }
 
@@ -405,13 +401,13 @@ void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t
 
     for (int i = 0; i < grid - 2; i += 2)
     {
-        const Vector3 p1 = m_vertices[m_edges[dir][i + 0]].position1;
+        /*const Vector3 p1 = m_vertices[m_edges[dir][i + 0]].position1;
         const Vector3 p2 = m_vertices[m_edges[dir][i + 2]].position1;
         const Vector3 n1 = m_vertices[m_edges[dir][i + 2]].normal1;
         const Vector3 n2 = m_vertices[m_edges[dir][i + 2]].normal1;
 
         m_vertices[m_edges[dir][i + 1]].position1 = (p1 + p2) / 2;
-        //m_vertices[m_edges[dir][i + 1]].normal1 = (n1 + n2) / 2;
+        m_vertices[m_edges[dir][i + 1]].normal1 = (n1 + n2) / 2;*/
     }
 }
 
