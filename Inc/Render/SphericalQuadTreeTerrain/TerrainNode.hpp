@@ -16,7 +16,6 @@ namespace Galactic
         DirectX::SimpleMath::Vector3 position;
         DirectX::SimpleMath::Vector3 normal;
         DirectX::SimpleMath::Vector3 tangent;
-        DirectX::SimpleMath::Vector3 sphere;
         DirectX::SimpleMath::Vector2 biome;
         DirectX::SimpleMath::Vector3 uv;
         float normalIndex;
@@ -108,6 +107,7 @@ namespace Galactic
             void CalculateNormals();
             void NotifyNeighbours();
             
+            void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             TerrainNode *GetGreaterThanOrEqualNeighbour(int dir) const;
             std::vector<TerrainNode*> GetSmallerNeighbours(TerrainNode *neighbour, int dir) const;
     };

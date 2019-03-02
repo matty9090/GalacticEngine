@@ -11,7 +11,6 @@ struct VS_OUTPUT {
     float3 WorldPos : POSITION;
     float3 Normal : NORMAL0;
     float3 Tangent : TANGENT;
-    float3 Sphere : NORMAL1;
     float2 Biome : COLOR0;
     float3 Colour1 : COLOR1;
     float3 Colour2 : COLOR2;
@@ -65,7 +64,7 @@ float4 main(VS_OUTPUT v) : SV_Target {
     float3 lightDist = length(lightPos - v.WorldPos);
     float3 diffuseLight = lightCol * max(dot(normal, lightDir), 0.0f);
 	
-	float3 finalCol = lerp(biomeCol, texCol, mLerp) * diffuseLight;
+	float3 finalCol = lerp(biomeCol, texCol, mLerp).xyz * diffuseLight;
 
 	return float4(finalCol, 1.0f);
 }

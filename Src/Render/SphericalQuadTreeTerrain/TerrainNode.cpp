@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 100.0f;
+float TerrainNode::SplitDistance = 140.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -114,7 +114,6 @@ void TerrainNode::Generate()
                 v.biome = biome;
                 v.position = pos + pos * height;
                 v.normal = Vector3::Zero;
-                v.sphere = pos;
                 v.uv = Vector3(xx * 10000.0f, yy * 10000.0f, texIndex);
                 v.normalIndex = normalIndex;
             }
@@ -340,8 +339,40 @@ void TerrainNode::FixEdges()
     else if (depthNorth && !depthEast && !depthSouth && depthWest)
         m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::LeftTop];
     
+    if (m_neighbours[North]) FixEdge(North, m_neighbours[North], m_neighbours[North]->GetEdge(South), m_neighbours[North]->GetDepth());
+    if (m_neighbours[East])  FixEdge(East, m_neighbours[East], m_neighbours[East]->GetEdge(West), m_neighbours[East]->GetDepth());
+    if (m_neighbours[South]) FixEdge(South, m_neighbours[South], m_neighbours[South]->GetEdge(North), m_neighbours[South]->GetDepth());
+    if (m_neighbours[West])  FixEdge(West, m_neighbours[West], m_neighbours[West]->GetEdge(East), m_neighbours[West]->GetDepth());
+
     CalculateNormals();
     Init();
+}
+
+void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth)
+{
+    neighbour;
+
+    int diff = m_depth - depth;
+    size_t grid = m_terrain->GetGridSize();
+
+    if (diff == 0)
+    {
+        for (int i = 0; i < grid; ++i)
+            m_vertices[m_edges[dir][i]].normal = neighbour->GetVertex(nEdge[i]).normal;
+    }
+
+    if (diff < 1)
+        return;
+
+    for (int i = 0; i < grid - 2; i += 2)
+    {
+        /*const Vector3 p1 = m_vertices[m_edges[dir][i + 0]].position1;
+        const Vector3 p2 = m_vertices[m_edges[dir][i + 2]].position1;
+        const Vector3 n1 = m_vertices[m_edges[dir][i + 2]].normal1;
+        const Vector3 n2 = m_vertices[m_edges[dir][i + 2]].normal1;*/
+
+        //m_vertices[m_edges[dir][i]].normal = 
+    }
 }
 
 void TerrainNode::CalculateNormals()
