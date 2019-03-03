@@ -15,6 +15,7 @@ struct VS_OUTPUT {
     float3 WorldPos : POSITION;
     float3 Normal : NORMAL0;
     float3 Tangent : TANGENT;
+    float3 Sphere : NORMAL1;
     float2 Biome : COLOR0;
     float3 Colour1 : COLOR1;
     float3 Colour2 : COLOR2;

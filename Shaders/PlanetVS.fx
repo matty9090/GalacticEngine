@@ -11,6 +11,7 @@ struct VS_OUTPUT {
 	float3 WorldPos : POSITION;
 	float3 Normal : NORMAL0;
 	float3 Tangent : TANGENT;
+	float3 Sphere : NORMAL1;
 	float2 Biome : COLOR0;
 	float3 Colour1 : COLOR1;
 	float3 Colour2 : COLOR2;
@@ -19,9 +20,10 @@ struct VS_OUTPUT {
 };
 
 struct VS_INPUT {
-	float3 vPosition : POSITION;
-	float3 vNormal : NORMAL;
+	float4 vPosition : POSITION;
+	float3 vNormal : NORMAL0;
 	float3 vTangent : TANGENT;
+	float3 vSphere : NORMAL1;
 	float2 vBiome : TEXCOORD0;
 	float3 vUV : TEXCOORD1;
     float  vNormalIndex : TEXCOORD2;
@@ -32,12 +34,13 @@ VS_OUTPUT main(VS_INPUT v_in) {
 	
 	float3 objPos = float3(mWorld[3][0], mWorld[3][1], mWorld[3][2]);
 		
-	scatter_surf(mul(float4(v_in.vPosition, 1.0f), mWorld).xyz - objPos);
+	scatter_surf(mul(v_in.vPosition, mWorld).xyz - objPos);
 
-	Output.Position     = mul(float4(v_in.vPosition, 1.0f), mWorldViewProj);
-	Output.WorldPos     = mul(float4(v_in.vPosition, 1.0f), mWorld).xyz;
-	Output.Normal       = mul(float4(v_in.vNormal, 1.0f), mWorld).xyz;
-	Output.Tangent      = mul(float4(v_in.vTangent, 1.0f), mWorld).xyz;
+	Output.Position     = mul(v_in.vPosition, mWorldViewProj);
+	Output.WorldPos     = mul(v_in.vPosition, mWorld);
+	Output.Normal       = mul(v_in.vNormal, mWorld);
+	Output.Tangent      = mul(v_in.vTangent, mWorld);
+	Output.Sphere       = v_in.vSphere;
 	Output.Biome 	    = v_in.vBiome;
 	Output.Colour1	    = PrimaryColour;
 	Output.Colour2	    = SecondaryColour;
