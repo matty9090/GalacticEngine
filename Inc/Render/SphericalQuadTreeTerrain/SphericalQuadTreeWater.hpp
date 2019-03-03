@@ -36,8 +36,11 @@ namespace Galactic
             float GetRadius() const { return m_radius; }
             size_t GetGridSize() const { return SphericalQuadTreeWater::GridSize; }
 
+            void RequestNoiseSet(int x, int y, int z, int w, int h, int d, float scale) {}
+            void FreeNoiseSet() {}
+
             __forceinline std::string GetBiome(const DirectX::SimpleMath::Vector2 &lookup);
-            __forceinline void GetHeight(const DirectX::SimpleMath::Vector3 &point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
+            __forceinline void GetHeight(int index, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }

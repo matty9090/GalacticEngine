@@ -69,6 +69,9 @@ void TerrainNode::Generate()
 
     auto parent = m_parent;
 
+    if(!m_simple)
+        m_terrain->RequestNoiseSet(m_bounds.x * gh, m_bounds.y * gh, 1, gridsize, gridsize, 1, m_scale * 0.01f);
+
     for (int y = 0; y < gridsize; ++y)
     {
         float yy = m_bounds.y + y * step;
@@ -102,7 +105,7 @@ void TerrainNode::Generate()
                 
                 if (!m_simple)
                 {
-                    m_terrain->GetHeight(pos, height, biome, tex);
+                    m_terrain->GetHeight(k, height, biome, tex);
                     texIndex = static_cast<float>(BiomeConfig::Biomes[tex].Tex);
                     normalIndex = static_cast<float>(BiomeConfig::Biomes[tex].NormalMap);
                 }
@@ -150,6 +153,9 @@ void TerrainNode::Generate()
             m_vertices.push_back(v);
         }
     }
+
+    if(!m_simple)
+        m_terrain->FreeNoiseSet();
 
     m_indices = SphericalQuadTreeTerrain::Perms[SphericalQuadTreeTerrain::None];
 
@@ -467,39 +473,6 @@ void TerrainNode::NotifyNeighbours()
 
     for (auto n : neighbours)
         n->FixEdges();
-}
-
-Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
-{
-    std::array<float, 9> s;
-    Vector3 n;
-    uint32_t i = 0;
-
-    std::string tex;
-    float height = 0.0f;
-    Vector2 biome;
-
-    for (int yy = -1; yy <= 1; yy++) {
-        for (int xx = -1; xx <= 1; xx++) {
-            Vector3 v = Vector3(x + (float)xx * step, 0.5f, y + (float)yy * step);
-            v.Normalize();
-            v = Vector3::TransformNormal(v, m_world);
-
-            m_terrain->GetHeight(v, height, biome, tex);
-
-            s[i++] = height;
-        }
-    }
-
-    float scale = 0.6f;
-
-    n.x = scale * -(s[2] - s[0] + 2 * (s[5] - s[3]) + s[8] - s[6]);
-    n.z = scale * -(s[6] - s[0] + 2 * (s[7] - s[1]) + s[8] - s[2]);
-    n.y = 1.0;
-
-    n.Normalize();
-
-    return n;
 }
 
 Vector3 TerrainNode::PointToSphere(DirectX::SimpleMath::Vector3 p)

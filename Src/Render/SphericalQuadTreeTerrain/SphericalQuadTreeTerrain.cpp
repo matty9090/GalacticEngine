@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 11;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 29;
+    size_t SphericalQuadTreeTerrain::GridSize = 21;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -79,27 +79,28 @@ void SphericalQuadTreeTerrain::Generate()
 
     for (const auto &map : settings.NoiseMaps)
     {
-        FastNoise noise;
-        noise.SetInterp(FastNoise::Quintic);
-        noise.SetNoiseType(FastNoise::SimplexFractal);
-        noise.SetFractalOctaves(map.Octaves);
-        noise.SetFractalGain(map.Gain);
-        noise.SetFractalLacunarity(map.Lacunarity);
-        noise.SetFrequency(map.Frequency);
-        noise.SetSeed(settings.Seed);
+        FastNoiseSIMD *noise = FastNoiseSIMD::NewFastNoiseSIMD();
+        noise->SetNoiseType(FastNoiseSIMD::SimplexFractal);
+        noise->SetFractalOctaves(map.Octaves);
+        noise->SetFractalGain(map.Gain);
+        noise->SetFractalLacunarity(map.Lacunarity);
+        noise->SetFrequency(map.Frequency);
+        noise->SetSeed(settings.Seed);
 
         m_noiseMaps.push_back(noise);
     }
 
+    m_noiseSets.resize(settings.NoiseMaps.size());
+
     auto &biomeSettings = settings.BiomeMap;
 
-    m_biomeMap.SetInterp(FastNoise::Quintic);
-    m_biomeMap.SetNoiseType(FastNoise::SimplexFractal);
-    m_biomeMap.SetFractalOctaves(biomeSettings.Octaves);
-    m_biomeMap.SetFractalGain(biomeSettings.Gain);
-    m_biomeMap.SetFractalLacunarity(biomeSettings.Lacunarity);
-    m_biomeMap.SetFrequency(biomeSettings.Frequency);
-    m_biomeMap.SetSeed(settings.Seed + 1);
+    m_biomeMap = FastNoiseSIMD::NewFastNoiseSIMD();
+    m_biomeMap->SetNoiseType(FastNoiseSIMD::SimplexFractal);
+    m_biomeMap->SetFractalOctaves(biomeSettings.Octaves);
+    m_biomeMap->SetFractalGain(biomeSettings.Gain);
+    m_biomeMap->SetFractalLacunarity(biomeSettings.Lacunarity);
+    m_biomeMap->SetFrequency(biomeSettings.Frequency);
+    m_biomeMap->SetSeed(settings.Seed + 1);
 
     auto row1 = BiomeConfig::Row().AddBiome(0.1f, "Scorched")
                                   .AddBiome(0.2f, "Bare")
@@ -223,7 +224,7 @@ void SphericalQuadTreeTerrain::InitEffect()
 #endif
 }
 
-void Galactic::SphericalQuadTreeTerrain::LoadTextures()
+void SphericalQuadTreeTerrain::LoadTextures()
 {
     std::cout << "Reading biomes\n";
 
@@ -264,6 +265,12 @@ void SphericalQuadTreeTerrain::Update(float dt)
 
 void SphericalQuadTreeTerrain::Reset()
 {
+    if(m_biomeMap) delete m_biomeMap;
+
+    for (int i = 0; i < m_noiseMaps.size(); ++i)
+        if (m_noiseMaps[i])
+            delete m_noiseMaps[i];
+
     m_texBiomes->Release();
     m_textures->Release();
     m_states.reset();
@@ -273,25 +280,41 @@ void SphericalQuadTreeTerrain::Reset()
         face->Release();
 }
 
+void SphericalQuadTreeTerrain::RequestNoiseSet(int x, int y, int z, int w, int h, int d, float scale)
+{
+    m_biomeSet = m_biomeMap->GetNoiseSet(x, y, x, w, h, d, scale);
+
+    for (int i = 0; i < m_noiseMaps.size(); ++i)
+        m_noiseSets[i] = m_noiseMaps[i]->GetNoiseSet(x, y, x, w, h, d, scale);
+}
+
+void SphericalQuadTreeTerrain::FreeNoiseSet()
+{
+    FastNoiseSIMD::FreeNoiseSet(m_biomeSet);
+
+    for (int i = 0; i < m_noiseMaps.size(); ++i)
+        FastNoiseSIMD::FreeNoiseSet(m_noiseSets[i]);
+}
+
 std::string SphericalQuadTreeTerrain::GetBiome(const DirectX::SimpleMath::Vector2 &lookup)
 {
     return m_planet->GetSettings().Biomes.Sample(lookup.x, lookup.y);
 }
 
-void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, float &height, Vector2 &biomeLookup, std::string &texIndex)
+void SphericalQuadTreeTerrain::GetHeight(int index, float &height, Vector2 &biomeLookup, std::string &texIndex)
 {
     auto &settings = m_planet->GetSettings();
     
-    float m = (m_biomeMap.GetNoise(p.x, p.y, p.z) + 1.0f) / 2.0f;
+    float m = (m_biomeSet[index] + 1.0f) / 2.0f;
     float mod = 1.0f;
 
-    float e = m_noiseMaps[0].GetNoise(p.x, p.y, p.z);
+    float e = m_noiseSets[0][index];
     float h = e * settings.NoiseMaps[0].Height;
 
     for (int i = 1; i < settings.NoiseMaps.size(); ++i)
     {
         mod *= settings.NoiseMaps[i].Mod;
-        h += m_noiseMaps[i].GetNoise(p.x, p.y, p.z) * settings.NoiseMaps[i].Height * mod;
+        h += m_noiseSets[i][index] * settings.NoiseMaps[i].Height * mod;
     }
 
     e = 1.0f - ((e + 1.0f) / 2.0f);

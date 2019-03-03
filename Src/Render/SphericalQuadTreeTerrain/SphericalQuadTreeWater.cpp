@@ -181,7 +181,7 @@ std::string Galactic::SphericalQuadTreeWater::GetBiome(const DirectX::SimpleMath
     return "Ocean";
 }
 
-void SphericalQuadTreeWater::GetHeight(const DirectX::SimpleMath::Vector3 &p, float &height, Vector2 &biomeLookup, std::string &texIndex)
+void SphericalQuadTreeWater::GetHeight(int index, float &height, Vector2 &biomeLookup, std::string &texIndex)
 {
     texIndex    = "Ocean";
     biomeLookup = Vector2(0.0f, 0.0f);

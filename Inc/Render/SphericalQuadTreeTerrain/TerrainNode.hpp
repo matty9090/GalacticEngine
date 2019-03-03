@@ -107,8 +107,6 @@ namespace Galactic
 
             DirectX::SimpleMath::Matrix m_world;
 
-            DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
-            DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
             void CalculateNormals();
             void NotifyNeighbours();
@@ -116,5 +114,6 @@ namespace Galactic
             void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             TerrainNode *GetGreaterThanOrEqualNeighbour(int dir) const;
             std::vector<TerrainNode*> GetSmallerNeighbours(TerrainNode *neighbour, int dir) const;
+            DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
     };
 }

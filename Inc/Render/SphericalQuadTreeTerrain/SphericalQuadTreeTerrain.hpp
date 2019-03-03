@@ -5,7 +5,7 @@
 #include "ISphericalTerrain.hpp"
 
 #include "Noise/Biome.hpp"
-#include "Noise/FastNoise.h"
+#include "Noise/FastNoiseSIMD.h"
 #include "Render/Scatter.hpp"
 #include "Render/DirectX/EffectManager.hpp"
 #include "Render/DirectX/ConstantBuffer.hpp"
@@ -31,8 +31,11 @@ namespace Galactic
             float GetRadius() const { return m_radius; }
             size_t GetGridSize() const { return SphericalQuadTreeTerrain::GridSize; }
 
+            void RequestNoiseSet(int x, int y, int z, int w, int h, int d, float scale);
+            void FreeNoiseSet();
+
             __forceinline std::string GetBiome(const DirectX::SimpleMath::Vector2 &lookup);
-            __forceinline void GetHeight(const DirectX::SimpleMath::Vector3 &point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
+            __forceinline void GetHeight(int index, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
 
             void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
@@ -50,8 +53,10 @@ namespace Galactic
         private:
             DirectX::SimpleMath::Matrix m_world;
 
-            FastNoise m_biomeMap;
-            std::vector<FastNoise> m_noiseMaps;
+            FastNoiseSIMD *m_biomeMap;
+            float *m_biomeSet;
+            std::vector<float*> m_noiseSets;
+            std::vector<FastNoiseSIMD*> m_noiseMaps;
 
             std::mutex m_mutex;
             IPlanet *m_planet;
