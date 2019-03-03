@@ -197,6 +197,12 @@
     <ClInclude Include="Inc\Utils\Json.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Noise\FastNoiseSIMD.h">
+      <Filter>Noise</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Noise\FastNoiseSIMD_internal.h">
+      <Filter>Noise</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -293,6 +299,27 @@
     </ClCompile>
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeWater.cpp">
       <Filter>Render\SphericalQuadTreeTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_avx2.cpp">
+      <Filter>Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_avx512.cpp">
+      <Filter>Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_internal.cpp">
+      <Filter>Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_neon.cpp">
+      <Filter>Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_sse2.cpp">
+      <Filter>Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_sse41.cpp">
+      <Filter>Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD.cpp">
+      <Filter>Noise</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

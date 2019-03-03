@@ -199,6 +199,8 @@
     <ClInclude Include="Inc\FastNoise\FastNoise.h" />
     <ClInclude Include="Inc\GalacticEngine.hpp" />
     <ClInclude Include="Inc\Noise\Biome.hpp" />
+    <ClInclude Include="Inc\Noise\FastNoiseSIMD.h" />
+    <ClInclude Include="Inc\Noise\FastNoiseSIMD_internal.h" />
     <ClInclude Include="Inc\pch.h" />
     <ClInclude Include="Inc\Physics\Constants.hpp" />
     <ClInclude Include="Inc\Physics\Gravity.hpp" />
@@ -251,6 +253,33 @@
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\Noise\Biome.cpp" />
     <ClCompile Include="Src\Noise\FastNoise.cpp" />
+    <ClCompile Include="Src\Noise\FastNoiseSIMD.cpp" />
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_avx2.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_avx512.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_internal.cpp" />
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_neon.cpp" />
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_sse2.cpp">
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
+    </ClCompile>
+    <ClCompile Include="Src\Noise\FastNoiseSIMD_sse41.cpp">
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
+    </ClCompile>
     <ClCompile Include="Src\pch.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
