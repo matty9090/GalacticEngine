@@ -19,9 +19,9 @@ Planet::Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::s
       m_atmosphere(nullptr),
       m_isGenerated(false),
       m_vertexCount(0),
-      m_cloudsEnabled(false),
-      m_atmEnabled(false),
-      m_waterEnabled(false),
+      m_cloudsEnabled(true),
+      m_atmEnabled(true),
+      m_waterEnabled(true),
       m_detail(EDetail::Medium),
       m_influence(nullptr)
 {

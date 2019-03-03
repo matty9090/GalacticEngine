@@ -8,9 +8,9 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 #ifdef _DEBUG
-    size_t SphericalQuadTreeTerrain::GridSize = 5;
+    size_t SphericalQuadTreeTerrain::GridSize = 11;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 5;
+    size_t SphericalQuadTreeTerrain::GridSize = 29;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -208,7 +208,7 @@ void SphericalQuadTreeTerrain::InitEffect()
         { "NORMAL",      2,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        60,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        72,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD",    1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        80,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    2,     DXGI_FORMAT_R32_FLOAT,           0,        92,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    2,     DXGI_FORMAT_R32_FLOAT,           0,        92,        D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
@@ -311,230 +311,419 @@ void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, 
 void SphericalQuadTreeTerrain::GeneratePermutations()
 {
     int gridsize = GetGridSize();
-    int i;
 
-    std::vector<uint16_t> *ind;
+    typedef std::array<uint16_t, 5> Tri;
 
-    auto func = [gridsize](std::vector<uint16_t> *ind, uint16_t x, uint16_t y, int i)
+    std::vector<Tri> ind;
+
+    auto add_index = [gridsize](std::vector<Tri> &ind, uint16_t x, uint16_t y, int i)
     {
+        Tri t1, t2;
+
         if (i % 2 == 0)
         {
-            ind->push_back(y * gridsize + x);
-            ind->push_back(y * gridsize + x + 1);
-            ind->push_back((y + 1) * gridsize + x + 1);
+            t1[0] = y * gridsize + x;
+            t1[1] = y * gridsize + x + 1;
+            t1[2] = (y + 1) * gridsize + x + 1;
 
-            ind->push_back((y + 1) * gridsize + x + 1);
-            ind->push_back((y + 1) * gridsize + x);
-            ind->push_back(y * gridsize + x);
+            t2[0] = (y + 1) * gridsize + x + 1;
+            t2[1] = (y + 1) * gridsize + x;
+            t2[2] = y * gridsize + x;
         }
         else
         {
-            ind->push_back(y * gridsize + x);
-            ind->push_back(y * gridsize + x + 1);
-            ind->push_back((y + 1) * gridsize + x);
+            t1[0] = y * gridsize + x;
+            t1[1] = y * gridsize + x + 1;
+            t1[2] = (y + 1) * gridsize + x;
 
-            ind->push_back(y * gridsize + x + 1);
-            ind->push_back((y + 1) * gridsize + x + 1);
-            ind->push_back((y + 1) * gridsize + x);
+            t2[0] = y * gridsize + x + 1;
+            t2[1] = (y + 1) * gridsize + x + 1;
+            t2[2] = (y + 1) * gridsize + x;
         }
+
+        t1[3] = x;
+        t1[4] = y;
+        t2[3] = x;
+        t2[4] = y;
+
+        ind.push_back(t1);
+        ind.push_back(t2);
+    };
+
+    auto index_loop = [=](std::vector<Tri> &ind)
+    {
+        int i = 0;
+
+        for (uint16_t y = 0; y < gridsize - 1; ++y)
+        {
+            for (uint16_t x = 0; x < gridsize - 1; ++x)
+            {
+                add_index(ind, x, y, i);
+                ++i;
+            }
+
+            ++i;
+        }
+    };
+
+    auto convert = [](std::vector<Tri> ind)
+    {
+        std::vector<uint16_t> r;
+
+        std::for_each(ind.begin(), ind.end(), [&r](Tri t) {
+            r.push_back(t[0]);
+            r.push_back(t[1]);
+            r.push_back(t[2]);
+        });
+
+        return r;
     };
 
     /*
         None
     */
 
-    ind = &Perms[None];
-    ind->clear();
-    i = 0;
+    ind.clear();
+    index_loop(ind);
 
-    for (uint16_t y = 0; y < gridsize - 1; ++y)
-    {
-        for (uint16_t x = 0; x < gridsize - 1; ++x)
-        {
-            func(ind, x, y, i);
-            ++i;
-        }
-
-        ++i;
-    }
+    Perms[None] = convert(ind);
 
     /*
         Top
     */
 
-    ind = &Perms[Top];
-    ind->clear();
-    i = 1;
+    ind.clear();
+    index_loop(ind);
 
-    ind->insert(ind->begin(), { 6, 5, 0,   0, 2, 6,   2, 7, 6,
-                                8, 7, 2,   2, 4, 8,   4, 9, 8 });
+    auto apply_top = [gridsize](std::vector<Tri> &ind) {
+        int i = -1;
 
-    for (uint16_t y = 1; y < gridsize - 1; ++y)
-    {
-        for (uint16_t x = 0; x < gridsize - 1; ++x)
-        {
-            func(ind, x, y, i);
+        ind.erase(std::remove_if(ind.begin(), ind.end(), [&i](const Tri &t) {
             ++i;
-        }
+            return i % 2 == 0 && t[4] == 0;
+        }), ind.end());
 
-        ++i;
-    }
+        for (int x = 0; x < gridsize - 2; x += 2)
+        {
+            Tri t = { x, x + 2, x + gridsize + 1 };
+            ind.push_back(t);
+        }
+    };
+
+    apply_top(ind);
+    Perms[Top] = convert(ind);
 
     /*
         Bottom
     */
 
-    ind = &Perms[Bottom];
-    ind->clear();
-    i = 0;
+    ind.clear();
+    index_loop(ind);    
 
-    for (uint16_t y = 0; y < gridsize - 2; ++y)
-    {
-        for (uint16_t x = 0; x < gridsize - 1; ++x)
-        {
-            func(ind, x, y, i);
+    auto apply_bottom = [gridsize](std::vector<Tri> &ind) {
+        int i = -1;
+
+        ind.erase(std::remove_if(ind.begin(), ind.end(), [&i, gridsize](const Tri &t) {
             ++i;
+            return i % 2 != 0 && t[4] == gridsize - 2;
+        }), ind.end());
+
+        int y0 = (gridsize - 2) * gridsize;
+        int y1 = (gridsize - 1) * gridsize;
+
+        for (int x = 0; x < gridsize - 2; x += 2)
+        {
+            Tri t = { x + y1, x + y1 + 2, x + y0 + 1 };
+            ind.push_back(t);
         }
+    };
 
-        ++i;
-    }
-
-    ind->insert(ind->end(), { 15, 16, 20,   20, 22, 16,   22, 17, 16,
-                              22, 17, 18,   22, 24, 18,   24, 19, 18 });
+    apply_bottom(ind);
+    Perms[Bottom] = convert(ind);
 
     /*
         Right
     */
 
-    ind = &Perms[Right];
-    ind->clear();
-    i = 0;
+    ind.clear();
+    index_loop(ind);
+    
+    auto apply_right = [gridsize](std::vector<Tri> &ind) {
+        std::set<int> list;
+        int i = -1;
 
-    for (uint16_t x = 0; x < gridsize - 2; ++x)
-    {
-        for (uint16_t y = 0; y < gridsize - 1; ++y)
+        for (int z = 1; z < gridsize * 2 - 1; z += 4)
         {
-            func(ind, x, y, i);
-            ++i;
+            list.insert(z);
+            list.insert(z + 1);
         }
 
-        ++i;
-    }
+        ind.erase(std::remove_if(ind.begin(), ind.end(), [&i, gridsize, list](const Tri &t) {
+            if (t[3] == gridsize - 2)
+            {
+                ++i;
+                return list.find(i) != list.end();
+            }
 
-    ind->insert(ind->end(), { 4, 3, 8,   4, 14, 8,   14, 13, 8,
-                              14, 13, 18,   14, 24, 18,   24, 23, 18 });
+            return false;
+        }), ind.end());
+
+        int x = gridsize - 1;
+
+        for (int y = 0; y < gridsize - 2; y += 2)
+        {
+            Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x - 1) + (y + 1) * gridsize };
+            ind.push_back(t);
+        }
+    };
+
+    apply_right(ind);
+    Perms[Right] = convert(ind);
 
     /*
         Left
     */
 
-    ind = &Perms[Left];
-    ind->clear();
-    i = 1;
+    ind.clear();
+    index_loop(ind);
 
-    ind->insert(ind->end(), { 0, 1, 6,   0, 10, 6,   10, 11, 6,
-                              10, 11, 16,   10, 20, 16,   20, 21, 16 });
+    auto apply_left = [gridsize](std::vector<Tri> &ind) {
+        std::set<int> list;
+        int i = -1;
 
-    for (uint16_t x = 1; x < gridsize - 1; ++x)
-    {
-        for (uint16_t y = 0; y < gridsize - 1; ++y)
+        for (int z = 1; z < gridsize * 2 - 1; z += 4)
         {
-            func(ind, x, y, i);
-            ++i;
+            list.insert(z);
+            list.insert(z + 1);
         }
 
-        ++i;
-    }
+        ind.erase(std::remove_if(ind.begin(), ind.end(), [&i, gridsize, list](const Tri &t) {
+            if (t[3] == 0)
+            {
+                ++i;
+                return list.find(i) != list.end();
+            }
+
+            return false;
+        }), ind.end());
+
+        int x = 0;
+
+        for (int y = 0; y < gridsize - 2; y += 2)
+        {
+            Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x + 1) + (y + 1) * gridsize };
+            ind.push_back(t);
+        }
+    };
+
+    apply_left(ind);
+    Perms[Left] = convert(ind);
 
     /*
         Top + Right
     */
 
-    ind = &Perms[TopRight];
-    ind->clear();
-    i = 1;
+    ind.clear();
+    index_loop(ind);
 
-    ind->insert(ind->begin(), { 6, 5, 0,   0, 2, 6,   2, 7, 6,
-                                8, 7, 2,   2, 4, 8 });
+    auto apply_topright = [gridsize](std::vector<Tri> &ind) {
+        int i = -1, j = -1;
+        std::set<int> list;
 
-    for (uint16_t y = 1; y < gridsize - 1; ++y)
-    {
-        for (uint16_t x = 0; x < gridsize - 2; ++x)
+        for (int z = 1; z < gridsize * 2 - 1; z += 4)
         {
-            func(ind, x, y, i);
-            ++i;
+            list.insert(z);
+            list.insert(z + 1);
         }
-    }
-    
-    ind->insert(ind->end(), { 4, 14, 8,   14, 13, 8,
-                              14, 13, 18,  14, 24, 18,  24, 23, 18 });
+
+        ind.erase(std::remove_if(ind.begin(), ind.end(), [&i, &j, list, gridsize](const Tri &t) {
+            ++j;
+            
+            if (t[3] == gridsize - 2)
+            {
+                ++i;
+
+                if (list.find(i) != list.end())
+                    return true;
+            }
+            
+            return j % 2 == 0 && t[4] == 0;
+        }), ind.end());
+
+        for (int x = 0; x < gridsize - 2; x += 2)
+        {
+            Tri t = { x, x + 2, x + gridsize + 1 };
+            ind.push_back(t);
+        }
+
+        int x = gridsize - 1;
+
+        for (int y = 0; y < gridsize - 2; y += 2)
+        {
+            Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x - 1) + (y + 1) * gridsize };
+            ind.push_back(t);
+        }
+    };
+
+    apply_topright(ind);
+
+    Perms[TopRight] = convert(ind);
 
     /*
         Right + Bottom
     */
 
-    ind = &Perms[RightBottom];
-    ind->clear();
-    i = 0;
+    ind.clear();
+    index_loop(ind);
 
-    ind->insert(ind->begin(), { 15, 16, 20,   20, 22, 16,   22, 17, 16,
-                              22, 17, 18,   22, 24, 18 });
+    auto apply_rightbottom = [gridsize](std::vector<Tri> &ind) {
+        int i = -1, j = -1;
+        std::set<int> list;
 
-    for (uint16_t y = 0; y < gridsize - 2; ++y)
-    {
-        for (uint16_t x = 0; x < gridsize - 2; ++x)
+        for (int z = 1; z < gridsize * 2 - 1; z += 4)
         {
-            func(ind, x, y, i);
-            ++i;
+            list.insert(z);
+            list.insert(z + 1);
         }
-    }
 
-    ind->insert(ind->end(), { 3, 4, 8,   4, 14, 8,   14, 13, 8,
-                              14, 13, 18,  14, 24, 18 });
+        ind.erase(std::remove_if(ind.begin(), ind.end(), [&i, &j, list, gridsize](const Tri &t) {
+            ++j;
+
+            if (t[3] == gridsize - 2)
+            {
+                ++i;
+
+                if (list.find(i) != list.end())
+                    return true;
+            }
+
+            return j % 2 != 0 && t[4] == gridsize - 2;
+        }), ind.end());
+
+        int y0 = (gridsize - 2) * gridsize;
+        int y1 = (gridsize - 1) * gridsize;
+
+        for (int x = 0; x < gridsize - 2; x += 2)
+        {
+            Tri t = { x + y1, x + y1 + 2, x + y0 + 1 };
+            ind.push_back(t);
+        }
+
+        int x = gridsize - 1;
+
+        for (int y = 0; y < gridsize - 2; y += 2)
+        {
+            Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x - 1) + (y + 1) * gridsize };
+            ind.push_back(t);
+        }
+    };
+
+    apply_rightbottom(ind);
+
+    Perms[RightBottom] = convert(ind);
 
     /*
         Bottom + Left
     */
 
-    ind = &Perms[BottomLeft];
-    ind->clear();
-    i = 1;
+    ind.clear();
+    index_loop(ind);
 
-    ind->insert(ind->begin(), { 20, 22, 16,   22, 17, 16,
-                              22, 17, 18,   22, 24, 18,   24, 19, 18 });
+    auto apply_bottomleft = [gridsize](std::vector<Tri> &ind) {
+        int i = -1, j = -1;
+        std::set<int> list;
 
-    for (uint16_t y = 0; y < gridsize - 2; ++y)
-    {
-        for (uint16_t x = 1; x < gridsize - 1; ++x)
+        for (int z = 1; z < gridsize * 2 - 1; z += 4)
         {
-            func(ind, x, y, i);
-            ++i;
+            list.insert(z);
+            list.insert(z + 1);
         }
-    }
 
-    ind->insert(ind->end(), { 0, 1, 6,   0, 10, 6,   10, 11, 6,
-                              10, 11, 16,   10, 20, 16 });
+        ind.erase(std::remove_if(ind.begin(), ind.end(), [&i, &j, list, gridsize](const Tri &t) {
+            ++j;
+
+            if (t[3] == 0)
+            {
+                ++i;
+
+                if (list.find(i) != list.end())
+                    return true;
+            }
+
+            return j % 2 != 0 && t[4] == gridsize - 2;
+        }), ind.end());
+
+        int y0 = (gridsize - 2) * gridsize;
+        int y1 = (gridsize - 1) * gridsize;
+
+        for (int x = 0; x < gridsize - 2; x += 2)
+        {
+            Tri t = { x + y1, x + y1 + 2, x + y0 + 1 };
+            ind.push_back(t);
+        }
+
+        int x = 0;
+
+        for (int y = 0; y < gridsize - 2; y += 2)
+        {
+            Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x + 1) + (y + 1) * gridsize };
+            ind.push_back(t);
+        }
+    };
+
+    apply_bottomleft(ind);
+
+    Perms[BottomLeft] = convert(ind);
 
     /*
         Left + Top
     */
 
-    ind = &Perms[LeftTop];
-    ind->clear();
-    i = 0;
+    ind.clear();
+    index_loop(ind);
 
-    ind->insert(ind->begin(), { 0, 2, 6,   2, 7, 6,
-                                8, 7, 2,   2, 4, 8,   4, 9, 8 });
+    auto apply_lefttop = [gridsize](std::vector<Tri> &ind) {
+        int i = -1, j = -1;
+        std::set<int> list;
 
-    for (uint16_t y = 1; y < gridsize - 1; ++y)
-    {
-        for (uint16_t x = 1; x < gridsize - 1; ++x)
+        for (int z = 1; z < gridsize * 2 - 1; z += 4)
         {
-            func(ind, x, y, i);
-            ++i;
+            list.insert(z);
+            list.insert(z + 1);
         }
-    }
 
-    ind->insert(ind->end(), { 0, 10, 6,   10, 11, 6,
-                              10, 11, 16,   10, 20, 16,   20, 21, 16 });
+        ind.erase(std::remove_if(ind.begin(), ind.end(), [&i, &j, list, gridsize](const Tri &t) {
+            ++j;
+
+            if (t[3] == 0)
+            {
+                ++i;
+
+                if (list.find(i) != list.end())
+                    return true;
+            }
+
+            return j % 2 == 0 && t[4] == 0;
+        }), ind.end());
+
+        for (int x = 0; x < gridsize - 2; x += 2)
+        {
+            Tri t = { x, x + 2, x + gridsize + 1 };
+            ind.push_back(t);
+        }
+
+        int x = 0;
+
+        for (int y = 0; y < gridsize - 2; y += 2)
+        {
+            Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x + 1) + (y + 1) * gridsize };
+            ind.push_back(t);
+        }
+    };
+
+    apply_lefttop(ind);
+
+    Perms[LeftTop] = convert(ind);
+
+    std::cout << "Generated permutations\n";
 }

@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 100.0f;
+float TerrainNode::SplitDistance = 40.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -85,7 +85,6 @@ void TerrainNode::Generate()
                 v = parent->GetVertex(xh + yh * gridsize);
 				v.position1 = v.position2;
                 v.normal1 = v.normal2;
-                v.calcNormal = true;
             }
             else
             {
@@ -109,7 +108,7 @@ void TerrainNode::Generate()
                 }
 
                 bool calcNormal = true;
-                Vector3 avgPos = pos + pos * height;
+                Vector3 avgPos  = pos + pos * height;
                 Vector3 avgNorm = Vector3::Zero;
 
                 if (hasParent)
@@ -126,10 +125,6 @@ void TerrainNode::Generate()
                     }
                     else if(x % 2 == 0 && y % 2 != 0)
                         yh2++;
-                    else
-                    {
-                        std::cout << "Error!!\n";
-                    }
 
                     avgPos = (parent->GetVertex(xh1 + yh1 * gridsize).position2 + (parent->GetVertex(xh2 + yh2 * gridsize).position2)) / 2;
                     avgNorm = (parent->GetVertex(xh1 + yh1 * gridsize).normal2 + (parent->GetVertex(xh2 + yh2 * gridsize).normal2)) / 2;
@@ -188,7 +183,7 @@ void TerrainNode::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::
             m_context->VSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
             m_context->PSSetConstantBuffers(0, 1, m_buffer->GetBuffer());
 
-		    Draw();
+            Draw();
         }
         else
         {
@@ -294,8 +289,7 @@ void TerrainNode::Split()
         for (auto &t : threads)
             t.join();*/
 
-        if(!m_simple)
-            NotifyNeighbours();
+        NotifyNeighbours();
     }
     else
     {
@@ -379,7 +373,6 @@ void TerrainNode::FixEdges()
     if (m_neighbours[South]) FixEdge(South, m_neighbours[South], m_neighbours[South]->GetEdge(North), m_neighbours[South]->GetDepth());
     if (m_neighbours[West])  FixEdge(West,  m_neighbours[West],  m_neighbours[West]->GetEdge(East),   m_neighbours[West]->GetDepth());
 
-    CalculateNormals();
     Init();
 }
 
@@ -413,7 +406,7 @@ void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t
 
 void TerrainNode::CalculateNormals()
 {
-    for (size_t i = 0; i < m_indices.size() - 3; i += 3)
+    for (size_t i = 0; i < m_indices.size(); i += 3)
     {
         Vector3 p1 = m_vertices[m_indices[i + 0]].position2;
         Vector3 p2 = m_vertices[m_indices[i + 1]].position2;

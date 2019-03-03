@@ -5,6 +5,7 @@ cbuffer MatrixBuffer : register(b0) {
     matrix mWorld;
     float3 mCam;
     float  mLerp;
+    float  mMorph;
 }
 
 struct VS_OUTPUT {
