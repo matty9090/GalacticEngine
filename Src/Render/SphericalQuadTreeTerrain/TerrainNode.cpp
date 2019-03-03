@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 40.0f;
+float TerrainNode::SplitDistance = 34.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -209,7 +209,8 @@ void TerrainNode::Update(float dt)
 
     if (m_visible)
     {
-        bool divide = (!m_simple && m_depth < 2) || distance < m_scale * SplitDistance;
+        float splitDist = m_simple ? SplitDistance / 2.0f : SplitDistance;
+        bool divide = (!m_simple && m_depth < 2) || distance < m_scale * splitDist;
 
         if (!divide)
             Merge();
@@ -263,19 +264,10 @@ void TerrainNode::Split()
         m_children[SE]->SetDebugName(m_dbgName + "_" + std::to_string(SE));
         m_children[SW]->SetDebugName(m_dbgName + "_" + std::to_string(SW));
 #endif
-        m_children[0]->Generate();
-        m_children[1]->Generate();
-        m_children[2]->Generate();
-        m_children[3]->Generate();
 
-        m_children[0]->FixEdges();
-        m_children[1]->FixEdges();
-        m_children[2]->FixEdges();
-        m_children[3]->FixEdges();
+        std::vector<std::thread> threads;
 
-        //std::vector<std::thread> threads;
-
-        /*for (auto &child : m_children)
+        for (auto &child : m_children)
             threads.push_back(std::thread([&]() { child->Generate(); }));
 
         for (auto &t : threads)
@@ -287,7 +279,7 @@ void TerrainNode::Split()
             threads.push_back(std::thread([&]() { child->FixEdges(); }));
 
         for (auto &t : threads)
-            t.join();*/
+            t.join();
 
         NotifyNeighbours();
     }

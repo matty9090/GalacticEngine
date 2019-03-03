@@ -8,9 +8,9 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 #ifdef _DEBUG
-    size_t SphericalQuadTreeWater::GridSize = 11;
+    size_t SphericalQuadTreeWater::GridSize = 5;
 #else
-    size_t SphericalQuadTreeWater::GridSize = 29;
+    size_t SphericalQuadTreeWater::GridSize = 41;
 #endif
 
 bool   SphericalQuadTreeWater::CancelGeneration = false;
