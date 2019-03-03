@@ -13,21 +13,26 @@ namespace Galactic
 {
     struct PlanetVertex
     {
-        DirectX::SimpleMath::Vector3 position;
-        DirectX::SimpleMath::Vector3 normal;
+        DirectX::SimpleMath::Vector3 position1;
+        DirectX::SimpleMath::Vector3 position2;
+        DirectX::SimpleMath::Vector3 normal1;
+        DirectX::SimpleMath::Vector3 normal2;
         DirectX::SimpleMath::Vector3 tangent;
         DirectX::SimpleMath::Vector3 sphere;
         DirectX::SimpleMath::Vector2 biome;
         DirectX::SimpleMath::Vector3 uv;
         float normalIndex;
+        bool calcNormal;
     };
 
     struct MatrixBuffer
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
         DirectX::SimpleMath::Matrix world;         // 64 bytes
+        DirectX::SimpleMath::Vector3 cam;          // 12 bytes
         float lerp;                                // 4  bytes
-        float p0, p1, p2;                          // 16 bytes
+        float morph;                               // 4  bytes
+        float p1, p2, p3;                          // 12 bytes
     };
 
     struct Square
@@ -108,6 +113,7 @@ namespace Galactic
             void CalculateNormals();
             void NotifyNeighbours();
             
+            void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
             TerrainNode *GetGreaterThanOrEqualNeighbour(int dir) const;
             std::vector<TerrainNode*> GetSmallerNeighbours(TerrainNode *neighbour, int dir) const;
     };

@@ -3,7 +3,9 @@
 cbuffer MatrixBuffer : register(b0) {
     matrix mWorldViewProj;
     matrix mWorld;
+    float3 mCam;
     float  mLerp;
+    float  mMorph;
 }
 
 cbuffer WaterBuffer : register(b2) {

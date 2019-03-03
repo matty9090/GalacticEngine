@@ -3,7 +3,9 @@
 cbuffer MatrixBuffer : register(b0) {
     matrix mWorldViewProj;
     matrix mWorld;
+    float3 mCam;
     float  mLerp;
+    float  mMorph;
 }
 
 cbuffer WaterBuffer : register(b2) {
@@ -11,15 +13,15 @@ cbuffer WaterBuffer : register(b2) {
 }
 
 struct VS_OUTPUT {
-	float4 Position : SV_POSITION;
-	float3 WorldPos : POSITION;
-	float3 Normal : NORMAL0;
-	float3 Tangent : TANGENT;
-	float3 Sphere : NORMAL1;
-	float2 Biome : COLOR0;
-	float3 Colour1 : COLOR1;
-	float3 Colour2 : COLOR2;
-	float3 UV : TEXCOORD0;
+    float4 Position : SV_POSITION;
+    float3 WorldPos : POSITION;
+    float3 Normal : NORMAL0;
+    float3 Tangent : TANGENT;
+    float3 Sphere : NORMAL1;
+    float2 Biome : COLOR0;
+    float3 Colour1 : COLOR1;
+    float3 Colour2 : COLOR2;
+    float3 UV : TEXCOORD0;
     float  NormalIndex : TEXCOORD1;
 };
 

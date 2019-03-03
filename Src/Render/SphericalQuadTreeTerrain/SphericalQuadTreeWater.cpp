@@ -8,9 +8,9 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 #ifdef _DEBUG
-    size_t SphericalQuadTreeWater::GridSize = 5;
+    size_t SphericalQuadTreeWater::GridSize = 11;
 #else
-    size_t SphericalQuadTreeWater::GridSize = 5;
+    size_t SphericalQuadTreeWater::GridSize = 29;
 #endif
 
 bool   SphericalQuadTreeWater::CancelGeneration = false;
@@ -40,11 +40,11 @@ void SphericalQuadTreeWater::CreateEffect()
 {
     InitEffect();
 
-    CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_BACK, FALSE,
+    CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_NONE, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
 
-    CD3D11_RASTERIZER_DESC rastDescWire(D3D11_FILL_WIREFRAME, D3D11_CULL_BACK, FALSE,
+    CD3D11_RASTERIZER_DESC rastDescWire(D3D11_FILL_WIREFRAME, D3D11_CULL_NONE, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
 
@@ -120,12 +120,14 @@ void SphericalQuadTreeWater::InitEffect()
     D3D11_INPUT_ELEMENT_DESC els[] = {
         // Semantic      Index  Format                           Slot      Offset     Slot Class                   Instance Step
         { "POSITION",    0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        0,         D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "NORMAL",      0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        12,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TANGENT",     0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "POSITION",    1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        12,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL",      0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        24,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL",      1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        36,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        48,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        56,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    2,     DXGI_FORMAT_R32_FLOAT,           0,        68,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TANGENT",     0,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        48,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL",      2,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        60,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    0,     DXGI_FORMAT_R32G32_FLOAT,        0,        72,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    1,     DXGI_FORMAT_R32G32B32_FLOAT,     0,        80,        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD",    2,     DXGI_FORMAT_R32_FLOAT,           0,        92,        D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
     unsigned int num = sizeof(els) / sizeof(els[0]);
