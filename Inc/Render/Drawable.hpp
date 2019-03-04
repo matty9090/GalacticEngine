@@ -72,8 +72,8 @@ namespace Galactic
 
         Cleanup();
 
-        m_vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertices.size();
-        m_indexBufferDesc.ByteWidth = sizeof(IndexType) * m_indices.size();
+        m_vertexBufferDesc.ByteWidth = sizeof(VertexType) * static_cast<unsigned int>(m_vertices.size());
+        m_indexBufferDesc.ByteWidth = sizeof(IndexType) * static_cast<unsigned int>(m_indices.size());
         
         m_vertexData.pSysMem = &m_vertices[0];
         m_indexData.pSysMem = &m_indices[0];
@@ -96,7 +96,7 @@ namespace Galactic
         m_context->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
         m_context->IASetPrimitiveTopology(m_topology);
 
-        m_context->DrawIndexed(m_indices.size(), 0U, 0U);
+        m_context->DrawIndexed(static_cast<unsigned int>(m_indices.size()), 0U, 0U);
     }
 
     template<class VertexType, class IndexType>

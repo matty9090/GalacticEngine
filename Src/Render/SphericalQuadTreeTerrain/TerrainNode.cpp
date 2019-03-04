@@ -307,7 +307,7 @@ void TerrainNode::Merge()
         m_children[3].reset();
 
         size_t gridsize = m_terrain->GetGridSize();
-        m_planet->IncrementVertices(-(gridsize * gridsize * 4));
+        m_planet->IncrementVertices(-static_cast<int>(gridsize * gridsize * 4));
 
         NotifyNeighbours();
     }

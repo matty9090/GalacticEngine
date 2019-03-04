@@ -29,7 +29,7 @@ namespace Galactic
             float Lacunarity;
             float Mod;
 
-            size_t Octaves;
+            unsigned int Octaves;
         };
 
         BiomeConfig Biomes;
@@ -58,7 +58,7 @@ namespace Galactic
             virtual bool IsCloudsEnabled() const = 0;
             virtual bool IsAtmosphereEnabled() const = 0;
 
-            virtual void IncrementVertices(size_t num) = 0;
+            virtual void IncrementVertices(int num) = 0;
             virtual size_t GetVertexCount() = 0;
             virtual DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal) = 0;
 

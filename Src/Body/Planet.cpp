@@ -182,9 +182,9 @@ void Planet::ReadSettings(std::string file)
         BiomeConfig::Row row;
 
         for (const auto &cols : rows.second.get<picojson::object>())
-            row.AddBiome(atoi(cols.first.c_str()), cols.second.get<std::string>());
+            row.AddBiome(strtof(cols.first.c_str(), nullptr), cols.second.get<std::string>());
 
-        biomes.AddBiomeRow(row, atoi(rows.first.c_str()));
+        biomes.AddBiomeRow(row, strtof(rows.first.c_str(), nullptr));
     }
 
     m_settings.GridSize     = static_cast<size_t>(obj["GridSize"].get<double>());
@@ -209,7 +209,7 @@ PlanetSettings::Map Galactic::Planet::ParseMap(picojson::object obj)
     map.Height      = static_cast<float>(obj["Height"].get<double>());
     map.Lacunarity  = static_cast<float>(obj["Lacunarity"].get<double>());
     map.Mod         = static_cast<float>(obj["Mod"].get<double>());
-    map.Octaves     = static_cast<size_t>(obj["Octaves"].get<double>());
+    map.Octaves     = static_cast<unsigned int>(obj["Octaves"].get<double>());
 
     return map;
 }

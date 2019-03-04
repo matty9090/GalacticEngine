@@ -53,9 +53,9 @@ void SphericalQuadTreeTerrain::CreateEffect()
     CD3D11_RASTERIZER_DESC rastDescWire(D3D11_FILL_WIREFRAME, D3D11_CULL_NONE, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, TRUE, FALSE);
-
+    
     const float border[4] = { 0.f, 0.f, 0.f, 0.f };
-    float maxAnisotropy = (m_device->GetFeatureLevel() > D3D_FEATURE_LEVEL_9_1) ? 16 : 2;
+    unsigned int maxAnisotropy = (m_device->GetFeatureLevel() > D3D_FEATURE_LEVEL_9_1) ? 16U : 2U;
 
     CD3D11_SAMPLER_DESC samplerDesc(D3D11_FILTER_ANISOTROPIC,
         D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_CLAMP,
@@ -310,7 +310,7 @@ void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, 
 
 void SphericalQuadTreeTerrain::GeneratePermutations()
 {
-    int gridsize = GetGridSize();
+    int gridsize = static_cast<int>(GetGridSize());
 
     typedef std::array<uint16_t, 5> Tri;
 
@@ -403,7 +403,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
             return i % 2 == 0 && t[4] == 0;
         }), ind.end());
 
-        for (int x = 0; x < gridsize - 2; x += 2)
+        for (uint16_t x = 0; x < gridsize - 2; x += 2)
         {
             Tri t = { x, x + 2, x + gridsize + 1 };
             ind.push_back(t);
@@ -431,7 +431,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
         int y0 = (gridsize - 2) * gridsize;
         int y1 = (gridsize - 1) * gridsize;
 
-        for (int x = 0; x < gridsize - 2; x += 2)
+        for (uint16_t x = 0; x < gridsize - 2; x += 2)
         {
             Tri t = { x + y1, x + y1 + 2, x + y0 + 1 };
             ind.push_back(t);
@@ -470,7 +470,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
 
         int x = gridsize - 1;
 
-        for (int y = 0; y < gridsize - 2; y += 2)
+        for (uint16_t y = 0; y < gridsize - 2; y += 2)
         {
             Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x - 1) + (y + 1) * gridsize };
             ind.push_back(t);
@@ -509,7 +509,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
 
         int x = 0;
 
-        for (int y = 0; y < gridsize - 2; y += 2)
+        for (uint16_t y = 0; y < gridsize - 2; y += 2)
         {
             Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x + 1) + (y + 1) * gridsize };
             ind.push_back(t);
@@ -550,7 +550,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
             return j % 2 == 0 && t[4] == 0;
         }), ind.end());
 
-        for (int x = 0; x < gridsize - 2; x += 2)
+        for (uint16_t x = 0; x < gridsize - 2; x += 2)
         {
             Tri t = { x, x + 2, x + gridsize + 1 };
             ind.push_back(t);
@@ -558,7 +558,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
 
         int x = gridsize - 1;
 
-        for (int y = 0; y < gridsize - 2; y += 2)
+        for (uint16_t y = 0; y < gridsize - 2; y += 2)
         {
             Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x - 1) + (y + 1) * gridsize };
             ind.push_back(t);
@@ -603,7 +603,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
         int y0 = (gridsize - 2) * gridsize;
         int y1 = (gridsize - 1) * gridsize;
 
-        for (int x = 0; x < gridsize - 2; x += 2)
+        for (uint16_t x = 0; x < gridsize - 2; x += 2)
         {
             Tri t = { x + y1, x + y1 + 2, x + y0 + 1 };
             ind.push_back(t);
@@ -611,7 +611,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
 
         int x = gridsize - 1;
 
-        for (int y = 0; y < gridsize - 2; y += 2)
+        for (uint16_t y = 0; y < gridsize - 2; y += 2)
         {
             Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x - 1) + (y + 1) * gridsize };
             ind.push_back(t);
@@ -656,7 +656,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
         int y0 = (gridsize - 2) * gridsize;
         int y1 = (gridsize - 1) * gridsize;
 
-        for (int x = 0; x < gridsize - 2; x += 2)
+        for (uint16_t x = 0; x < gridsize - 2; x += 2)
         {
             Tri t = { x + y1, x + y1 + 2, x + y0 + 1 };
             ind.push_back(t);
@@ -664,7 +664,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
 
         int x = 0;
 
-        for (int y = 0; y < gridsize - 2; y += 2)
+        for (uint16_t y = 0; y < gridsize - 2; y += 2)
         {
             Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x + 1) + (y + 1) * gridsize };
             ind.push_back(t);
@@ -706,7 +706,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
             return j % 2 == 0 && t[4] == 0;
         }), ind.end());
 
-        for (int x = 0; x < gridsize - 2; x += 2)
+        for (uint16_t x = 0; x < gridsize - 2; x += 2)
         {
             Tri t = { x, x + 2, x + gridsize + 1 };
             ind.push_back(t);
@@ -714,7 +714,7 @@ void SphericalQuadTreeTerrain::GeneratePermutations()
 
         int x = 0;
 
-        for (int y = 0; y < gridsize - 2; y += 2)
+        for (uint16_t y = 0; y < gridsize - 2; y += 2)
         {
             Tri t = { x + y * gridsize, x + (y + 2) * gridsize, (x + 1) + (y + 1) * gridsize };
             ind.push_back(t);

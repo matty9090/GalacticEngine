@@ -14,7 +14,7 @@ BiomeConfig::~BiomeConfig()
     Clear();
 }
 
-void BiomeConfig::Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv, size_t w, size_t h)
+void BiomeConfig::Generate(ID3D11Device *device, ID3D11ShaderResourceView **srv, unsigned int w, unsigned int h)
 {
     Clear();
 

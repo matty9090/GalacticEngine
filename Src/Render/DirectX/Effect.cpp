@@ -60,7 +60,7 @@ void Effect::LogErrors(ID3DBlob *error)
         return;
 
     char *compileErrors;
-    unsigned long bufferSize, i;
+    size_t bufferSize, i;
     std::ofstream file("errors.txt", std::ios_base::app);
 
     compileErrors = (char*)(error->GetBufferPointer());

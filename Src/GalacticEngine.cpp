@@ -56,8 +56,8 @@ namespace Galactic {
             std::string tex = biome.second.get("Diffuse").get<std::string>();
             std::string norm = biome.second.get("Normal").get<std::string>();
 
-            BiomeConfig::Biomes[biome.first].Tex = std::distance(textures.begin(), textures.find(tex));
-            BiomeConfig::Biomes[biome.first].NormalMap = std::distance(ntextures.begin(), ntextures.find(norm));
+            BiomeConfig::Biomes[biome.first].Tex = static_cast<int>(std::distance(textures.begin(), textures.find(tex)));
+            BiomeConfig::Biomes[biome.first].NormalMap = static_cast<int>(std::distance(ntextures.begin(), ntextures.find(norm)));
         }
         
         std::string cmd = "texassemble.exe array -w 1024 -h 1024 -f R32G32B32A32_FLOAT -y -o Resources/Biomes.dds ";

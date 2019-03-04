@@ -56,7 +56,7 @@ namespace Galactic
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             void SetInfluence(IBody *body) { m_influence = body; }
 
-            void IncrementVertices(size_t num) { m_vertexCount += num; }
+            void IncrementVertices(int num) { m_vertexCount += num; }
             size_t GetVertexCount() { return m_vertexCount; }
 
             DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal);
