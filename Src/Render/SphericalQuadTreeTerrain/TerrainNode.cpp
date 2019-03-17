@@ -9,7 +9,7 @@ using namespace Galactic;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-float TerrainNode::SplitDistance = 34.0f;
+float TerrainNode::SplitDistance = 27000.0f;
 
 TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple)
     : Drawable<PlanetVertex>(terrain->GetContext().Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
@@ -210,6 +210,8 @@ void TerrainNode::Update(float dt)
     if (m_visible)
     {
         float splitDist = m_simple ? SplitDistance / 2.0f : SplitDistance;
+        splitDist /= Constants::Scale;
+
         bool divide = (!m_simple && m_depth < 2) || distance < m_scale * splitDist;
 
         if (!divide)

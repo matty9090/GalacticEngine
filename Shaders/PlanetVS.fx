@@ -40,8 +40,8 @@ VS_OUTPUT main(VS_INPUT v_in) {
     float3 finalPos = mul(float4(v_in.vPosition2, 1.0f), mWorld).xyz;
     float  morph = clamp(mMorph / (length(finalPos - mCam)), 0.0f, 1.0f);
 
-    float3 pos = lerp(v_in.vPosition1, v_in.vPosition2, morph);
-    float3 normal = lerp(v_in.vNormal1, v_in.vNormal2, morph);
+    float3 pos = lerp(v_in.vPosition1, v_in.vPosition2, 1.0f);
+    float3 normal = lerp(v_in.vNormal1, v_in.vNormal2, 1.0f);
 	float3 objPos = float3(mWorld[3][0], mWorld[3][1], mWorld[3][2]);
 		
 	scatter_surf(mul(float4(pos, 1.0f), mWorld).xyz - objPos);

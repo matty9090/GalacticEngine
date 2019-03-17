@@ -157,7 +157,7 @@ void Game::Update(DX::StepTimer const& timer)
     auto dir = m_camera->GetPosition() - closestBody->GetPosition();
 
     float factor = ((Vector3::Distance(m_camera->GetPosition(), closestBody->GetPoint(dir)))) * 30.0f;
-    factor = std::fminf(std::fmaxf(factor, 0.02f), 100000.0f);
+    //factor = std::fminf(std::fmaxf(factor, 0.02f), 100000.0f);
 
     move = move * factor * dt;
     m_speed = factor;
@@ -350,7 +350,7 @@ void Game::CreateDevice()
 
     auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet"/*, 5.683e26, 58232.0*/);
     planet->SetInfluence(star.get());
-    planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
+    planet->SetPosition(Vector3(5000.0f, 0.0f, -1600.0f));
     planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
     //planet->SetAtmosphereHeight(800.0f);
     planet->ReadSettings("settings.json");

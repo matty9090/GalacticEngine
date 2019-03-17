@@ -53,9 +53,6 @@ float4 main(VS_OUTPUT v) : SV_Target {
 	// Sample texture/normal map colour
     float4 texCol = Tex.Sample(Sampler, v.UV);
     float3 normalMap = NTex.Sample(Sampler, float3(v.UV.x, v.UV.y, v.NormalIndex)).xyz;
-	
-    //float4 texCol = biomeCol;
-    //float3 normalMap = biomeCol;
 
     // Normal mapping
     float3 normal = normalize(v.Normal);
@@ -64,13 +61,17 @@ float4 main(VS_OUTPUT v) : SV_Target {
     float3x3 invTangent = float3x3(tangent, bitangent, normal);
 
 	normalMap = (normalMap * 2.0f) - 1.0f;
-    //normal = normalize(mul(normalMap, invTangent));
+    normal = normalize(mul(normalMap, invTangent));
     
     // Lighting
     float3 lightDist = length(lightPos - v.WorldPos);
     float3 diffuseLight = lightCol * max(dot(normal, lightDir), 0.0f);
+
+    float3 cameraDir = normalize(mCam - v.WorldPos.xyz);
+    float3 halfway = normalize(lightDir + cameraDir);
+    float3 specularLight = diffuseLight * pow(max(dot(normal, halfway), 0), 10) / 3.0f;
 	
-	float3 finalCol = lerp(biomeCol, texCol, mLerp) * diffuseLight + sColour;
+    float3 finalCol = lerp(biomeCol, texCol, mLerp) * diffuseLight + sColour + specularLight;
 
 	return float4(finalCol, 1.0f);
 }

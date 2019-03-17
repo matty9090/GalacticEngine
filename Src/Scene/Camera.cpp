@@ -9,7 +9,7 @@ Camera::Camera(size_t width, size_t height)
     : m_width(width),
       m_height(height),
       m_body(nullptr),
-      m_cameraPos(0.0f, 0.0f, -150.0f),
+      m_cameraPos(0.0f, 0.0f, -500.0f),
       //m_relPos(0.0f, 0.0f, -150.0f),
       m_yaw(0.0f),
       m_pitch(0.0f)

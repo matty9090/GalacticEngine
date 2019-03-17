@@ -70,8 +70,12 @@ float4 main(VS_OUTPUT v) : SV_Target {
     // Lighting
     float3 lightDist = length(lightPos - v.WorldPos);
     float3 diffuseLight = lightCol * max(dot(normal, lightDir), 0.0f);
+
+    float3 cameraDir = normalize(mCam - v.WorldPos.xyz);
+    float3 halfway = normalize(lightDir + cameraDir);
+    float3 specularLight = diffuseLight * pow(max(dot(normal, halfway), 0), 10) / 3.0f;
 	
-    float3 finalCol = biomeCol * diffuseLight + sColour;
+    float3 finalCol = biomeCol * diffuseLight + sColour + specularLight;
 
 	return float4(finalCol, 1.0f);
 }
