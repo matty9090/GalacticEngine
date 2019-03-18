@@ -42,6 +42,15 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     GeneratePermutations();
 }
 
+Galactic::SphericalQuadTreeTerrain::~SphericalQuadTreeTerrain()
+{
+    m_textures->Release();
+    m_normalMaps->Release();
+    m_texBiomes->Release();
+    m_states.reset();
+    m_effect->Reset();
+}
+
 void SphericalQuadTreeTerrain::CreateEffect()
 {
     InitEffect();
@@ -264,12 +273,6 @@ void SphericalQuadTreeTerrain::Update(float dt)
 
 void SphericalQuadTreeTerrain::Reset()
 {
-    m_texBiomes->Release();
-    m_textures->Release();
-    m_normalMaps->Release();
-    m_states.reset();
-    m_effect->Reset();
-
     for (auto &face : m_faces)
         face->Release();
 }

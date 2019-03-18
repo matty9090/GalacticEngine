@@ -70,28 +70,14 @@ void Planet::Generate(EDetail detail)
         matrix = m_renderer->GetMatrix();
 
         m_renderer->Reset();
-        m_renderer.reset();
         
-        if (m_atmEnabled)
-        {
-            m_atmosphere->Reset();
-            m_atmosphere.reset();
-        }
-
-        if (m_cloudsEnabled)
-        {
-            m_clouds->Reset();
-            m_clouds.reset();
-        }
-
-        if (m_waterEnabled)
-        {
-            m_water->Reset();
-            m_water.reset();
-        }
+        if (m_atmEnabled) m_atmosphere->Reset();
+        if (m_cloudsEnabled) m_clouds->Reset();
+        if (m_waterEnabled)  m_water->Reset();
     }
 
-    m_renderer = CreatePlanetRenderer(m_deviceContext, this, m_detail);
+    if(!m_renderer)
+        m_renderer = CreatePlanetRenderer(m_deviceContext, this, m_detail);
 
     if (m_atmEnabled) m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this, m_detail);
     if (m_cloudsEnabled) m_clouds = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);

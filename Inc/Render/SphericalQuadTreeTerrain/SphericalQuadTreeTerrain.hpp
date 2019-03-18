@@ -31,6 +31,12 @@ namespace Galactic
              * @param planet 
              */
             SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
+            
+            /**
+             * @brief Free up resources
+             *
+             */
+            ~SphericalQuadTreeTerrain();
 
             /**
              * @brief Generate the geometry
@@ -88,8 +94,8 @@ namespace Galactic
             float m_radius;
 
             void InitEffect();
-            void LoadTextures();
             void SetRenderContext();
             void GeneratePermutations();
+            void LoadTextures();
     };
 }

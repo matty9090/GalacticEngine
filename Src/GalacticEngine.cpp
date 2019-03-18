@@ -69,8 +69,8 @@ namespace Galactic {
         for (const auto &tex : ntextures)
             ncmd += "Resources/Biomes/" + tex + " ";
 
-        //system(cmd.c_str());
-        //system(ncmd.c_str());
+        system(cmd.c_str());
+        system(ncmd.c_str());
 
         std::cout << "Loaded " << numBiomes << " biomes\n";
     }

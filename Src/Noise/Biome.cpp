@@ -140,9 +140,6 @@ void BiomeConfig::Clear()
 
     m_pixels = NULL;
     m_pixelBiomes = NULL;
-
-    if(m_tex)
-        m_tex->Release();
 }
 
 std::string Galactic::BiomeConfig::Sample(float m, float e)

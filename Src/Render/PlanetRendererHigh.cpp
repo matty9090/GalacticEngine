@@ -30,7 +30,7 @@ void HighDetailPlanetRenderer::Update(float dt)
 void Galactic::HighDetailPlanetRenderer::Reset()
 {
     m_terrain->Reset();
-    m_terrain.reset();
+    m_terrain->Generate();
 }
 
 Vector3 Galactic::HighDetailPlanetRenderer::GetPoint(Vector3 normal)
