@@ -10,20 +10,43 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Scattered atmosphere vertex
+     * 
+     */
     struct ScatteredAtmosphereVertex
     {
         DirectX::SimpleMath::Vector3 position;
     };
 
+    /**
+     * @brief Scattered atmosphere constant buffer
+     * 
+     */
     struct ScatteredAtmosphereBuffer
     {
         DirectX::SimpleMath::Matrix worldViewProj;
     };
 
+    /**
+     * @brief Scattered atmosphere renderer
+     * 
+     */
     class ScatteredAtmosphere : public IAtmosphereRenderer, public Drawable<ScatteredAtmosphereVertex>
     {
         public:
+            /**
+             * @brief Construct a new Scattered Atmosphere object
+             * 
+             * @param context 
+             * @param planet 
+             */
             ScatteredAtmosphere(ID3D11DeviceContext *context, IPlanet *planet);
+
+            /**
+             * @brief Destroy the Scattered Atmosphere object
+             * 
+             */
             virtual ~ScatteredAtmosphere();
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);

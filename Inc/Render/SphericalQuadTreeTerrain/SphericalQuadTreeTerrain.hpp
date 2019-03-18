@@ -17,12 +17,28 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Implementation of spherical quadtree terrain
+     * 
+     */
     class SphericalQuadTreeTerrain : public ISphericalTerrain
     {
         public:
+            /**
+             * @brief Construct a new Spherical Quad Tree Terrain object
+             * 
+             * @param deviceContext 
+             * @param planet 
+             */
             SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
 
+            /**
+             * @brief Generate the geometry
+             * 
+             */
             void Generate();
+
+            // TODO: Make private
             void CreateEffect();
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);

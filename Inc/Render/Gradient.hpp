@@ -3,9 +3,16 @@
 #include <vector>
 #include <math.h>
 
-namespace Gradient {
+namespace Gradient
+{
+    /**
+     * @brief Gradient stop
+     * 
+     * @tparam T Colour data type
+     */
     template<class T>
-    class GradientStop {
+    class GradientStop
+    {
         private:
             float t;
             T value;
@@ -17,19 +24,27 @@ namespace Gradient {
             GradientStop(float _t, T _val) :t(_t), value(_val) {}
     };
 
+    /**
+     * @brief Linear interpolation
+     * 
+     * @tparam T Colour type
+     * @param s Start
+     * @param e End
+     * @param t 0 -> 1 value to interpolate by
+     * @return Interpolated colour 
+     */
     template<class T>
-    T lerp(T s, T e, float t) {
+    T lerp(T s, T e, float t)
+    {
         return s + (e - s) * t;
     }
 
-    template<class T>
-    T cerp(T a, T b, float x) {
-        float ft = x * M_PI;
-        float f = (1.0 - cos(ft)) / 2.0;
-        return a * (1.0 - f) + b * f;
-    }
-
-    class GradientColor {
+    /**
+     * @brief Gradient colour
+     * 
+     */
+    class GradientColor
+    {
         public:
             float r, g, b, a;
 
@@ -44,12 +59,25 @@ namespace Gradient {
             const GradientColor operator*(const float&) const;
     };
 
+    /**
+     * @brief Gradient class
+     * 
+     * @tparam T Colour type
+     */
     template<class T>
-    class Gradient {
+    class Gradient
+    {
         std::vector<GradientStop<T>> stops;
 
         public:
-            void addColorStop(float t, T val) {
+            /**
+             * @brief Add a colour stop
+             * 
+             * @param t 
+             * @param val 
+             */
+            void addColorStop(float t, T val)
+            {
                 typename std::vector<GradientStop<T>>::iterator it;
 
                 for (it = stops.begin(); it != stops.end(); it++) {
@@ -59,7 +87,14 @@ namespace Gradient {
                 stops.insert(it, GradientStop<T>(t, val));
             }
 
-            T getColorAt(float t) {
+            /**
+             * @brief Get the colour at a specfic point
+             * 
+             * @param t 
+             * @return T 
+             */
+            T getColorAt(float t)
+            {
                 typename std::vector<GradientStop<T>>::iterator it;
                 GradientStop<T> start, stop;
                 for (it = stops.begin(); it != stops.end(); it++) {

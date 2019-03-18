@@ -12,6 +12,7 @@
 
 namespace Galactic
 {
+    // TODO: Remove
     class GrassRenderer : public IRenderable
     {
         public:

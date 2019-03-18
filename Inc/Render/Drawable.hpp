@@ -7,15 +7,46 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Helper class to draw DirectX geometry
+     * 
+     * @tparam VertexType 
+     * @tparam IndexType 
+     */
     template <class VertexType, class IndexType = uint16_t>
     class Drawable
     {
         public:
+            /**
+             * @brief Construct a new Drawable object
+             * 
+             * @param context 
+             * @param topology 
+             */
             Drawable(ID3D11DeviceContext *context, D3D_PRIMITIVE_TOPOLOGY topology);
+
+            /**
+             * @brief Destroy the Drawable object
+             * 
+             */
             ~Drawable() { Cleanup(); }
 
+            /**
+             * @brief Create the buffers
+             * 
+             */
             void Init();
+
+            /**
+             * @brief Draw the geometry
+             * 
+             */
             void Draw();
+
+            /**
+             * @brief Clean up resources
+             * 
+             */
             void Cleanup();
             
         private:

@@ -8,12 +8,38 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Randomly generate planets
+     * 
+     */
     class PlanetGenerator
     {
         public:
+            /**
+             * @brief Construct a new Planet Generator object
+             * 
+             * @param context 
+             */
             PlanetGenerator(ID3D11DeviceContext *context);
 
+            /**
+             * @brief Create a rocky planet
+             * 
+             * @param name 
+             * @param mass 
+             * @param radius 
+             * @return std::unique_ptr<IPlanet> 
+             */
             std::unique_ptr<IPlanet> CreateRocky(std::string name, double mass, double radius);
+
+            /**
+             * @brief Create a gas giant planet
+             * 
+             * @param name 
+             * @param mass 
+             * @param radius 
+             * @return std::unique_ptr<IPlanet> 
+             */
             std::unique_ptr<IPlanet> CreateGasGiant(std::string name, double mass, double radius);
 
         private:

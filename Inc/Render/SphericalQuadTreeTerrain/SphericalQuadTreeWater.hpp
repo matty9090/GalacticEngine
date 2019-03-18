@@ -16,18 +16,38 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Shader constant buffer for the water
+     * 
+     */
     struct WaterBuffer
     {
         float Scroll;
         float p0, p1, p2;
     };
 
+    /**
+     * @brief Implementation of spherical quadtree water
+     * 
+     */
     class SphericalQuadTreeWater : public ISphericalTerrain
     {
         public:
+            /**
+             * @brief Construct a new Spherical Quad Tree Water object
+             * 
+             * @param deviceContext 
+             * @param planet 
+             */
             SphericalQuadTreeWater(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, IPlanet *planet);
 
+            /**
+             * @brief Generate the geometry
+             * 
+             */
             void Generate();
+
+            // TODO: Make private
             void CreateEffect();
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);

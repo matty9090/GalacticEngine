@@ -68,7 +68,7 @@ namespace Galactic
     /**
      * @brief Set the Split Distance
      * 
-     * @param Distance from camera to terrainnode in which it will split the quadtree
+     * @param d Distance from camera to terrainnode in which it will split the quadtree
      */
     void SetSplitDistance(float d);
 
@@ -82,7 +82,7 @@ namespace Galactic
     /**
      * @brief Set the Grid Size
      * 
-     * @param size_t Grid size
+     * @param gs Grid size
      */
     void SetGridSize(size_t gs);
 
@@ -96,26 +96,52 @@ namespace Galactic
     /**
      * @brief Set the max quadtree Splits Per Frame
      * 
-     * @param Splits per frame
+     * @param splits Splits per frame
      */
     void SetSplitsPerFrame(size_t splits);
 
     /**
      * @brief Get the max quadtree Splits Per Frame
      * 
-     * @return size_t splits per frame
+     * @return size_t Splits per frame
      */
     size_t GetSplitsPerFrame();
 
     /**
      * @brief Create a Star System with the specificed type
      * 
-     * @param name name of the star system
-     * @param type 
+     * @param name of the star system
+     * @param type of the star sytem
      * @return std::unique_ptr<Galactic::IStarSystem> 
      */
     std::unique_ptr<Galactic::IStarSystem> CreateStarSystem(std::string name, EStarSystem type);
+
+    /**
+     * @brief Create a Star
+     * 
+     * @param deviceContext 
+     * @param name of the star
+     * @return std::unique_ptr<Galactic::IStar> Pointer to the newly created star object
+     */
     std::unique_ptr<Galactic::IStar> CreateStar(ID3D11DeviceContext *deviceContext, std::string name);
+
+    /**
+     * @brief Create a Planet
+     * 
+     * @param deviceContext
+     * @param name of the planet
+     * @return std::unique_ptr<Galactic::IPlanet> Pointer to the newly created planet object
+     */
     std::unique_ptr<Galactic::IPlanet> CreatePlanet(ID3D11DeviceContext *deviceContext, std::string name);
+
+    /**
+     * @brief Create a Flat Earth
+     * 
+     * @param deviceContext 
+     * @param name of the flat earth shaped 'planet'?
+     * @param mass of the flat earth
+     * @param radius of the flat earth
+     * @return std::unique_ptr<Galactic::FlatEarth> Pointer to the newly created flat earth object
+     */
     std::unique_ptr<Galactic::FlatEarth> CreateFlatEarth(ID3D11DeviceContext *deviceContext, std::string name, long double mass, double radius);
 }

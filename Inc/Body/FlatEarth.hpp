@@ -3,6 +3,10 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Flat Earth body
+     * 
+     */
     class FlatEarth : public IBody
     {
         public:
@@ -16,7 +20,14 @@ namespace Galactic
             void Generate(EDetail detail = EDetail::Medium);
 
             void SetMass(long double mass) { m_mass = mass; };
+
+            /**
+             * @brief Set the radius
+             * 
+             * @param radius 
+             */
             void SetRadius(long double radius) { m_radius = radius; };
+
             void SetPosition(DirectX::SimpleMath::Vector3 pos) { m_position = pos; }
             void SetVelocity(DirectX::SimpleMath::Vector3 vel) { m_velocity = vel; }
             void SetRotation(DirectX::SimpleMath::Vector3 rot) { m_rotation = rot; }

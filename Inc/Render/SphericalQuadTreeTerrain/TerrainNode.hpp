@@ -11,6 +11,10 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Planet terrain vertex
+     * 
+     */
     struct PlanetVertex
     {
         DirectX::SimpleMath::Vector3 position1;
@@ -25,6 +29,10 @@ namespace Galactic
         bool calcNormal;
     };
 
+    /**
+     * @brief Constant buffer to send matrices to shader
+     * 
+     */
     struct MatrixBuffer
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
@@ -35,12 +43,20 @@ namespace Galactic
         float p1, p2, p3;                          // 12 bytes
     };
 
+    /**
+     * @brief Square
+     * 
+     */
     struct Square
     {
         float x, y;
         float size;
     };
     
+    /**
+     * @brief Quadtree node
+     * 
+     */
     class TerrainNode : public IRenderable, public Drawable<PlanetVertex>
     {
         public:
@@ -49,6 +65,11 @@ namespace Galactic
 
             TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlanet *planet, Square bounds, int quad, bool simple = false);
 
+            /**
+             * @brief Set the world matrix
+             * 
+             * @param m 
+             */
             void SetMatrix(DirectX::SimpleMath::Matrix m) { m_world = m; }
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
@@ -56,23 +77,97 @@ namespace Galactic
 
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
 
+            /**
+             * @brief Generate the geometry
+             * 
+             */
             void Generate();
+
+            /**
+             * @brief Is this node a leaf node (aka has no children)
+             * 
+             * @return is leaf
+             */
             bool IsLeaf() { return m_children[0] == nullptr; }
+
+            /**
+             * @brief Split the node into 4 nodes
+             * 
+             */
             void Split();
+
+            /**
+             * @brief Merge the child nodes back into 1 node
+             * 
+             */
             void Merge();
+
+            /**
+             * @brief Clean up resources
+             * 
+             */
             void Release();
 
+            /**
+             * @brief Is this node the root node (aka has no parent)
+             * 
+             * @return true 
+             * @return false 
+             */
             bool IsRoot() const { return m_parent == nullptr; }
+
+            /**
+             * @brief Set the debug identifier
+             * 
+             * @param name 
+             */
             void SetDebugName(std::string name) { m_dbgName = name; }
+
+            /**
+             * @brief Set the debug colour
+             * 
+             * @param col 
+             */
             void SetDebugColour(DirectX::SimpleMath::Color col) { m_dbgCol = col; }
+
+            /**
+             * @brief Find neighbour nodes and make sure the edges line up without cracks due to LOD difference
+             * 
+             */
             void FixEdges();
 
+            /**
+             * @brief Get the depth of the node
+             * 
+             * @return int 
+             */
             int GetDepth() const { return m_depth; }
 
+            /**
+             * @brief Get a vertex
+             * 
+             * @param i 
+             * @return PlanetVertex& 
+             */
             __forceinline PlanetVertex &GetVertex(int i) { return m_vertices[i]; }
+
+            /**
+             * @brief Get a specific edges indices
+             * 
+             * @param edge 
+             * @return std::vector<uint16_t>
+             */
             __forceinline std::vector<uint16_t> GetEdge(EDir edge) const { return m_edges[edge]; }
+
+            /**
+             * @brief Get a specific child node
+             * 
+             * @param dir 
+             * @return TerrainNode*
+             */
             __forceinline TerrainNode *GetChild(int dir) const { return m_children[dir].get(); }
 
+            /// Split distance from camera to terrain node
             static float SplitDistance;
 
         private:
@@ -107,14 +202,42 @@ namespace Galactic
 
             DirectX::SimpleMath::Matrix m_world;
 
+            // TODO: Remove
             DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
+
+            // TODO: Remove
             DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
 
+            /**
+             * @brief Calculate normals
+             * 
+             */
             void CalculateNormals();
+
+            /**
+             * @brief Tell neighbours that this node's LOD has changed
+             * 
+             */
             void NotifyNeighbours();
             
+            // TODO: Remove
             void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
+
+            /**
+             * @brief Get the all Greater than or qqual depth Neighbours
+             * 
+             * @param dir 
+             * @return TerrainNode* 
+             */
             TerrainNode *GetGreaterThanOrEqualNeighbour(int dir) const;
+
+            /**
+             * @brief Get the smaller depth neighbours
+             * 
+             * @param neighbour 
+             * @param dir 
+             * @return std::vector<TerrainNode*> 
+             */
             std::vector<TerrainNode*> GetSmallerNeighbours(TerrainNode *neighbour, int dir) const;
     };
 }

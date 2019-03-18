@@ -8,6 +8,10 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Star implementation
+     * 
+     */
     class Star : public IStar, public ILightSource
     {
         public:
@@ -21,7 +25,14 @@ namespace Galactic
 
             void SetRadius(double r) { m_radius = r; }
             void SetMass(long double mass) { m_mass = mass; }
+
+            /**
+             * @brief Set the colour of the star
+             * 
+             * @param col 
+             */
             void SetColour(DirectX::SimpleMath::Color col) { m_colour = col; }
+
             void SetTemperature(int kelvin) { m_temperature = kelvin; }
             void SetPosition(DirectX::SimpleMath::Vector3 pos) { m_position = pos; }
             void SetVelocity(DirectX::SimpleMath::Vector3 vel) { m_velocity = vel; }
@@ -34,7 +45,14 @@ namespace Galactic
             double                       GetRadius()   const { return m_radius; }
             std::string                  GetName()     const { return m_name; }
             long double                  GetMass()     const { return m_mass; }
+
+            /**
+             * @brief Get the colour of the star
+             * 
+             * @return DirectX::SimpleMath::Color 
+             */
             DirectX::SimpleMath::Color   GetColour()   const { return m_colour; }
+
             DirectX::SimpleMath::Matrix  GetMatrix()   const { return m_world; }
             DirectX::SimpleMath::Vector3 GetPosition() const { return m_position; }
             DirectX::SimpleMath::Vector3 GetVelocity() const { return m_velocity; }

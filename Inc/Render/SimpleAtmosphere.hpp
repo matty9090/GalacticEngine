@@ -9,11 +9,19 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Simple atmosphere vertex
+     * 
+     */
     struct AtmosphereVertex
     {
         DirectX::SimpleMath::Vector3 position;
     };
 
+    /**
+     * @brief Simple atmosphere constant buffer
+     * 
+     */
     struct AtmosphereBuffer
     {
         DirectX::SimpleMath::Matrix viewProj;      // 64 bytes
@@ -26,9 +34,19 @@ namespace Galactic
         float camHeight;                           // 4 bytes
     };
 
+    /**
+     * @brief Simple atmosphere renderer
+     * 
+     */
     class SimpleAtmosphere : public IAtmosphereRenderer, public Drawable<AtmosphereVertex>
     {
         public:
+            /**
+             * @brief Construct a new Simple Atmosphere object
+             * 
+             * @param context 
+             * @param planet 
+             */
             SimpleAtmosphere(ID3D11DeviceContext *context, IPlanet *planet);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);

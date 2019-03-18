@@ -1,0 +1,6 @@
+var searchData=
+[
+  ['wireframe',['Wireframe',['../class_galactic_1_1_i_body.html#a6a7155a03754e083eab334e474cca57e',1,'Galactic::IBody']]],
+  ['world',['world',['../struct_galactic_1_1_cloud_buffer.html#a309c3ea586d5fdf3f1b724330868dc3f',1,'Galactic::CloudBuffer::world()'],['../struct_galactic_1_1_atmosphere_buffer.html#a6738d6e68912528fc122864caad464a4',1,'Galactic::AtmosphereBuffer::world()'],['../struct_galactic_1_1_matrix_buffer.html#a3d1f36b36e62441c627b3aa87551581e',1,'Galactic::MatrixBuffer::world()']]],
+  ['worldviewproj',['worldViewProj',['../struct_galactic_1_1_billboard_buffer.html#a654d4a2db7b76a750f491d1b0e949ede',1,'Galactic::BillboardBuffer::worldViewProj()'],['../struct_galactic_1_1_cube_buffer.html#a274c8662aa6903f5e5e476812e7d54b1',1,'Galactic::CubeBuffer::worldViewProj()'],['../struct_galactic_1_1_scattered_atmosphere_buffer.html#a4368d108b44197f655c4ac1445b31ad8',1,'Galactic::ScatteredAtmosphereBuffer::worldViewProj()'],['../struct_galactic_1_1_star_buffer.html#a47908e3aba9d043e6f754314ef7a4693',1,'Galactic::StarBuffer::worldViewProj()'],['../struct_galactic_1_1_matrix_buffer.html#a9ac54e7eb2b75e91a8d91878e058c1a3',1,'Galactic::MatrixBuffer::worldViewProj()']]]
+];

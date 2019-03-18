@@ -11,22 +11,45 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Matrix buffer for a cube object
+     * 
+     */
     struct CubeBuffer
     {
         DirectX::SimpleMath::Matrix worldViewProj; // 64 bytes
     };
 
+    /**
+     * @brief Cube renderer
+     * 
+     */
     class Cube : public IRenderable, public Galactic::Drawable<DirectX::VertexPositionColor>
     {
         public:
+            /**
+             * @brief Construct a new Cube object
+             * 
+             * @param context 
+             */
             Cube(ID3D11DeviceContext *context);
 
             void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
             void Update(float dt);
             void Reset();
 
+            /**
+             * @brief Set the position
+             * 
+             * @param position 
+             */
             void SetPosition(DirectX::SimpleMath::Vector3 position) { m_position = position; }
 
+            /**
+             * @brief Get the world matrix
+             * 
+             * @return DirectX::SimpleMath::Matrix& 
+             */
             DirectX::SimpleMath::Matrix &GetMatrix() { return m_world; }
 
         private:

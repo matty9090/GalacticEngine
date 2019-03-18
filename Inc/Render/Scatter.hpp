@@ -6,6 +6,10 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Atmospheric scattering constant buffer
+     * 
+     */
     struct ScatterBuffer
     {
         DirectX::SimpleMath::Vector3 v3CameraPos;
@@ -28,6 +32,12 @@ namespace Galactic
         float g2;
     };
 
+    /**
+     * @brief Get the scatter constant buffer
+     * 
+     * @param planet 
+     * @return ScatterBuffer 
+     */
     inline ScatterBuffer GetScatterBuffer(IPlanet *planet)
     {
         float radius = (float)(planet->GetRadius() / Constants::Scale);

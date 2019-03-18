@@ -6,6 +6,10 @@
 
 namespace Galactic
 {
+    /**
+     * @brief IPlanet renderer interface
+     * 
+     */
     class IPlanetRenderer : public IRenderable {
         public:
             virtual DirectX::SimpleMath::Vector3 GetPoint(DirectX::SimpleMath::Vector3 normal) = 0;

@@ -6,13 +6,35 @@
 
 namespace Galactic
 {
+    /**
+     * @brief DirectX constant buffer helper
+     * 
+     * @tparam T data type to pass to shader
+     */
     template <class T>
     class ConstantBuffer
     {
         public:
+            /**
+             * @brief Construct a new Constant Buffer object
+             * 
+             * @param device 
+             */
             ConstantBuffer(ID3D11Device *device);
 
+            /**
+             * @brief Set the data of the buffer
+             * 
+             * @param deviceContext 
+             * @param data 
+             */
             void SetData(ID3D11DeviceContext *deviceContext, const T &data);
+
+            /**
+             * @brief Get the DirectX buffer
+             * 
+             * @return ID3D11Buffer** 
+             */
             ID3D11Buffer **GetBuffer() { return m_buffer.GetAddressOf(); }
 
         private:
@@ -31,7 +53,7 @@ namespace Galactic
 
         DX::ThrowIfFailed(device->CreateBuffer(&desc, nullptr, m_buffer.ReleaseAndGetAddressOf()));
     }
-
+    
     template<class T>
     inline void ConstantBuffer<T>::SetData(ID3D11DeviceContext *deviceContext, const T &data)
     {

@@ -10,10 +10,25 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Planet implementation
+     * 
+     */
     class Planet : public IPlanet
     {
         public:
+            /**
+             * @brief Construct a new Planet object
+             * 
+             * @param deviceContext 
+             * @param name of the planet
+             */
             Planet(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, std::string name);
+
+            /**
+             * @brief Destroy the Planet object
+             * 
+             */
             ~Planet();
 
             void Generate(EDetail detail = EDetail::Medium);
@@ -21,6 +36,8 @@ namespace Galactic
             void Update(float dt);
             void Reset();
             void ReadSettings(std::string file);
+
+            // TODO: Add to IPlanet interface
             void SetSettings(PlanetSettings settings) { m_settings = settings; }
 
             void EnableWater(bool enabled) { m_waterEnabled = enabled; Generate(m_detail); }

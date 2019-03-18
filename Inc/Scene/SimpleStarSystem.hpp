@@ -7,6 +7,10 @@
 
 namespace Galactic
 {
+    /**
+     * @brief Simple star system
+     * 
+     */
     class SimpleStarSystem : public IStarSystem
     {
         public:
