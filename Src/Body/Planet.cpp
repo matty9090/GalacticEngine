@@ -96,7 +96,7 @@ void Planet::Generate(EDetail detail)
     if (m_atmEnabled) m_atmosphere = CreateAtmosphereRenderer(m_deviceContext, this, m_detail);
     if (m_cloudsEnabled) m_clouds = std::make_unique<NoiseCloudRenderer>(m_deviceContext.Get(), this);
     if (m_waterEnabled) m_water = std::make_unique<SphericalQuadTreeWater>(m_deviceContext.Get(), this);
-
+    
     if (m_isGenerated)
         m_renderer->GetMatrix() = matrix;
 
