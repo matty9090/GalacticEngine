@@ -5,6 +5,8 @@
 
 #include <mutex>
 
+//std::mutex d_mutex;
+
 namespace Galactic
 {
     template <class VertexType, class IndexType = uint16_t>
@@ -12,7 +14,6 @@ namespace Galactic
     {
         public:
             Drawable(ID3D11DeviceContext *context, D3D_PRIMITIVE_TOPOLOGY topology);
-            ~Drawable() { Cleanup(); }
 
             void Init();
             void Draw();

@@ -6,8 +6,8 @@
       0.52999997138977051,
       1
     ],
-    "Diffuse": "rocks01d.jpg",
-    "Normal": "rocks01n.jpg"
+    "Diffuse": "test0.png",
+    "Normal": "grass01n.png"
   },
   "Beach": {
     "Colour": [
@@ -17,7 +17,7 @@
       1
     ],
     "Diffuse": "sand01d.jpg",
-    "Normal": "whiten.png"
+    "Normal": "grass01n.png"
   },
   "Desert": {
     "Colour": [
@@ -27,7 +27,7 @@
       1
     ],
     "Diffuse": "sand01d.jpg",
-    "Normal": "whiten.png"
+    "Normal": "grass01n.png"
   },
   "DryDesert": {
     "Colour": [
@@ -36,8 +36,8 @@
       0.54000002145767212,
       1
     ],
-    "Diffuse": "rocks02d.jpg",
-    "Normal": "rocks02n.jpg"
+    "Diffuse": "sand01d.jpg",
+    "Normal": "grass01n.png"
   },
   "Forest": {
     "Colour": [
@@ -46,7 +46,7 @@
       0.34999999403953552,
       1
     ],
-    "Diffuse": "grass04d.png",
+    "Diffuse": "grass03d.jpg",
     "Normal": "grass01n.png"
   },
   "GrassLand": {
@@ -56,8 +56,8 @@
       0.33000001311302185,
       1
     ],
-    "Diffuse": "grass05d.png",
-    "Normal": "clovern.png"
+    "Diffuse": "grass01d.jpg",
+    "Normal": "grass01n.png"
   },
   "Ocean": {
     "Colour": [
@@ -76,8 +76,8 @@
       0.33000001311302185,
       1
     ],
-    "Diffuse": "rocks03d.jpg",
-    "Normal": "rocks03n.jpg"
+    "Diffuse": "rock01d.png",
+    "Normal": "rock01n.png"
   },
   "ShrubLand": {
     "Colour": [
@@ -86,7 +86,7 @@
       0.46000000834465027,
       1
     ],
-    "Diffuse": "grass06d.png",
+    "Diffuse": "grass02d.jpg",
     "Normal": "grass02n.jpg"
   },
   "Snowy": {
@@ -126,8 +126,8 @@
       0.25999999046325684,
       1
     ],
-    "Diffuse": "grass07d.png",
-    "Normal": "clovern.png"
+    "Diffuse": "grass01d.jpg",
+    "Normal": "grass01n.png"
   },
   "TropRainForest": {
     "Colour": [
@@ -136,8 +136,8 @@
       0.33000001311302185,
       1
     ],
-    "Diffuse": "grass08d.png",
-    "Normal": "clovern.png"
+    "Diffuse": "grass01d.jpg",
+    "Normal": "grass01n.png"
   },
   "Tundra": {
     "Colour": [
@@ -146,7 +146,7 @@
       0.67000001668930054,
       1
     ],
-    "Diffuse": "snow01d.png",
-    "Normal": "snow01n.png"
+    "Diffuse": "grass03d.jpg",
+    "Normal": "grass01n.png"
   }
 }
