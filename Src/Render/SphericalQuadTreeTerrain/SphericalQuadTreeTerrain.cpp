@@ -266,6 +266,7 @@ void SphericalQuadTreeTerrain::Reset()
 {
     m_texBiomes->Release();
     m_textures->Release();
+    m_normalMaps->Release();
     m_states.reset();
     m_effect->Reset();
 

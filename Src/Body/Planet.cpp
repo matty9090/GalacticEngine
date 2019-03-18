@@ -143,6 +143,8 @@ void Planet::Update(float dt)
 
 void Planet::Reset()
 {
+    m_isGenerated = false;
+
     if (m_renderer) m_renderer->Reset();
     if (m_atmosphere) m_atmosphere->Reset();
     if (m_clouds) m_clouds->Reset();
