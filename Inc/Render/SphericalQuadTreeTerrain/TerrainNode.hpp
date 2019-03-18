@@ -202,12 +202,6 @@ namespace Galactic
 
             DirectX::SimpleMath::Matrix m_world;
 
-            // TODO: Remove
-            DirectX::SimpleMath::Vector3 CalculateNormal(float x, float y, float step);
-
-            // TODO: Remove
-            DirectX::SimpleMath::Vector3 PointToSphere(DirectX::SimpleMath::Vector3 point);
-
             /**
              * @brief Calculate normals
              * 

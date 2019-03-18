@@ -461,48 +461,6 @@ void TerrainNode::NotifyNeighbours()
         n->FixEdges();
 }
 
-Vector3 TerrainNode::CalculateNormal(float x, float y, float step)
-{
-    std::array<float, 9> s;
-    Vector3 n;
-    uint32_t i = 0;
-
-    std::string tex;
-    float height = 0.0f;
-    Vector2 biome;
-
-    for (int yy = -1; yy <= 1; yy++) {
-        for (int xx = -1; xx <= 1; xx++) {
-            Vector3 v = Vector3(x + (float)xx * step, 0.5f, y + (float)yy * step);
-            v.Normalize();
-            v = Vector3::TransformNormal(v, m_world);
-
-            m_terrain->GetHeight(v, height, biome, tex);
-
-            s[i++] = height;
-        }
-    }
-
-    float scale = 0.6f;
-
-    n.x = scale * -(s[2] - s[0] + 2 * (s[5] - s[3]) + s[8] - s[6]);
-    n.z = scale * -(s[6] - s[0] + 2 * (s[7] - s[1]) + s[8] - s[2]);
-    n.y = 1.0;
-
-    n.Normalize();
-
-    return n;
-}
-
-Vector3 TerrainNode::PointToSphere(DirectX::SimpleMath::Vector3 p)
-{
-    float x2 = p.x * p.x, y2 = p.y * p.y, z2 = p.z * p.z;
-
-    return Vector3(p.x * sqrtf(1.0f - y2 * 0.5f - z2 * 0.5f + (y2 * z2) * 0.33333333f),
-                   p.y * sqrtf(1.0f - z2 * 0.5f - x2 * 0.5f + (z2 * x2) * 0.33333333f),
-                   p.z * sqrtf(1.0f - x2 * 0.5f - y2 * 0.5f + (x2 * y2) * 0.33333333f));
-}
-
 std::vector<TerrainNode*> TerrainNode::GetSmallerNeighbours(TerrainNode *neighbour, int dir) const {
     std::vector<TerrainNode*> neighbours;
     std::queue<TerrainNode*> nodes;
