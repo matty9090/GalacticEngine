@@ -380,20 +380,6 @@ void TerrainNode::FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t
             m_vertices[m_edges[dir][i]].normal2 = neighbour->GetVertex(nEdge[i]).normal2;
         }
     }
-
-    if (diff < 1)
-        return;
-
-    for (int i = 0; i < grid - 2; i += 2)
-    {
-        /*const Vector3 p1 = m_vertices[m_edges[dir][i + 0]].position1;
-        const Vector3 p2 = m_vertices[m_edges[dir][i + 2]].position1;
-        const Vector3 n1 = m_vertices[m_edges[dir][i + 2]].normal1;
-        const Vector3 n2 = m_vertices[m_edges[dir][i + 2]].normal1;
-
-        m_vertices[m_edges[dir][i + 1]].position1 = (p1 + p2) / 2;
-        m_vertices[m_edges[dir][i + 1]].normal1 = (n1 + n2) / 2;*/
-    }
 }
 
 void TerrainNode::CalculateNormals()

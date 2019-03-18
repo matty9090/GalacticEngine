@@ -41,9 +41,6 @@ namespace Galactic
              */
             virtual size_t GetGridSize() const = 0;
 
-            //TODO: make private
-            virtual void SetRenderContext() = 0; 
-
             /**
              * @brief Get the biome from the lookup texture
              * 

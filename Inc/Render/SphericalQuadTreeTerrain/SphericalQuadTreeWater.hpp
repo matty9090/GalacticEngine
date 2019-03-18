@@ -59,7 +59,6 @@ namespace Galactic
             __forceinline std::string GetBiome(const DirectX::SimpleMath::Vector2 &lookup);
             __forceinline void GetHeight(const DirectX::SimpleMath::Vector3 &point, float &height, DirectX::SimpleMath::Vector2 &biomeLookup, std::string &texIndex);
 
-            void SetRenderContext();
             DirectX::SimpleMath::Matrix GetMatrix() const { return m_world; }
             Effect *GetEffect() const { return m_effect; };
             Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() const { return m_context; };
@@ -94,5 +93,6 @@ namespace Galactic
             float m_radius;
 
             void InitEffect();
+            void SetRenderContext();
     };
 }
