@@ -328,6 +328,10 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+#VSCode
+.vscode/
+
 Resources/Fonts/MakeSpriteFont.exe
 Resources/Packs/
 errors.txt
