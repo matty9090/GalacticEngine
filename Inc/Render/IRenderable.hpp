@@ -7,6 +7,11 @@
 
 namespace Galactic
 {
+	/*! \brief Brief description.
+	*         Brief description continued.
+	*
+	*  Detailed description starts here.
+	*/
     class IRenderable {
         public:
             virtual void Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj) = 0;
