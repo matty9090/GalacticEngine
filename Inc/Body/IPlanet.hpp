@@ -94,6 +94,12 @@ namespace Galactic
             virtual void ReadSettings(std::string file) = 0;
 
             /**
+             * @brief Set the planet settings
+             *
+             */
+            virtual void SetSettings(PlanetSettings settings) = 0;
+
+            /**
              * @brief Set the radius
              * 
              * @param r 

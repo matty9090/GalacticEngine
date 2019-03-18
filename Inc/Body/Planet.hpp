@@ -36,8 +36,6 @@ namespace Galactic
             void Update(float dt);
             void Reset();
             void ReadSettings(std::string file);
-
-            // TODO: Add to IPlanet interface
             void SetSettings(PlanetSettings settings) { m_settings = settings; }
 
             void EnableWater(bool enabled) { m_waterEnabled = enabled; Generate(m_detail); }
