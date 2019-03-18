@@ -214,7 +214,10 @@ namespace Galactic
              */
             void NotifyNeighbours();
             
-            // TODO: Remove
+            /**
+             * @brief Update a specific edge to connect normals with neighbouring node
+             *
+             */
             void FixEdge(EDir dir, TerrainNode *neighbour, std::vector<uint16_t> nEdge, int depth);
 
             /**
