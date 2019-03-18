@@ -169,7 +169,10 @@ namespace Galactic
              */
             virtual bool IsAtmosphereEnabled() const = 0;
 
-            // TODO: make private
+            /**
+             * @brief Increment vertices of planet (internally used by TerrainNode)
+             *
+             */
             virtual void IncrementVertices(int num) = 0;
 
             /**
