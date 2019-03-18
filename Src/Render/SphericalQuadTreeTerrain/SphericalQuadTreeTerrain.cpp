@@ -223,7 +223,7 @@ void SphericalQuadTreeTerrain::InitEffect()
 #endif
 }
 
-void Galactic::SphericalQuadTreeTerrain::LoadTextures()
+void SphericalQuadTreeTerrain::LoadTextures()
 {
     std::cout << "Reading biomes\n";
 
@@ -283,6 +283,8 @@ void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, 
     auto &settings = m_planet->GetSettings();
     
     float m = (m_biomeMap.GetNoise(p.x, p.y, p.z) + 1.0f) / 2.0f;
+    m = (m - 0.2f) / 0.64f;
+
     float mod = 1.0f;
 
     float e = m_noiseMaps[0].GetNoise(p.x, p.y, p.z);
@@ -295,15 +297,16 @@ void SphericalQuadTreeTerrain::GetHeight(const DirectX::SimpleMath::Vector3 &p, 
     }
 
     e = 1.0f - ((e + 1.0f) / 2.0f);
-
-    if (e < hmin) hmin = e;
-    if (e > hmax) hmax = e;
+    e = (e - 0.2f) / 0.5f;
 
     texIndex    = settings.Biomes.Sample(m, e);
     biomeLookup = Vector2(m, e);
     height      = h;
 
 #ifdef _DEBUG
+    if (e < hmin) hmin = e;
+    if (e > hmax) hmax = e;
+
     counts[texIndex]++;
 #endif
 }

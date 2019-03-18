@@ -167,7 +167,7 @@ void Game::Update(DX::StepTimer const& timer)
     m_system->SetCameraPos(m_camera->GetPosition());
     m_system->Update(dt * 0.01f);
 
-    m_fe->Update(dt * 0.01f);
+    //m_fe->Update(dt * 0.01f);
 }
 
 // Draws the scene.
@@ -185,7 +185,7 @@ void Game::Render()
     auto proj = m_camera->GetProjectionMatrix();
 
     m_system->Render(view, proj);
-    m_fe->Render(view, proj);
+    //m_fe->Render(view, proj);
 
     Present();
 }
@@ -348,13 +348,13 @@ void Game::CreateDevice()
     
     Galactic::PlanetGenerator gen(m_d3dContext.Get());
 
-    auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet"/*, 5.683e26, 58232.0*/);
-    planet->SetInfluence(star.get());
-    planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
-    planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
-    //planet->SetAtmosphereHeight(800.0f);
-    planet->ReadSettings("settings.json");
-    planet->Generate(Galactic::EDetail::High);
+    //auto planet = Galactic::CreatePlanet(m_d3dContext.Get(), "Planet"/*, 5.683e26, 58232.0*/);
+    //planet->SetInfluence(star.get());
+    //planet->SetPosition(Vector3(500.0f, 0.0f, -160.0f));
+    //planet->SetVelocity(Vector3(0.0f, 0.0f, 1e6));
+    ////planet->SetAtmosphereHeight(800.0f);
+    //planet->ReadSettings("settings.json");
+    //planet->Generate(Galactic::EDetail::High);
 
     auto moon = gen.CreateRocky("Moon", 5.971e24, 6371.0);
     //moon->SetInfluence(planet.get());
@@ -364,11 +364,11 @@ void Game::CreateDevice()
     moon->ReadSettings("settings.json");
     moon->Generate(Galactic::EDetail::High);
 
-    m_fe = Galactic::CreateFlatEarth(m_d3dContext.Get(), "Flat Earth", 5e26, 60000.0);
-    //m_fe->SetInfluence(planet.get());
+    /*m_fe = Galactic::CreateFlatEarth(m_d3dContext.Get(), "Flat Earth", 5e26, 60000.0);
+    m_fe->SetInfluence(planet.get());
     m_fe->SetPosition(Vector3(0.0f, 0.0f, 100.0f));
     m_fe->SetVelocity(Vector3(-0.8e5, 0.0f, 0.3e6));
-    m_fe->Generate();
+    m_fe->Generate();*/
 
     m_system->AddLightSource(dynamic_cast<Galactic::ILightSource*>(star.get()));
     m_system->AddBody(std::move(star));
