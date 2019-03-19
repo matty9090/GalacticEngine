@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeWater::GridSize = 5;
 #else
-    size_t SphericalQuadTreeWater::GridSize = 41;
+    size_t SphericalQuadTreeWater::GridSize = 23;
 #endif
 
 bool   SphericalQuadTreeWater::CancelGeneration = false;
@@ -135,11 +135,11 @@ void SphericalQuadTreeWater::InitEffect()
     std::wstring vs = L"Shaders/PlanetVS.fx";
     std::wstring ps = (m_planet->IsAtmosphereEnabled()) ? L"Shaders/WaterPS.fx" : L"Shaders/WaterNoAtmPS.fx";
 
-#ifdef _DEBUG
-    m_effect = new Effect(m_device.Get(), vs, ps, els, num, false);
-#else
+//#ifdef _DEBUG
+    //m_effect = new Effect(m_device.Get(), vs, ps, els, num, false);
+//#else
     m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), vs, ps, els, num, false);
-#endif
+//#endif
 }
 
 void SphericalQuadTreeWater::Render(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj)

@@ -264,7 +264,6 @@ void TerrainNode::Split()
         m_children[SE]->SetDebugName(m_dbgName + "_" + std::to_string(SE));
         m_children[SW]->SetDebugName(m_dbgName + "_" + std::to_string(SW));
 #endif
-
         std::vector<std::thread> threads;
 
         for (auto &child : m_children)

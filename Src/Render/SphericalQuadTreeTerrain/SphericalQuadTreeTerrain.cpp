@@ -10,7 +10,7 @@ using namespace DirectX::SimpleMath;
 #ifdef _DEBUG
     size_t SphericalQuadTreeTerrain::GridSize = 5;
 #else
-    size_t SphericalQuadTreeTerrain::GridSize = 41;
+    size_t SphericalQuadTreeTerrain::GridSize = 23;
 #endif
 
 bool   SphericalQuadTreeTerrain::CancelGeneration = false;
@@ -152,23 +152,33 @@ void SphericalQuadTreeTerrain::Generate()
         Matrix::CreateRotationZ(-XM_PI / 2)
     };
 
+    std::vector<std::thread> threads;
+
     for (int i = 0; i < 6; ++i)
     {
         m_faces[i] = std::make_unique<TerrainNode>(this, nullptr, m_planet, Square{ -0.5f, -0.5f, 1.0f }, 0);
         m_faces[i]->SetMatrix(orientations[i]);
-        
-//#ifdef _DEBUG
-        m_faces[i]->SetDebugName(std::to_string(i));
-//#endif
     }
     
     for (int i = 0; i < 6; ++i) {
-        m_faces[i]->Generate();
+        threads.push_back(std::thread([&]() {
+            m_faces[i]->Generate();
+        }));
     }
 
+    for (auto &t : threads)
+        t.join();
+
+    threads.clear();
+
     for (int i = 0; i < 6; ++i) {
-        m_faces[i]->Init();
+        threads.push_back(std::thread([&]() {
+            m_faces[i]->Init();
+        }));
     }
+
+    for (auto &t : threads)
+        t.join();
 
 #ifdef _DEBUG
     for (auto c : counts)
@@ -225,11 +235,11 @@ void SphericalQuadTreeTerrain::InitEffect()
     std::wstring vs = L"Shaders/PlanetVS.fx";
     std::wstring ps = (m_planet->IsAtmosphereEnabled()) ? L"Shaders/PlanetPS.fx" : L"Shaders/PlanetNoAtmPS.fx";
 
-#ifdef _DEBUG
-    m_effect = new Effect(m_device.Get(), vs, ps, els, num, false);
-#else
+//#ifdef _DEBUG
+    //m_effect = new Effect(m_device.Get(), vs, ps, els, num, false);
+//#else
     m_effect = EffectManager::getInstance().GetEffect(m_device.Get(), vs, ps, els, num, false);
-#endif
+//#endif
 }
 
 void SphericalQuadTreeTerrain::LoadTextures()
