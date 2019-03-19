@@ -2,7 +2,6 @@
 
 #include "IBody.hpp"
 #include "Render/Gradient.hpp"
-#include "Render/GrassDistributor.hpp"
 #include "Noise/Biome.hpp"
 
 namespace Galactic

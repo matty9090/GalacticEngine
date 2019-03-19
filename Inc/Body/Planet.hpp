@@ -5,7 +5,6 @@
 #include "Render/IPlanetRenderer.hpp"
 #include "Render/IAtmosphereRenderer.hpp"
 #include "Render/NoiseCloudRenderer.hpp"
-#include "Render/GrassRenderer.hpp"
 #include "Render/SphericalQuadTreeTerrain/ISphericalTerrain.hpp"
 
 namespace Galactic

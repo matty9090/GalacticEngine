@@ -179,12 +179,6 @@
     <ClInclude Include="Inc\Render\DirectX\TextureManager.hpp">
       <Filter>Render\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Render\GrassRenderer.hpp">
-      <Filter>Render\Body</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Render\GrassDistributor.hpp">
-      <Filter>Render\Body</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Body\FlatEarth.hpp">
       <Filter>Body</Filter>
     </ClInclude>
@@ -281,12 +275,6 @@
     </ClCompile>
     <ClCompile Include="Src\Render\DirectX\TextureManager.cpp">
       <Filter>Render\DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Render\GrassRenderer.cpp">
-      <Filter>Render\Body</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Render\GrassDistributor.cpp">
-      <Filter>Render\Body</Filter>
     </ClCompile>
     <ClCompile Include="Src\Body\FlatEarth.cpp">
       <Filter>Body</Filter>
