@@ -6,7 +6,7 @@
 
 namespace Galactic {
     /**
-     * @brief IUAtmosphere renderer interface
+     * @brief IAtmosphere renderer interface
      * 
      */
     class IAtmosphereRenderer : public IRenderable
