@@ -215,8 +215,6 @@
     <ClInclude Include="Inc\Render\DirectX\TextureManager.hpp" />
     <ClInclude Include="Inc\Render\Drawable.hpp" />
     <ClInclude Include="Inc\Render\Gradient.hpp" />
-    <ClInclude Include="Inc\Render\GrassDistributor.hpp" />
-    <ClInclude Include="Inc\Render\GrassRenderer.hpp" />
     <ClInclude Include="Inc\Render\IAtmosphereRenderer.hpp" />
     <ClInclude Include="Inc\Render\IPlanetRenderer.hpp" />
     <ClInclude Include="Inc\Render\IRenderable.hpp" />
@@ -273,8 +271,6 @@
     <ClCompile Include="Src\Render\DirectX\EffectManager.cpp" />
     <ClCompile Include="Src\Render\DirectX\TextureManager.cpp" />
     <ClCompile Include="Src\Render\Gradient.cpp" />
-    <ClCompile Include="Src\Render\GrassDistributor.cpp" />
-    <ClCompile Include="Src\Render\GrassRenderer.cpp" />
     <ClCompile Include="Src\Render\NoiseCloudRenderer.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererHigh.cpp" />
     <ClCompile Include="Src\Render\PlanetRendererLow.cpp" />
