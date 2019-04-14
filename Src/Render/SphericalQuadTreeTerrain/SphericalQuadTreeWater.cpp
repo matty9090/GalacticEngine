@@ -23,7 +23,8 @@ SphericalQuadTreeWater::SphericalQuadTreeWater(Microsoft::WRL::ComPtr<ID3D11Devi
       m_world(planet->GetMatrix()),
       m_radius((float)(planet->GetSettings().Radius / Constants::Scale)),
       m_scroll(0.0f),
-      m_waterLevel(1.0f)
+      m_waterLevel(1.0f),
+	  m_effect(nullptr)
 {
     m_context->GetDevice(&m_device);
 

@@ -20,7 +20,8 @@ TerrainNode::TerrainNode(ISphericalTerrain *terrain, TerrainNode *parent, IPlane
       m_scale(bounds.size),
       m_visible(true),
       m_quad(quad),
-      m_simple(simple)
+      m_simple(simple),
+	  m_neighbours()
 {
     ID3D11Device *device;
     m_context->GetDevice(&device);

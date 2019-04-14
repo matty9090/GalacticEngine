@@ -26,7 +26,11 @@ SphericalQuadTreeTerrain::SphericalQuadTreeTerrain(Microsoft::WRL::ComPtr<ID3D11
     : m_context(deviceContext),
       m_planet(planet),
       m_world(planet->GetMatrix()),
-      m_radius((float)(planet->GetSettings().Radius / Constants::Scale))
+      m_radius((float)(planet->GetSettings().Radius / Constants::Scale)),
+	  m_effect(nullptr),
+	  m_normalMaps(nullptr),
+	  m_texBiomes(nullptr),
+	  m_textures(nullptr)
 {
     m_context->GetDevice(&m_device);
 
