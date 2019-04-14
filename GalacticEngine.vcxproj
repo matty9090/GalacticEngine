@@ -236,6 +236,7 @@
     <ClInclude Include="Inc\Scene\Camera.hpp" />
     <ClInclude Include="Inc\Scene\ILightSource.hpp" />
     <ClInclude Include="Inc\Scene\IStarSystem.hpp" />
+    <ClInclude Include="Inc\Scene\Model.hpp" />
     <ClInclude Include="Inc\Scene\SimpleStarSystem.hpp" />
     <ClInclude Include="Inc\StepTimer.h" />
     <ClInclude Include="Inc\Utils\Json.hpp" />
@@ -282,6 +283,7 @@
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeWater.cpp" />
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\TerrainNode.cpp" />
     <ClCompile Include="Src\Scene\Camera.cpp" />
+    <ClCompile Include="Src\Scene\Model.cpp" />
     <ClCompile Include="Src\Scene\SimpleStarSystem.cpp" />
     <ClCompile Include="Src\Utils\PlanetGenerator.cpp" />
     <ClCompile Include="Src\Utils\Shapes.cpp" />

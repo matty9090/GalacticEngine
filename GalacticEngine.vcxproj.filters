@@ -191,6 +191,9 @@
     <ClInclude Include="Inc\Utils\Json.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Scene\Model.hpp">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Game.cpp">
@@ -281,6 +284,9 @@
     </ClCompile>
     <ClCompile Include="Src\Render\SphericalQuadTreeTerrain\SphericalQuadTreeWater.cpp">
       <Filter>Render\SphericalQuadTreeTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Model.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
